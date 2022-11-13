@@ -1,12 +1,9 @@
-import Background from "./background/background";
 import { gameScreenHeight, gameScreenWidth } from "./constants";
+import WallCollection from "./entities/wallColection";
+import FighterType from "./enums/fighterType";
+import Fighter from "./fighter";
 import "./style.css";
-
-const appCanvas: HTMLCanvasElement = document.getElementById(
-  "appCanvas"
-) as HTMLCanvasElement;
-appCanvas.width = window.innerWidth;
-appCanvas.height = window.innerHeight;
+import Vector2D from "./utilities/vector2d";
 
 const gameCanvas: HTMLCanvasElement = document.getElementById(
   "gameCanvas"
@@ -14,19 +11,22 @@ const gameCanvas: HTMLCanvasElement = document.getElementById(
 gameCanvas.width = gameScreenWidth;
 gameCanvas.height = gameScreenHeight;
 
-const appCtx = appCanvas.getContext("2d")!;
 const gameCtx = gameCanvas.getContext("2d")!;
 
-const background: Background = new Background();
+const player: Fighter = new Fighter(
+  new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2),
+  FighterType.Player
+);
 
-animateBackground();
+const walls: WallCollection = new WallCollection();
 
-function animateBackground(time: number = 0) {
-  appCanvas.width = window.innerWidth;
-  appCanvas.height = window.innerHeight;
+animate();
 
-  background.update();
-  background.show(appCtx);
+function animate(time: number = 0) {
+  gameCtx.clearRect(0, 0, gameCtx.canvas.width, gameCtx.canvas.height);
 
-  requestAnimationFrame(animateBackground);
+  walls.draw(gameCtx);
+  player.update(walls.collection);
+  player.show(gameCtx);
+  requestAnimationFrame(animate);
 }

@@ -1,8 +1,6 @@
-//import { rotate } from "mathjs";
-
 class Vector2D {
-  x: number;
-  y: number;
+  readonly x: number;
+  readonly y: number;
 
   constructor(x: number, y: number) {
     this.x = x;
@@ -13,40 +11,42 @@ class Vector2D {
     return new Vector2D(Math.cos(angle), Math.sin(angle));
   };
 
-  normalize = () => {
+  copy = (): Vector2D => new Vector2D(this.x, this.y);
+
+  normalize = (): Vector2D => {
     const length: number = this.getLength();
-    this.x = this.x / length;
-    this.y = this.y / length;
+    return new Vector2D(this.x / length, this.y / length);
   };
 
-  add = (secondVector: Vector2D) => {
-    this.x += secondVector.x;
-    this.y += secondVector.y;
+  add = (other: Vector2D): Vector2D => {
+    return new Vector2D(this.x + other.x, this.y + other.y);
   };
 
-  multiply = (num: number) => {
-    this.x *= num;
-    this.y *= num;
+  multiply = (num: number): Vector2D => {
+    return new Vector2D(this.x * num, this.y * num);
   };
 
-  rotate = (angle: number) => {
-    //const [newX, newY] = rotate([this.x, this.y], angle);
-    const newX = Math.cos(angle * this.x) - Math.sin(angle * this.y);
-    const newY = Math.sin(angle * this.x) + Math.cos(angle * this.y);
+  rotate = (angle: number): Vector2D => {
+    const newX = this.x * Math.cos(angle) - this.y * Math.sin(angle);
+    const newY = this.x * Math.sin(angle) + this.y * Math.cos(angle);
 
-    this.x = newX;
-    this.y = newY;
+    return new Vector2D(newX, newY);
   };
 
-  setMagnitude = (mag: number) => {
+  setMagnitude = (mag: number): Vector2D => {
+    let newX: number;
+    let newY: number;
+
     if (mag === 0) {
-      this.x = 0;
-      this.y = 0;
+      newX = 0;
+      newY = 0;
     } else {
       const length: number = this.getLength();
-      this.x = this.x * (mag / length);
-      this.y = this.y * (mag / length);
+      newX = this.x * (mag / length);
+      newY = this.y * (mag / length);
     }
+
+    return new Vector2D(newX, newY);
   };
 
   distanceFrom = (point: Vector2D): number => {

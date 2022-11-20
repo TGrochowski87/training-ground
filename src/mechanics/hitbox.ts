@@ -1,5 +1,5 @@
-import Fighter from "../fighter";
-import Vector2D from "../utilities/vector2d";
+import Fighter from "fighter";
+import Vector2D from "utilities/vector2d";
 
 class Hitbox {
   object: Fighter;

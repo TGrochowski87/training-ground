@@ -1,9 +1,9 @@
 import { gameScreenHeight, gameScreenWidth } from "./constants";
-import WallCollection from "./entities/wallColection";
-import FighterType from "./enums/fighterType";
-import Fighter from "./fighter";
-import "./style.css";
-import Vector2D from "./utilities/vector2d";
+import WallCollection from "entities/wallCollection";
+import FighterType from "enums/fighterType";
+import Fighter from "fighter";
+import "style.css";
+import Vector2D from "utilities/vector2d";
 
 const gameCanvas: HTMLCanvasElement = document.getElementById(
   "gameCanvas"
@@ -26,7 +26,7 @@ function animate(time: number = 0) {
   gameCtx.clearRect(0, 0, gameCtx.canvas.width, gameCtx.canvas.height);
 
   walls.draw(gameCtx);
-  player.update(walls.collection);
   player.show(gameCtx);
+  player.update(walls.collection, gameCtx);
   requestAnimationFrame(animate);
 }

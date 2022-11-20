@@ -14,8 +14,9 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
-    "rootDir": "src",
-    "rootDirs": ["src", "public"]
+    "baseUrl": "./src",
+    "paths": {
+      "~/*": ["./*"]
+    }
   },
-  "include": ["src"]
 }

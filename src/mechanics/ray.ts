@@ -1,9 +1,9 @@
 import { gunPointOffset } from "../constants";
-import Wall from "../entities/wall";
-import RayType from "../enums/RayType";
-import SensorReading from "../models/SensorReading";
-import { getIntersection } from "../utilities/mechanicsFunctions";
-import Vector2D from "../utilities/vector2d";
+import Wall from "entities/wall";
+import RayType from "enums/RayType";
+import SensorReading from "models/SensorReading";
+import { getIntersection } from "utilities/mechanicsFunctions";
+import Vector2D from "utilities/vector2d";
 
 class Ray {
   start: Vector2D;

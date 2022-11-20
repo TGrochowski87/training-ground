@@ -1,10 +1,10 @@
 import { gunPointOffset, playerSpeed } from "./constants";
-import Wall from "./entities/wall";
-import FighterType from "./enums/fighterType";
-import RayType from "./enums/RayType";
-import Controls from "./mechanics/controls";
-import Ray from "./mechanics/ray";
-import Vector2D from "./utilities/vector2d";
+import Wall from "entities/wall";
+import FighterType from "enums/fighterType";
+import RayType from "enums/RayType";
+import Controls from "mechanics/controls";
+import Ray from "mechanics/ray";
+import Vector2D from "utilities/vector2d";
 
 class Fighter {
   position: Vector2D;
@@ -23,9 +23,10 @@ class Fighter {
 
     this.aimRay = new Ray(gunPointOffset, RayType.Aim);
   }
+
   // fix rootDir
-  update = (walls: Wall[]): void => {
-    this.move();
+  update = (walls: Wall[], ctx: CanvasRenderingContext2D): void => {
+    this.move(walls, ctx);
     this.aimRay.update(this.position, this.angle, walls);
   };
 
@@ -51,9 +52,10 @@ class Fighter {
     this.aimRay.draw(ctx);
   };
 
-  private move = (): void => {
+  private move = (walls: Wall[], ctx: CanvasRenderingContext2D): void => {
     if (this.controls.forward) {
       let displacementVector = new Vector2D(0, -playerSpeed).rotate(this.angle);
+      displacementVector.visualize(ctx, this.position, 10);
       this.position = this.position.add(displacementVector);
     }
     if (this.controls.backward) {
@@ -68,6 +70,19 @@ class Fighter {
     if (this.controls.left) {
       this.angle -= 0.08 * flip;
     }
+  };
+
+  // 0. Check only the closest walls
+  // 1. Calculate line function formula from every like of the wall by points
+  // 2. Calculate distance between the line and the center of the player circle
+  // 3. If the distance is lower than player's circle's radius, then the collision occurs
+
+  // 4. Create a return force vector from the wall
+  // 5. Move the vector to player's center
+  // 6. Sum the vectors (might be more than 2)
+  // 7. Apply the new vector
+  detectCollisionWithWalls = (walls: Wall[]) => {
+    let collidingWalls = [];
   };
 }
 

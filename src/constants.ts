@@ -1,4 +1,4 @@
-import Vector2D from "./utilities/vector2d";
+import Vector2D from "utilities/vector2d";
 
 export const gameScreenWidth: number = 700;
 export const gameScreenHeight: number = 700;

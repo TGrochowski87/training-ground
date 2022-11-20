@@ -5,9 +5,12 @@ import RayType from "enums/RayType";
 import Controls from "mechanics/controls";
 import Ray from "mechanics/ray";
 import Vector2D from "utilities/vector2d";
+import { pointsDistanceFromLineSegment } from "./utilities/mathExtensions";
 
 class Fighter {
   position: Vector2D;
+  radius: number = 10;
+
   type: FighterType;
 
   controls: Controls;
@@ -37,7 +40,7 @@ class Fighter {
 
     ctx.fillStyle = "#566040";
     ctx.beginPath();
-    ctx.arc(0, 0, 10, 0, Math.PI * 2);
+    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.strokeStyle = "black";
@@ -56,7 +59,10 @@ class Fighter {
     if (this.controls.forward) {
       let displacementVector = new Vector2D(0, -playerSpeed).rotate(this.angle);
       displacementVector.visualize(ctx, this.position, 10);
-      this.position = this.position.add(displacementVector);
+      const newPosition: Vector2D = this.position.add(displacementVector);
+      if (this.detectCollisionWithWalls(walls, newPosition) === false) {
+        this.position = newPosition;
+      }
     }
     if (this.controls.backward) {
       let displacementVector = new Vector2D(0, playerSpeed).rotate(this.angle);
@@ -81,8 +87,43 @@ class Fighter {
   // 5. Move the vector to player's center
   // 6. Sum the vectors (might be more than 2)
   // 7. Apply the new vector
-  detectCollisionWithWalls = (walls: Wall[]) => {
+  private detectCollisionWithWalls = (
+    walls: Wall[],
+    newPlayerPosition: Vector2D
+  ) => {
     let collidingWalls = [];
+
+    for (const wall of walls) {
+      const { topLeft, topRight, bottomLeft, bottomRight } = wall;
+      const points = [
+        [topLeft, topRight],
+        [topRight, bottomRight],
+        [bottomRight, bottomLeft],
+        [bottomLeft, topLeft],
+      ];
+
+      for (let i = 0; i < points.length; i++) {
+        const distanceFromPlayerCenter = pointsDistanceFromLineSegment(
+          newPlayerPosition,
+          points[i][0],
+          points[i][1]
+        );
+        if (distanceFromPlayerCenter.distance <= this.radius) {
+          collidingWalls.push(wall);
+          break;
+        }
+      }
+
+      // Lets try for max 2 walls
+      // if (collidingWalls.length === 2) {
+      //   break;
+      // }
+    }
+
+    if (collidingWalls.length > 0) {
+      return true;
+    }
+    return false;
   };
 }
 

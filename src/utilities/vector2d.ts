@@ -66,7 +66,7 @@ class Vector2D {
     return new Vector2D(newX, newY);
   };
 
-  distanceFrom = (point: Vector2D): number => {
+  distanceFromPoint = (point: Vector2D): number => {
     return Math.sqrt(
       Math.pow(this.x - point.x, 2) + Math.pow(this.y - point.y, 2)
     );

@@ -1,10 +1,10 @@
 import Vector2D from "utilities/vector2d";
 
 class Wall {
-  topLeft: Vector2D;
-  topRight: Vector2D;
-  bottomLeft: Vector2D;
-  bottomRight: Vector2D;
+  readonly topLeft: Vector2D;
+  readonly topRight: Vector2D;
+  readonly bottomLeft: Vector2D;
+  readonly bottomRight: Vector2D;
 
   constructor(
     topLeft: Vector2D,

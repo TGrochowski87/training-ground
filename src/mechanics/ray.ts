@@ -75,7 +75,7 @@ class Ray {
     ctx.stroke();
   };
 
-  private getIntersectionReading = (walls: Wall[]) => {
+  private getIntersectionReading = (walls: Wall[]): SensorReading | null => {
     let intersections: SensorReading[] = [];
 
     // Processed by splitting every wall into four separate lines

@@ -1,4 +1,4 @@
-import { gameScreenHeight, gameScreenWidth } from "constants";
+import { gameScreenHeight, gameScreenWidth } from "../constants";
 import Vector2D from "utilities/vector2d";
 import Wall from "entities/wall";
 

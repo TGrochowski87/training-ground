@@ -6,6 +6,7 @@ import Controls from "mechanics/controls";
 import Ray from "mechanics/ray";
 import Vector2D from "utilities/vector2d";
 import { pointsDistanceFromLineSegment } from "./utilities/mathExtensions";
+import DistanceData from "./models/distanceData";
 
 class Fighter {
   position: Vector2D;
@@ -58,14 +59,34 @@ class Fighter {
   private move = (walls: Wall[], ctx: CanvasRenderingContext2D): void => {
     if (this.controls.forward) {
       let displacementVector = new Vector2D(0, -playerSpeed).rotate(this.angle);
-      displacementVector.visualize(ctx, this.position, 10);
-      const newPosition: Vector2D = this.position.add(displacementVector);
-      if (this.detectCollisionWithWalls(walls, newPosition) === false) {
-        this.position = newPosition;
-      }
+
+      displacementVector = this.applyCollisionToDisplacementVector(
+        walls,
+        displacementVector
+      );
+
+      let componentX = new Vector2D(displacementVector.x, 0);
+      let componentY = new Vector2D(0, displacementVector.y);
+
+      componentX.visualize(ctx, this.position, 10);
+      componentY.visualize(ctx, this.position, 10);
+
+      this.position = this.position.add(displacementVector);
     }
     if (this.controls.backward) {
       let displacementVector = new Vector2D(0, playerSpeed).rotate(this.angle);
+
+      displacementVector = this.applyCollisionToDisplacementVector(
+        walls,
+        displacementVector
+      );
+
+      let componentX = new Vector2D(displacementVector.x, 0);
+      let componentY = new Vector2D(0, displacementVector.y);
+
+      componentX.visualize(ctx, this.position, 10);
+      componentY.visualize(ctx, this.position, 10);
+
       this.position = this.position.add(displacementVector);
     }
 
@@ -78,20 +99,33 @@ class Fighter {
     }
   };
 
-  // 0. Check only the closest walls
-  // 1. Calculate line function formula from every like of the wall by points
-  // 2. Calculate distance between the line and the center of the player circle
-  // 3. If the distance is lower than player's circle's radius, then the collision occurs
+  private applyCollisionToDisplacementVector = (
+    walls: Wall[],
+    displacementVector: Vector2D
+  ): Vector2D => {
+    const newPosition: Vector2D = this.position.add(displacementVector);
+    const collisions = this.detectCollisionWithWalls(walls, newPosition);
 
-  // 4. Create a return force vector from the wall
-  // 5. Move the vector to player's center
-  // 6. Sum the vectors (might be more than 2)
-  // 7. Apply the new vector
+    for (const collision of collisions) {
+      const { intersectionPoint } = collision;
+
+      // Diagonal walls not supported
+      if (Math.floor(intersectionPoint.x) === Math.floor(newPosition.x)) {
+        displacementVector = new Vector2D(displacementVector.x, 0);
+      }
+      if (Math.floor(intersectionPoint.y) === Math.floor(newPosition.y)) {
+        displacementVector = new Vector2D(0, displacementVector.y);
+      }
+    }
+
+    return displacementVector;
+  };
+
   private detectCollisionWithWalls = (
     walls: Wall[],
     newPlayerPosition: Vector2D
-  ) => {
-    let collidingWalls = [];
+  ): DistanceData[] => {
+    let collisions: DistanceData[] = [];
 
     for (const wall of walls) {
       const { topLeft, topRight, bottomLeft, bottomRight } = wall;
@@ -109,21 +143,18 @@ class Fighter {
           points[i][1]
         );
         if (distanceFromPlayerCenter.distance <= this.radius) {
-          collidingWalls.push(wall);
+          collisions.push(distanceFromPlayerCenter);
           break;
         }
       }
 
-      // Lets try for max 2 walls
-      // if (collidingWalls.length === 2) {
-      //   break;
-      // }
+      // Max two walls possible
+      if (collisions.length === 2) {
+        break;
+      }
     }
 
-    if (collidingWalls.length > 0) {
-      return true;
-    }
-    return false;
+    return collisions;
   };
 }
 

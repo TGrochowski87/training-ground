@@ -1,4 +1,5 @@
-import Vector2D from "./vector2d";
+import DistanceData from "~/models/distanceData";
+import Vector2D from "~/utilities/vector2d";
 
 export const randomBetween = (min: number = 0, max: number = 1) => {
   return Math.random() * (max - min) + min;
@@ -52,8 +53,3 @@ export const pointsDistanceFromLineSegment = (
     intersectionPoint: new Vector2D(xx, yy),
   };
 };
-
-interface DistanceData {
-  distance: number;
-  intersectionPoint: Vector2D;
-}

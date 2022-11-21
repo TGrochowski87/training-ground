@@ -81,19 +81,19 @@ class Ray {
     // Processed by splitting every wall into four separate lines
     for (let i = 0; i < walls.length; i++) {
       const { topLeft, topRight, bottomLeft, bottomRight } = walls[i];
-      const points = [
+      const lines = [
         [topLeft, topRight],
         [topRight, bottomRight],
         [bottomRight, bottomLeft],
         [bottomLeft, topLeft],
       ];
 
-      for (let j = 0; j < points.length; j++) {
+      for (let j = 0; j < lines.length; j++) {
         const intersection: SensorReading | null = getIntersection(
           this.start,
           this.end,
-          points[j][0],
-          points[j][1]
+          lines[j][0],
+          lines[j][1]
         );
 
         if (intersection) {

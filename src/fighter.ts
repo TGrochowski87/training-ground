@@ -62,7 +62,8 @@ class Fighter {
 
       displacementVector = this.applyCollisionToDisplacementVector(
         walls,
-        displacementVector
+        displacementVector,
+        ctx
       );
 
       let componentX = new Vector2D(displacementVector.x, 0);
@@ -78,7 +79,8 @@ class Fighter {
 
       displacementVector = this.applyCollisionToDisplacementVector(
         walls,
-        displacementVector
+        displacementVector,
+        ctx
       );
 
       let componentX = new Vector2D(displacementVector.x, 0);
@@ -101,20 +103,44 @@ class Fighter {
 
   private applyCollisionToDisplacementVector = (
     walls: Wall[],
-    displacementVector: Vector2D
+    displacementVector: Vector2D,
+    ctx: CanvasRenderingContext2D
   ): Vector2D => {
     const newPosition: Vector2D = this.position.add(displacementVector);
     const collisions = this.detectCollisionWithWalls(walls, newPosition);
+    console.log(collisions.length);
 
     for (const collision of collisions) {
       const { intersectionPoint } = collision;
 
-      // Diagonal walls not supported
-      if (Math.floor(intersectionPoint.x) === Math.floor(newPosition.x)) {
+      ctx.fillStyle = "#21A92F";
+      ctx.beginPath();
+      ctx.arc(intersectionPoint.x, intersectionPoint.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (
+        Math.floor(intersectionPoint.x) > Math.floor(newPosition.x) &&
+        displacementVector.x > 0
+      ) {
+        displacementVector = new Vector2D(0, displacementVector.y);
+      }
+      if (
+        Math.floor(intersectionPoint.x) < Math.floor(newPosition.x) &&
+        displacementVector.x < 0
+      ) {
+        displacementVector = new Vector2D(0, displacementVector.y);
+      }
+      if (
+        Math.floor(intersectionPoint.y) > Math.floor(newPosition.y) &&
+        displacementVector.y > 0
+      ) {
         displacementVector = new Vector2D(displacementVector.x, 0);
       }
-      if (Math.floor(intersectionPoint.y) === Math.floor(newPosition.y)) {
-        displacementVector = new Vector2D(0, displacementVector.y);
+      if (
+        Math.floor(intersectionPoint.y) < Math.floor(newPosition.y) &&
+        displacementVector.y < 0
+      ) {
+        displacementVector = new Vector2D(displacementVector.x, 0);
       }
     }
 
@@ -129,23 +155,37 @@ class Fighter {
 
     for (const wall of walls) {
       const { topLeft, topRight, bottomLeft, bottomRight } = wall;
-      const points = [
+      const lines = [
         [topLeft, topRight],
         [topRight, bottomRight],
         [bottomRight, bottomLeft],
         [bottomLeft, topLeft],
       ];
 
-      for (let i = 0; i < points.length; i++) {
+      let collidingWalls: DistanceData[] = [];
+      for (let i = 0; i < lines.length; i++) {
         const distanceFromPlayerCenter = pointsDistanceFromLineSegment(
           newPlayerPosition,
-          points[i][0],
-          points[i][1]
+          lines[i][0],
+          lines[i][1]
         );
         if (distanceFromPlayerCenter.distance <= this.radius) {
-          collisions.push(distanceFromPlayerCenter);
-          break;
+          collidingWalls.push(distanceFromPlayerCenter);
         }
+      }
+
+      if (collidingWalls.length > 0) {
+        // Take the single closest collision
+        const collisionToAdd =
+          collidingWalls.length > 1
+            ? collidingWalls.filter(
+                (c) =>
+                  c.distance ===
+                  Math.min(...collidingWalls.map((col) => col.distance))
+              )[0]
+            : collidingWalls[0];
+
+        collisions.push(collisionToAdd);
       }
 
       // Max two walls possible

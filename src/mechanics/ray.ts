@@ -1,4 +1,4 @@
-import { aimRayLength, gunPointOffset, sensorLength } from "../constants";
+import { aimRayLength, gunPointOffset, sensorRayLength } from "../constants";
 import Wall from "entities/wall";
 import RayType from "enums/RayType";
 import SensorReading from "models/SensorReading";
@@ -6,9 +6,9 @@ import { getIntersection } from "utilities/mechanicsFunctions";
 import Vector2D from "utilities/vector2d";
 
 class Ray {
+  readonly angle: number;
   start: Vector2D;
   end: Vector2D;
-  angle: number;
   length: number;
 
   width: number;
@@ -17,9 +17,9 @@ class Ray {
 
   intersectionReading: SensorReading | null = null;
 
-  constructor(start: Vector2D, type: RayType) {
+  constructor(start: Vector2D, type: RayType, angle: number = 0) {
     this.start = start.copy();
-    this.angle = 0;
+    this.angle = angle;
     this.end = new Vector2D(0, 0);
 
     if (type === RayType.Aim) {
@@ -31,21 +31,21 @@ class Ray {
       this.color = "yellow";
       this.readingColor = "grey";
       this.width = 2;
-      this.length = sensorLength;
+      this.length = sensorRayLength;
     }
   }
 
   update = (
     newStartingPoint: Vector2D,
-    newAngle: number,
+    additionalRotation: number,
     walls: Wall[]
   ): void => {
-    this.start = newStartingPoint.copy().add(gunPointOffset.rotate(this.angle));
-    this.angle = newAngle;
+    this.start = newStartingPoint;
+    const newAngle = this.angle + additionalRotation;
 
     this.end = new Vector2D(
-      this.start.x + Math.sin(this.angle) * this.length,
-      this.start.y - Math.cos(this.angle) * this.length
+      this.start.x + Math.sin(newAngle) * this.length,
+      this.start.y - Math.cos(newAngle) * this.length
     );
 
     this.intersectionReading = this.getIntersectionReading(walls);

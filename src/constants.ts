@@ -12,8 +12,10 @@ export const playerRadius: number = 10;
 // Bullets
 export const bulletSpeed: number = 12;
 export const bulletRadius: number = 3;
-export const bulletMaxDistance: number = 200;
+export const bulletMaxDistance: number = 150;
 
 // Rays
-export const aimRayLength: number = 200;
-export const sensorLength: number = 300;
+export const aimRayLength: number = 150;
+export const sensorRayLength: number = 200;
+export const sensorRaySpread: number = Math.PI * 2;
+export const sensorRayCount: number = 16;

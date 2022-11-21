@@ -8,6 +8,7 @@ import Vector2D from "utilities/vector2d";
 import { pointsDistanceFromLineSegment } from "../utilities/mathExtensions";
 import DistanceData from "../models/distanceData";
 import Bullet from "./bullet";
+import Sensor from "~/mechanics/sensor";
 
 class Fighter {
   position: Vector2D;
@@ -22,6 +23,9 @@ class Fighter {
   bullets: Bullet[] = [];
   canShoot: boolean = true;
 
+  // AI stuff (TODO: move to different Fighter class)
+  sensor: Sensor;
+
   constructor(pos: Vector2D, fighterType: FighterType) {
     this.position = pos.copy();
     this.type = fighterType;
@@ -30,19 +34,27 @@ class Fighter {
     this.controls = new Controls();
 
     this.aimRay = new Ray(gunPointOffset, RayType.Aim);
+    this.sensor = new Sensor(this);
   }
 
   update = (walls: Wall[]): void => {
     this.move(walls);
-    this.aimRay.update(this.position, this.angle, walls);
+    this.aimRay.update(
+      this.position.add(gunPointOffset.rotate(this.angle)),
+      this.angle,
+      walls
+    );
 
+    this.sensor.update(walls);
     this.bullets = this.bullets.filter(
       (bullet) => bullet.toBeDeleted === false
     );
     this.bullets.forEach((bullet) => bullet.update(walls));
   };
 
-  show = (ctx: CanvasRenderingContext2D): void => {
+  draw = (ctx: CanvasRenderingContext2D): void => {
+    this.sensor.draw(ctx);
+
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
     ctx.rotate(this.angle);

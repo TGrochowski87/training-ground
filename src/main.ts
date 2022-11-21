@@ -25,8 +25,8 @@ animate();
 function animate(time: number = 0) {
   gameCtx.clearRect(0, 0, gameCtx.canvas.width, gameCtx.canvas.height);
 
+  player.draw(gameCtx);
   walls.draw(gameCtx);
-  player.show(gameCtx);
   player.update(walls.collection);
   requestAnimationFrame(animate);
 }

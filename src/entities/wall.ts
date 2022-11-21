@@ -1,10 +1,12 @@
 import Vector2D from "utilities/vector2d";
 
 class Wall {
-  readonly topLeft: Vector2D;
-  readonly topRight: Vector2D;
-  readonly bottomLeft: Vector2D;
-  readonly bottomRight: Vector2D;
+  private readonly topLeft: Vector2D;
+  private readonly topRight: Vector2D;
+  private readonly bottomLeft: Vector2D;
+  private readonly bottomRight: Vector2D;
+
+  lines: [Vector2D, Vector2D][];
 
   constructor(
     topLeft: Vector2D,
@@ -16,6 +18,13 @@ class Wall {
     this.topRight = topRight;
     this.bottomLeft = bottomLeft;
     this.bottomRight = bottomRight;
+
+    this.lines = [
+      [this.topLeft, this.topRight],
+      [this.topRight, this.bottomRight],
+      [this.bottomRight, this.bottomLeft],
+      [this.bottomLeft, this.topLeft],
+    ];
   }
 
   draw = (ctx: CanvasRenderingContext2D): void => {

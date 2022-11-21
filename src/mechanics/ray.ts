@@ -1,4 +1,4 @@
-import { gunPointOffset } from "../constants";
+import { aimRayLength, gunPointOffset, sensorLength } from "../constants";
 import Wall from "entities/wall";
 import RayType from "enums/RayType";
 import SensorReading from "models/SensorReading";
@@ -26,12 +26,12 @@ class Ray {
       this.color = "#BD1000";
       this.readingColor = "#00000000";
       this.width = 1;
-      this.length = 200;
+      this.length = aimRayLength;
     } else {
       this.color = "yellow";
       this.readingColor = "grey";
       this.width = 2;
-      this.length = 300;
+      this.length = sensorLength;
     }
   }
 
@@ -80,13 +80,7 @@ class Ray {
 
     // Processed by splitting every wall into four separate lines
     for (let i = 0; i < walls.length; i++) {
-      const { topLeft, topRight, bottomLeft, bottomRight } = walls[i];
-      const lines = [
-        [topLeft, topRight],
-        [topRight, bottomRight],
-        [bottomRight, bottomLeft],
-        [bottomLeft, topLeft],
-      ];
+      const { lines } = walls[i];
 
       for (let j = 0; j < lines.length; j++) {
         const intersection: SensorReading | null = getIntersection(

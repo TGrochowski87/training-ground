@@ -54,7 +54,7 @@ class Controls {
           this.backward = false;
           break;
         case " ":
-          this.shoot = true;
+          this.shoot = false;
           break;
 
         default:

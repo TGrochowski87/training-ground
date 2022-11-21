@@ -1,7 +1,7 @@
 import { gameScreenHeight, gameScreenWidth } from "./constants";
 import WallCollection from "entities/wallCollection";
 import FighterType from "enums/fighterType";
-import Fighter from "fighter";
+import Fighter from "~/entities/fighter";
 import "style.css";
 import Vector2D from "utilities/vector2d";
 
@@ -27,6 +27,6 @@ function animate(time: number = 0) {
 
   walls.draw(gameCtx);
   player.show(gameCtx);
-  player.update(walls.collection, gameCtx);
+  player.update(walls.collection);
   requestAnimationFrame(animate);
 }

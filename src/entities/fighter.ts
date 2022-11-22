@@ -1,14 +1,14 @@
-import { gunPointOffset, playerRadius, playerSpeed } from "../constants";
+import { gunPointOffset, playerRadius, playerSpeed } from "configuration";
 import Wall from "entities/wall";
-import FighterType from "enums/fighterType";
-import RayType from "enums/RayType";
+import FighterType from "enums/fighter-type";
+import RayType from "enums/ray-type";
 import Controls from "mechanics/controls";
 import Ray from "mechanics/ray";
 import Vector2D from "utilities/vector2d";
-import { pointsDistanceFromLineSegment } from "../utilities/mathExtensions";
-import DistanceData from "../models/distanceData";
-import Bullet from "./bullet";
-import Sensor from "~/mechanics/sensor";
+import { pointsDistanceFromLineSegment } from "utilities/math-extensions";
+import DistanceData from "models/distance-data";
+import Bullet from "entities/bullet";
+import Sensor from "mechanics/sensor";
 
 class Fighter {
   position: Vector2D;

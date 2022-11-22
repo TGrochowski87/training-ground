@@ -1,7 +1,7 @@
-import { gameScreenHeight, gameScreenWidth } from "./constants";
-import WallCollection from "entities/wallCollection";
-import FighterType from "enums/fighterType";
-import Fighter from "~/entities/fighter";
+import { gameScreenHeight, gameScreenWidth } from "configuration";
+import WallCollection from "entities/wall-collection";
+import FighterType from "enums/fighter-type";
+import Fighter from "entities/fighter";
 import "style.css";
 import Vector2D from "utilities/vector2d";
 

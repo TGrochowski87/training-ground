@@ -1,7 +1,7 @@
-import { bulletMaxDistance, bulletRadius, bulletSpeed } from "~/constants";
-import { getIntersection } from "~/utilities/mechanicsFunctions";
-import Vector2D from "~/utilities/vector2d";
-import Wall from "./wall";
+import { bulletMaxDistance, bulletRadius, bulletSpeed } from "configuration";
+import { getIntersection } from "utilities/mechanics-functions";
+import Vector2D from "utilities/vector2d";
+import Wall from "entities/wall";
 
 class Bullet {
   position: Vector2D;

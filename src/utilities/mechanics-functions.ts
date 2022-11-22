@@ -1,4 +1,4 @@
-import SensorReading from "models/SensorReading";
+import SensorReading from "models/sensor-reading";
 import Vector2D from "utilities/vector2d";
 
 export const lerp = (A: number, B: number, percentage: number): number => {

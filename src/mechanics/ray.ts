@@ -1,8 +1,8 @@
-import { aimRayLength, gunPointOffset, sensorRayLength } from "../constants";
+import { aimRayLength, sensorRayLength } from "configuration";
 import Wall from "entities/wall";
-import RayType from "enums/RayType";
-import SensorReading from "models/SensorReading";
-import { getIntersection } from "utilities/mechanicsFunctions";
+import RayType from "enums/ray-type";
+import SensorReading from "models/sensor-reading";
+import { getIntersection } from "utilities/mechanics-functions";
 import Vector2D from "utilities/vector2d";
 
 class Ray {

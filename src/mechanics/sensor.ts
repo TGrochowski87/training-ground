@@ -1,9 +1,9 @@
-import { sensorRayCount, sensorRaySpread } from "~/constants";
-import Ray from "~/mechanics/ray";
-import Fighter from "~/entities/fighter";
-import { lerp } from "~/utilities/mechanicsFunctions";
-import RayType from "~/enums/RayType";
-import Wall from "~/entities/wall";
+import { sensorRayCount, sensorRaySpread } from "configuration";
+import Ray from "mechanics/ray";
+import Fighter from "entities/fighter";
+import { lerp } from "utilities/mechanics-functions";
+import RayType from "enums/ray-type";
+import Wall from "entities/wall";
 
 class Sensor {
   source: Fighter;

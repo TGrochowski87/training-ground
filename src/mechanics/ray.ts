@@ -1,8 +1,8 @@
 import { aimRayLength, sensorRayLength } from "configuration";
 import Wall from "entities/wall";
-import RayType from "enums/ray-type";
-import SensorReading from "models/sensor-reading";
-import { getIntersection } from "utilities/mechanics-functions";
+import RayType from "enums/rayType";
+import SensorReading from "models/sensorReading";
+import { getIntersection } from "utilities/mechanicsFunctions";
 import Vector2D from "utilities/vector2d";
 
 class Ray {
@@ -35,11 +35,7 @@ class Ray {
     }
   }
 
-  update = (
-    newStartingPoint: Vector2D,
-    additionalRotation: number,
-    walls: Wall[]
-  ): void => {
+  update = (newStartingPoint: Vector2D, additionalRotation: number, walls: Wall[]): void => {
     this.start = newStartingPoint;
     const newAngle = this.angle + additionalRotation;
 
@@ -54,10 +50,7 @@ class Ray {
   draw = (ctx: CanvasRenderingContext2D): void => {
     let changePoint: Vector2D = this.end;
     if (this.intersectionReading) {
-      changePoint = new Vector2D(
-        this.intersectionReading.x,
-        this.intersectionReading.y
-      );
+      changePoint = new Vector2D(this.intersectionReading.x, this.intersectionReading.y);
     }
 
     ctx.lineWidth = this.width;
@@ -83,12 +76,7 @@ class Ray {
       const { lines } = walls[i];
 
       for (let j = 0; j < lines.length; j++) {
-        const intersection: SensorReading | null = getIntersection(
-          this.start,
-          this.end,
-          lines[j][0],
-          lines[j][1]
-        );
+        const intersection: SensorReading | null = getIntersection(this.start, this.end, lines[j][0], lines[j][1]);
 
         if (intersection) {
           intersections.push(intersection);
@@ -99,9 +87,9 @@ class Ray {
     if (intersections.length === 0) {
       return null;
     } else {
-      const offsets = intersections.map((i) => i.offset);
+      const offsets = intersections.map(i => i.offset);
       const minOffset = Math.min(...offsets);
-      return intersections.find((i) => i.offset === minOffset) || null;
+      return intersections.find(i => i.offset === minOffset) || null;
     }
   };
 }

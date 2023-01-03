@@ -1,5 +1,5 @@
 import { bulletMaxDistance, bulletRadius, bulletSpeed } from "configuration";
-import { getIntersection } from "utilities/mechanics-functions";
+import { getIntersection } from "utilities/mechanicsFunctions";
 import Vector2D from "utilities/vector2d";
 import Wall from "entities/wall";
 
@@ -46,17 +46,12 @@ class Bullet {
     }
   };
 
-  private detectCollisionWithWalls = (
-    walls: Wall[],
-    newPosition: Vector2D
-  ): boolean => {
+  private detectCollisionWithWalls = (walls: Wall[], newPosition: Vector2D): boolean => {
     for (const wall of walls) {
       const { lines } = wall;
 
       for (let i = 0; i < lines.length; i++) {
-        if (
-          getIntersection(this.position, newPosition, lines[i][0], lines[i][1])
-        ) {
+        if (getIntersection(this.position, newPosition, lines[i][0], lines[i][1])) {
           return true;
         }
       }

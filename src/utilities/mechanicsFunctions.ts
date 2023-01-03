@@ -1,4 +1,4 @@
-import SensorReading from "models/sensor-reading";
+import SensorReading from "models/sensorReading";
 import Vector2D from "utilities/vector2d";
 
 export const lerp = (A: number, B: number, percentage: number): number => {
@@ -11,15 +11,9 @@ export const getIntersection = (
   startB: Vector2D,
   endB: Vector2D
 ): SensorReading | null => {
-  const tTop =
-    (endB.x - startB.x) * (startA.y - startB.y) -
-    (endB.y - startB.y) * (startA.x - startB.x);
-  const uTop =
-    (startB.y - startA.y) * (startA.x - endA.x) -
-    (startB.x - startA.x) * (startA.y - endA.y);
-  const bottom =
-    (endB.y - startB.y) * (endA.x - startA.x) -
-    (endB.x - startB.x) * (endA.y - startA.y);
+  const tTop = (endB.x - startB.x) * (startA.y - startB.y) - (endB.y - startB.y) * (startA.x - startB.x);
+  const uTop = (startB.y - startA.y) * (startA.x - endA.x) - (startB.x - startA.x) * (startA.y - endA.y);
+  const bottom = (endB.y - startB.y) * (endA.x - startA.x) - (endB.x - startB.x) * (endA.y - startA.y);
 
   if (bottom != 0) {
     const t = tTop / bottom;
@@ -36,10 +30,7 @@ export const getIntersection = (
   return null;
 };
 
-export const polygonsIntersect = (
-  polygon1: Vector2D[],
-  polygon2: Vector2D[]
-): boolean => {
+export const polygonsIntersect = (polygon1: Vector2D[], polygon2: Vector2D[]): boolean => {
   for (let i = 0; i < polygon1.length; i++) {
     for (let j = 0; j < polygon2.length; j++) {
       const touch = getIntersection(
@@ -56,4 +47,21 @@ export const polygonsIntersect = (
   }
 
   return false;
+};
+
+export const getRGBAFromWeight = (value: number): string => {
+  const alpha = Math.abs(value);
+  const R = value < 0 ? 0 : 255;
+  const G = value > 0 ? 0 : 255;
+  const B = 100;
+
+  return `rgba(${R}, ${G}, ${B}, ${alpha})`;
+};
+
+export const getRGBFromWeight = (value: number): string => {
+  const R = value < 0 ? 0 : 255;
+  const G = value > 0 ? 0 : 255;
+  const B = 100;
+
+  return `rgb(${R}, ${G}, ${B})`;
 };

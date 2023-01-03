@@ -4,11 +4,20 @@ body {
 }
 
 #app {
+  padding-top: 10px;
   display: flex;
+  flex-direction: row;
   justify-content: center;
+  align-items: center;
+  gap: 30px;
 }
 
 #gameCanvas {
   background-color: #b6b6b6;
   border: 2px #222222 solid;
+}
+
+#networkCanvas {
+  background-color: #888888;
+  border: 6px #222222 solid;
 }

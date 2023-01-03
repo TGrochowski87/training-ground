@@ -18,4 +18,8 @@ export const bulletMaxDistance: number = 150;
 export const aimRayLength: number = 150;
 export const sensorRayLength: number = 200;
 export const sensorRaySpread: number = Math.PI * 2;
-export const sensorRayCount: number = 16;
+export const sensorRayCount: number = 8;
+
+// Machine Learning
+export const networkViewWidth: number = 500;
+export const networkViewHeight: number = 600;

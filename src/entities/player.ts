@@ -1,0 +1,53 @@
+import { gunPointOffset } from "configuration";
+import Wall from "entities/wall";
+import Vector2D from "utilities/vector2d";
+import Sensor from "mechanics/sensor";
+import Fighter from "./fighter";
+import PlayerControls from "mechanics/playerControls";
+
+class Player extends Fighter {
+  // AI stuff (TODO: move to different Fighter class)
+  sensor: Sensor;
+
+  constructor(pos: Vector2D) {
+    super(pos, new PlayerControls());
+
+    this.sensor = new Sensor(this);
+  }
+
+  update = (walls: Wall[]): void => {
+    this.move(walls);
+    this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls);
+
+    this.sensor.update(walls);
+    this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
+    this.bullets.forEach(bullet => bullet.update(walls));
+  };
+
+  draw = (ctx: CanvasRenderingContext2D): void => {
+    this.sensor.draw(ctx);
+
+    ctx.save();
+    ctx.translate(this.position.x, this.position.y);
+    ctx.rotate(this.angle);
+
+    ctx.fillStyle = "#566040";
+    ctx.beginPath();
+    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(8, -3);
+    ctx.lineTo(8, -13);
+    ctx.stroke();
+
+    ctx.restore();
+
+    this.aimRay.draw(ctx);
+    this.bullets.forEach(bullet => bullet.draw(ctx));
+  };
+}
+
+export default Player;

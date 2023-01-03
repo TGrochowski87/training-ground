@@ -16,6 +16,10 @@ export const gaussianRandom = () => {
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 };
 
+export const distanceBetweenPoints = (pointA: Vector2D, pointB: Vector2D): number => {
+  return Math.sqrt(Math.pow(pointB.x - pointA.x, 2) + Math.pow(pointB.y - pointA.y, 2));
+};
+
 export const pointsDistanceFromLineSegment = (
   point: Vector2D,
   segmentPointA: Vector2D,

@@ -1,31 +1,31 @@
 import { gunPointOffset } from "configuration";
 import Wall from "entities/wall";
 import Vector2D from "utilities/vector2d";
-import Sensor from "mechanics/sensor";
+import Sensor from "machine-learning/sensor";
 import Fighter from "./fighter";
 import PlayerControls from "mechanics/playerControls";
 
 class Player extends Fighter {
   // AI stuff (TODO: move to different Fighter class)
-  sensor: Sensor;
+  //sensor: Sensor;
 
   constructor(pos: Vector2D) {
     super(pos, new PlayerControls());
 
-    this.sensor = new Sensor(this);
+    //this.sensor = new Sensor(this);
   }
 
   update = (walls: Wall[]): void => {
     this.move(walls);
-    this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls);
+    this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, this);
 
-    this.sensor.update(walls);
+    //this.sensor.update(walls);
     this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
     this.bullets.forEach(bullet => bullet.update(walls));
   };
 
   draw = (ctx: CanvasRenderingContext2D): void => {
-    this.sensor.draw(ctx);
+    //this.sensor.draw(ctx);
 
     ctx.save();
     ctx.translate(this.position.x, this.position.y);

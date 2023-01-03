@@ -1,7 +1,9 @@
 import { aimRayLength, sensorRayLength } from "configuration";
+import Player from "entities/player";
 import Wall from "entities/wall";
 import RayType from "enums/rayType";
 import SensorReading from "models/sensorReading";
+import { distanceBetweenPoints, pointsDistanceFromLineSegment } from "utilities/mathExtensions";
 import { getIntersection } from "utilities/mechanicsFunctions";
 import Vector2D from "utilities/vector2d";
 
@@ -35,7 +37,7 @@ class Ray {
     }
   }
 
-  update = (newStartingPoint: Vector2D, additionalRotation: number, walls: Wall[]): void => {
+  update = (newStartingPoint: Vector2D, additionalRotation: number, walls: Wall[], player: Player): void => {
     this.start = newStartingPoint;
     const newAngle = this.angle + additionalRotation;
 
@@ -44,7 +46,7 @@ class Ray {
       this.start.y - Math.cos(newAngle) * this.length
     );
 
-    this.intersectionReading = this.getIntersectionReading(walls);
+    this.intersectionReading = this.getIntersectionReading(walls, player);
   };
 
   draw = (ctx: CanvasRenderingContext2D): void => {
@@ -68,7 +70,21 @@ class Ray {
     ctx.stroke();
   };
 
-  private getIntersectionReading = (walls: Wall[]): SensorReading | null => {
+  private getIntersectionReading = (walls: Wall[], player: Player): SensorReading | null => {
+    const readings = [this.getReadingForIntersectionWithWalls(walls), this.getReadingForIntersectionWithPlayer(player)];
+
+    const nonNullReadings = readings.filter(r => r !== null);
+
+    if (nonNullReadings.length === 0) {
+      return null;
+    } else {
+      const offsets = nonNullReadings.map(r => r!.offset);
+      const minOffset = Math.min(...offsets);
+      return nonNullReadings.find(r => r!.offset === minOffset) || null;
+    }
+  };
+
+  private getReadingForIntersectionWithWalls = (walls: Wall[]): SensorReading | null => {
     let intersections: SensorReading[] = [];
 
     // Processed by splitting every wall into four separate lines
@@ -90,6 +106,20 @@ class Ray {
       const offsets = intersections.map(i => i.offset);
       const minOffset = Math.min(...offsets);
       return intersections.find(i => i.offset === minOffset) || null;
+    }
+  };
+
+  private getReadingForIntersectionWithPlayer = (player: Player): SensorReading | null => {
+    const distanceFromPlayerCenter = pointsDistanceFromLineSegment(player.position, this.start, this.end);
+    if (distanceFromPlayerCenter.distance <= player.radius) {
+      return {
+        x: distanceFromPlayerCenter.intersectionPoint.x,
+        y: distanceFromPlayerCenter.intersectionPoint.y,
+        offset: distanceBetweenPoints(this.start, distanceFromPlayerCenter.intersectionPoint) / this.length,
+        detectedEntity: "PLAYER",
+      };
+    } else {
+      return null;
     }
   };
 }

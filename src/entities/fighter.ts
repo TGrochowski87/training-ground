@@ -26,7 +26,6 @@ abstract class Fighter {
     this.controls = controls;
   }
 
-  abstract update(walls: Wall[]): void;
   abstract draw(ctx: CanvasRenderingContext2D): void;
 
   protected move = (walls: Wall[]): void => {

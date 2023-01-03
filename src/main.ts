@@ -17,7 +17,7 @@ const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
 
 const player: Player = new Player(new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2));
-const enemies: Enemy[] = [new Enemy(new Vector2D(200, 200))];
+const enemies: Enemy[] = [new Enemy(new Vector2D(300, 300))];
 
 const walls: WallCollection = new WallCollection();
 
@@ -36,7 +36,7 @@ function manageGameCanvas(time: number) {
   player.update(walls.collection);
   player.draw(gameCtx);
   for (const enemy of enemies) {
-    enemy.update(walls.collection);
+    enemy.update(walls.collection, player);
     enemy.draw(gameCtx);
   }
   walls.draw(gameCtx);

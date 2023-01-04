@@ -12,6 +12,9 @@ gameCanvas.height = gameScreenHeight;
 const networkCanvas: HTMLCanvasElement = document.getElementById("networkCanvas") as HTMLCanvasElement;
 networkCanvas.width = networkViewWidth;
 networkCanvas.height = networkViewHeight;
+networkCanvas.style.display = "none";
+
+const networkDisplayButton: HTMLButtonElement = document.getElementById("show-hide-button") as HTMLButtonElement;
 
 const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
@@ -21,11 +24,30 @@ const enemies: Enemy[] = [new Enemy(new Vector2D(300, 300))];
 
 const walls: WallCollection = new WallCollection();
 
+let networkDrawDelay = 0;
+let showNetwork = false;
+
+networkDisplayButton.onclick = () => {
+  if (showNetwork) {
+    showNetwork = false;
+    networkCanvas.style.display = "none";
+  } else {
+    networkCanvas.style.display = "block";
+    showNetwork = true;
+  }
+};
+
 animate();
 
 function animate(time: number = 0) {
   manageGameCanvas(time);
-  manageNetworkCanvas(time);
+  if (showNetwork) {
+    if (networkDrawDelay >= 10) {
+      manageNetworkCanvas(time);
+      networkDrawDelay = 0;
+    }
+    networkDrawDelay++;
+  }
 
   requestAnimationFrame(animate);
 }
@@ -44,6 +66,6 @@ function manageGameCanvas(time: number) {
 
 function manageNetworkCanvas(time: number) {
   networkCtx.clearRect(0, 0, networkCtx.canvas.width, networkCtx.canvas.height);
-  networkCtx.lineDashOffset = -time / 50;
+  //networkCtx.lineDashOffset = -time / 50;
   enemies[0].drawNeuralNetwork(networkCtx);
 }

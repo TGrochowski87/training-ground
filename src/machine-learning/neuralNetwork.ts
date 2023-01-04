@@ -14,6 +14,17 @@ class NeuralNetwork {
     }
   }
 
+  feedForward = (inputs: number[]): number[] => {
+    // Funkcja output z asteroid.
+
+    let outputs = this.layers[0].feedForward(inputs);
+    for (let i = 1; i < this.layers.length; i++) {
+      outputs = this.layers[i].feedForward(outputs);
+    }
+
+    return outputs;
+  };
+
   draw = (ctx: CanvasRenderingContext2D): void => {
     const margin: number = 20;
     const width: number = ctx.canvas.width - margin * 2;
@@ -53,7 +64,7 @@ class NeuralNetwork {
         ctx.moveTo(this.getNodeXPosition(inputCount, i, margin, width + margin), layerBottom);
         ctx.lineTo(this.getNodeXPosition(outputCount + 1, j, margin, width + margin), layerTop);
 
-        const weightOnLine = weights.matrix[i][j];
+        const weightOnLine = weights.matrix[j][i];
         ctx.lineWidth = 2;
         ctx.strokeStyle = getRGBAFromWeight(weightOnLine);
 

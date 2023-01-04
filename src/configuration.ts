@@ -21,5 +21,5 @@ export const sensorRaySpread: number = Math.PI * 2;
 export const sensorRayCount: number = 8;
 
 // Machine Learning
-export const networkViewWidth: number = 500;
-export const networkViewHeight: number = 600;
+export const networkViewWidth: number = 1500;
+export const networkViewHeight: number = 1600;

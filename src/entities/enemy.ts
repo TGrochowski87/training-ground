@@ -13,22 +13,27 @@ class Enemy extends Fighter {
   sensor: Sensor;
   color: string;
 
+  controls: EnemyControls;
+
   private readonly colors = {
     normal: "#A77500",
     danger: "#AF0D0D",
   };
 
   constructor(pos: Vector2D) {
-    super(pos, new EnemyControls());
+    super(pos);
 
-    this.brain = new NeuralNetwork([3, 4, 4, 5]);
+    this.brain = new NeuralNetwork([24, 24, 24, 5]);
     this.sensor = new Sensor(this);
     this.color = this.colors.normal;
+
+    this.controls = new EnemyControls();
   }
 
   update = (walls: Wall[], player: Player): void => {
-    this.look(walls, player);
-    this.move(walls);
+    const neuralNetInputs = this.look(walls, player);
+    this.think(neuralNetInputs);
+    this.move(this.controls, walls);
     this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
 
     this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
@@ -64,7 +69,7 @@ class Enemy extends Fighter {
     this.brain.draw(ctx);
   };
 
-  look = (walls: Wall[], player: Player) => {
+  look = (walls: Wall[], player: Player): number[] => {
     this.sensor.update(walls, player);
     const sensorReadings: (SensorReading | null)[] = this.sensor.getReadings();
 
@@ -73,6 +78,25 @@ class Enemy extends Fighter {
     } else {
       this.color = this.colors.normal;
     }
+
+    let neuralNetInputs: number[][] = [];
+
+    for (const reading of sensorReadings) {
+      const inputsFromReading = [
+        reading === null ? 0 : 1 - reading.offset,
+        reading?.detectedEntity === "PLAYER" ? 1 : 0,
+        reading?.detectedEntity === "WALL" ? 1 : 0,
+      ];
+
+      neuralNetInputs.push(inputsFromReading);
+    }
+
+    return neuralNetInputs.flat();
+  };
+
+  think = (inputs: number[]): void => {
+    const outputs = this.brain.feedForward(inputs);
+    this.controls.decideOnMove(outputs);
   };
 }
 

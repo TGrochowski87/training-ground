@@ -6,17 +6,19 @@ import Fighter from "./fighter";
 import PlayerControls from "mechanics/playerControls";
 
 class Player extends Fighter {
+  controls: PlayerControls;
   // AI stuff (TODO: move to different Fighter class)
   //sensor: Sensor;
 
   constructor(pos: Vector2D) {
-    super(pos, new PlayerControls());
+    super(pos);
 
+    this.controls = new PlayerControls();
     //this.sensor = new Sensor(this);
   }
 
   update = (walls: Wall[]): void => {
-    this.move(walls);
+    this.move(this.controls, walls);
     this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, this);
 
     //this.sensor.update(walls);

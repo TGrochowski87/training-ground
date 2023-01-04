@@ -17,26 +17,23 @@ abstract class Fighter {
   bullets: Bullet[] = [];
   canShoot: boolean = true;
 
-  controls: Controls;
-
-  constructor(pos: Vector2D, controls: Controls) {
+  constructor(pos: Vector2D) {
     this.position = pos.copy();
     this.angle = 0.0;
     this.aimRay = new Ray(gunPointOffset, RayType.Aim);
-    this.controls = controls;
   }
 
   abstract draw(ctx: CanvasRenderingContext2D): void;
 
-  protected move = (walls: Wall[]): void => {
-    if (this.controls.forward) {
+  protected move = (controls: Controls, walls: Wall[]): void => {
+    if (controls.forward) {
       let displacementVector = new Vector2D(0, -playerSpeed).rotate(this.angle);
 
       displacementVector = this.applyCollisionToDisplacementVector(walls, displacementVector);
 
       this.position = this.position.add(displacementVector);
     }
-    if (this.controls.backward) {
+    if (controls.backward) {
       let displacementVector = new Vector2D(0, playerSpeed).rotate(this.angle);
 
       displacementVector = this.applyCollisionToDisplacementVector(walls, displacementVector);
@@ -44,15 +41,15 @@ abstract class Fighter {
       this.position = this.position.add(displacementVector);
     }
 
-    const flip: number = this.controls.backward ? -1 : 1;
-    if (this.controls.right) {
+    const flip: number = controls.backward ? -1 : 1;
+    if (controls.right) {
       this.angle += 0.08 * flip;
     }
-    if (this.controls.left) {
+    if (controls.left) {
       this.angle -= 0.08 * flip;
     }
 
-    if (this.controls.shoot && this.canShoot) {
+    if (controls.shoot && this.canShoot) {
       this.canShoot = false;
       const bullet = new Bullet(this.position.add(gunPointOffset.rotate(this.angle)), this.angle);
       this.bullets.push(bullet);

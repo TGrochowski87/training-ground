@@ -21,3 +21,9 @@ body {
   background-color: #888888;
   border: 6px #222222 solid;
 }
+
+#show-hide-button{
+  position: relative;
+  bottom: -20px;
+  left: -500px;
+}

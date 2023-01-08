@@ -1,4 +1,5 @@
-import { randomBetween } from "./mathExtensions";
+import { mutationRate } from "configuration";
+import { gaussianRandom, randomBetween } from "./mathExtensions";
 
 class Matrix {
   rows: number;
@@ -135,6 +136,59 @@ class Matrix {
 
     return result;
   };
+
+  // ======== EVOLUTION =========================
+  clone = (): Matrix => {
+    let clone: Matrix = new Matrix(this.rows, this.cols);
+
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        clone.matrix[i][j] = this.matrix[i][j];
+      }
+    }
+
+    return clone;
+  };
+
+  crossover = (other: Matrix): Matrix => {
+    let newMatrix: Matrix = new Matrix(this.rows, this.cols);
+
+    const randRow: number = Math.floor(Math.random() * this.rows);
+    const randCol: number = Math.floor(Math.random() * this.cols);
+    const threshold = randRow * this.cols + randCol;
+
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        if (i * this.cols + j < threshold) {
+          newMatrix.matrix[i][j] = this.matrix[i][j];
+        } else {
+          newMatrix.matrix[i][j] = other.matrix[i][j];
+        }
+      }
+    }
+
+    return newMatrix;
+  };
+
+  mutate = (): void => {
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        const rand: number = Math.random();
+
+        if (rand < mutationRate) {
+          this.matrix[i][j] += gaussianRandom() / 5;
+
+          if (this.matrix[i][j] > 1) {
+            this.matrix[i][j] = 1;
+          }
+          if (this.matrix[i][j] < -1) {
+            this.matrix[i][j] = -1;
+          }
+        }
+      }
+    }
+  };
+  // ======== EVOLUTION =========================
 
   static singleColumnMatrixFromArray = (array: number[]): Matrix => {
     let result = new Matrix(array.length, 1);

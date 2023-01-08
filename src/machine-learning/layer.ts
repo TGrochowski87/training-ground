@@ -5,6 +5,9 @@ class Layer {
   outputs: number[];
   weights: Matrix;
 
+  receivedInputCount: number;
+  receivedOutputCount: number;
+
   /*
      I N P U T
   O [ | | | | ]
@@ -15,25 +18,42 @@ class Layer {
   T [ | | | | ]
   */
 
-  constructor(inputCount: number, outputCount: number) {
+  constructor(inputCount: number, outputCount: number, weights?: Matrix) {
+    this.receivedInputCount = inputCount;
+    this.receivedOutputCount = outputCount;
+
     // +1 is for bias which is basically an additional input.
     this.inputs = new Array<number>(inputCount + 1);
     this.outputs = new Array<number>(outputCount);
-    this.weights = new Matrix(outputCount, inputCount + 1);
-    this.weights.randomize();
+
+    if (weights) {
+      this.weights = weights;
+    } else {
+      this.weights = new Matrix(outputCount, inputCount + 1);
+      this.weights.randomize();
+    }
   }
 
   feedForward = (inputs: number[]): number[] => {
     this.inputs = [...inputs, 1];
-    //this.setBias();
     const inputColumn = Matrix.singleColumnMatrixFromArray(this.inputs);
     const outputs = this.weights.dot(inputColumn).toArray();
     return outputs;
   };
 
-  private setBias = () => {
-    const biasValue = 1;
-    this.inputs[this.inputs.length - 1] = biasValue;
+  clone = (): Layer => {
+    const clone = new Layer(this.receivedInputCount, this.receivedOutputCount, this.weights.clone());
+    return clone;
+  };
+
+  crossover = (other: Layer): Layer => {
+    const childWeights = this.weights.crossover(other.weights);
+    const newLayer = new Layer(this.receivedInputCount, this.receivedOutputCount, childWeights);
+    return newLayer;
+  };
+
+  mutate = (): void => {
+    this.weights.mutate();
   };
 }
 

@@ -1,16 +1,22 @@
-import { getRGBAFromWeight, getRGBFromWeight, lerp } from "utilities/mechanicsFunctions";
+import { getRGBAFromWeight, lerp } from "utilities/mechanicsFunctions";
 import Layer from "./Layer";
 
 class NeuralNetwork {
   layers: Layer[];
+  receivedNeuronCounts: number[];
 
   outputLabels: string[] = ["🠉", "🠈", "🠊", "🠋", "🔫"];
 
-  constructor(neuronCounts: number[]) {
+  constructor(neuronCounts: number[], layers?: Layer[]) {
     this.layers = [];
+    this.receivedNeuronCounts = [...neuronCounts];
 
-    for (let i = 0; i < neuronCounts.length - 1; i++) {
-      this.layers.push(new Layer(neuronCounts[i], neuronCounts[i + 1]));
+    if (layers) {
+      this.layers = [...layers];
+    } else {
+      for (let i = 0; i < neuronCounts.length - 1; i++) {
+        this.layers.push(new Layer(neuronCounts[i], neuronCounts[i + 1]));
+      }
     }
   }
 
@@ -23,6 +29,30 @@ class NeuralNetwork {
     }
 
     return outputs;
+  };
+
+  clone = (): NeuralNetwork => {
+    const clonedLayers = this.layers.map(l => l.clone());
+    const clone = new NeuralNetwork([...this.receivedNeuronCounts], clonedLayers);
+    return clone;
+  };
+
+  crossover = (other: NeuralNetwork): NeuralNetwork => {
+    const childLayers: Layer[] = [];
+
+    for (let i = 0; i < this.layers.length; i++) {
+      const childLayer = this.layers[i].crossover(other.layers[i]);
+      childLayers.push(childLayer);
+    }
+
+    const child = new NeuralNetwork([...this.receivedNeuronCounts], childLayers);
+    return child;
+  };
+
+  mutate = (): void => {
+    for (let i = 0; i < this.layers.length; i++) {
+      this.layers[i].mutate();
+    }
   };
 
   draw = (ctx: CanvasRenderingContext2D): void => {

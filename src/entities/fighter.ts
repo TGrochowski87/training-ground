@@ -23,8 +23,6 @@ abstract class Fighter {
     this.aimRay = new Ray(gunPointOffset, RayType.Aim);
   }
 
-  abstract draw(ctx: CanvasRenderingContext2D): void;
-
   protected move = (controls: Controls, walls: Wall[]): void => {
     if (controls.forward) {
       let displacementVector = new Vector2D(0, -playerSpeed).rotate(this.angle);

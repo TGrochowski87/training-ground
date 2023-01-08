@@ -22,7 +22,13 @@ body {
   border: 6px #222222 solid;
 }
 
-#show-hide-button{
+#button-network{
+  position: relative;
+  bottom: -20px;
+  left: -500px;
+}
+
+#button-sensors{
   position: relative;
   bottom: -20px;
   left: -500px;

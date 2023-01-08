@@ -1,4 +1,4 @@
-import { gunPointOffset } from "configuration";
+import { enemySpawnPoint, gunPointOffset, sensorRayCount } from "configuration";
 import NeuralNetwork from "machine-learning/neuralNetwork";
 import EnemyControls from "mechanics/enemyControls";
 import Sensor from "machine-learning/sensor";
@@ -7,30 +7,56 @@ import Fighter from "./fighter";
 import Wall from "./wall";
 import SensorReading from "models/sensorReading";
 import Player from "./player";
+import { distanceBetweenPoints } from "utilities/mathExtensions";
 
 class Enemy extends Fighter {
+  id: string;
   brain: NeuralNetwork;
   sensor: Sensor;
+  controls: EnemyControls;
+
   color: string;
 
-  controls: EnemyControls;
+  isDead: boolean;
+  ticksAlive: number = 0.0;
+  pointsForBeingCloseToPlayer: number = 0.0;
+  penaltyForBeingAwayFromPlayer: number = 0.0;
+
+  fitness: number = 0.0;
 
   private readonly colors = {
     normal: "#A77500",
     danger: "#AF0D0D",
   };
 
-  constructor(pos: Vector2D) {
+  constructor(pos: Vector2D, brain?: NeuralNetwork) {
     super(pos);
+    this.id = crypto.randomUUID();
 
-    this.brain = new NeuralNetwork([24, 24, 24, 5]);
+    if (brain) {
+      this.brain = brain;
+    } else {
+      this.brain = new NeuralNetwork([sensorRayCount * 3, 12, 12, 4]);
+    }
     this.sensor = new Sensor(this);
     this.color = this.colors.normal;
 
     this.controls = new EnemyControls();
+    this.isDead = false;
   }
 
   update = (walls: Wall[], player: Player): void => {
+    if (this.ticksAlive === 300) {
+      this.isDead = true;
+      return;
+    }
+    const distanceToPlayer = distanceBetweenPoints(this.position, player.position);
+    if (distanceToPlayer < 50) {
+      this.pointsForBeingCloseToPlayer += 50 / (distanceToPlayer + 0.001);
+    } else {
+      this.penaltyForBeingAwayFromPlayer += 1;
+    }
+
     const neuralNetInputs = this.look(walls, player);
     this.think(neuralNetInputs);
     this.move(this.controls, walls);
@@ -38,10 +64,13 @@ class Enemy extends Fighter {
 
     this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
     this.bullets.forEach(bullet => bullet.update(walls));
+    this.ticksAlive++;
   };
 
-  draw = (ctx: CanvasRenderingContext2D): void => {
-    this.sensor.draw(ctx);
+  draw = (ctx: CanvasRenderingContext2D, showSensors: boolean, isBest: boolean = false): void => {
+    if (showSensors) {
+      this.sensor.draw(ctx);
+    }
 
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
@@ -59,6 +88,25 @@ class Enemy extends Fighter {
     ctx.lineTo(8, -13);
     ctx.stroke();
 
+    if (isBest) {
+      ctx.beginPath();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "black";
+      ctx.strokeStyle = "white";
+      ctx.font = this.radius * 1.5 + "px Arial";
+      ctx.fillText("⭐", 0, 0);
+    }
+    if (this.isDead) {
+      ctx.beginPath();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "black";
+      ctx.strokeStyle = "white";
+      ctx.font = this.radius * 1.5 + "px Arial";
+      ctx.fillText("☠️", 0, 0);
+    }
+
     ctx.restore();
 
     this.aimRay.draw(ctx);
@@ -69,6 +117,7 @@ class Enemy extends Fighter {
     this.brain.draw(ctx);
   };
 
+  // ========= THINKING ==========================
   look = (walls: Wall[], player: Player): number[] => {
     this.sensor.update(walls, player);
     const sensorReadings: (SensorReading | null)[] = this.sensor.getReadings();
@@ -97,6 +146,30 @@ class Enemy extends Fighter {
   think = (inputs: number[]): void => {
     const outputs = this.brain.feedForward(inputs);
     this.controls.decideOnMove(outputs);
+  };
+
+  // ========= EVOLUTION ==========================
+  calculateFitness = (player: Player) => {
+    this.fitness = 0.0;
+    this.fitness += 1 / distanceBetweenPoints(this.position, player.position);
+    this.fitness += this.pointsForBeingCloseToPlayer;
+  };
+
+  clone = (): Enemy => {
+    const clonedBrain = this.brain.clone();
+    let clone = new Enemy(enemySpawnPoint.copy(), clonedBrain);
+    clone.id = this.id;
+    return clone;
+  };
+
+  crossover = (other: Enemy): Enemy => {
+    const childBrain = this.brain.crossover(other.brain);
+    const child: Enemy = new Enemy(enemySpawnPoint.copy(), childBrain);
+    return child;
+  };
+
+  mutate = (): void => {
+    this.brain.mutate();
   };
 }
 

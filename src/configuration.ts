@@ -3,6 +3,7 @@ import Vector2D from "utilities/vector2d";
 // Game
 export const gameScreenWidth: number = 700;
 export const gameScreenHeight: number = 700;
+export const enemySpawnPoint: Vector2D = new Vector2D(100, 100);
 
 // Fighter
 export const playerSpeed: number = 4;
@@ -23,3 +24,4 @@ export const sensorRayCount: number = 8;
 // Machine Learning
 export const networkViewWidth: number = 1500;
 export const networkViewHeight: number = 1600;
+export const mutationRate: number = 0.05;

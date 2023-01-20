@@ -4,6 +4,7 @@ body {
 }
 
 #app {
+  min-width: fit-content;
   padding-top: 10px;
   display: flex;
   flex-direction: row;
@@ -22,14 +23,27 @@ body {
   border: 6px #222222 solid;
 }
 
+#button-space {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+#import {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 #button-network{
-  position: relative;
+  /* position: relative;
   bottom: -20px;
-  left: -500px;
+  left: -500px; */
 }
 
 #button-sensors{
-  position: relative;
+  /* position: relative;
   bottom: -20px;
-  left: -500px;
+  left: -500px; */
 }

@@ -72,6 +72,35 @@ class NeuralNetwork {
     }
   };
 
+  export = (): void => {
+    let stringRepresentation = "";
+    stringRepresentation += `${this.receivedNeuronCounts.join(" ")}\n\n`;
+    for (const layer of this.layers) {
+      stringRepresentation += `${layer.export()}\n`;
+    }
+    let a = document.createElement("a") as HTMLAnchorElement;
+    a.href = window.URL.createObjectURL(new Blob([stringRepresentation], { type: "text/plain" }));
+    a.download = "test.txt";
+    document.body.append(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  static import = (text: string): NeuralNetwork => {
+    let listRepresentation = text.split("\n\n");
+    const countsText = listRepresentation.splice(0, 1);
+    const counts = countsText[0].split(" ").map(s => +s);
+
+    let layers: Layer[] = [];
+    for (let i = 0; i < listRepresentation.length - 1; i++) {
+      const reconstructedLayer = Layer.import(listRepresentation[i]);
+      layers.push(reconstructedLayer);
+    }
+
+    const reconstructedNetwork = new NeuralNetwork(counts, layers);
+    return reconstructedNetwork;
+  };
+
   private drawLayer = (
     ctx: CanvasRenderingContext2D,
     layerIndex: number,

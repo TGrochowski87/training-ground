@@ -1,19 +1,20 @@
-import { enemySpawnPoint } from "configuration";
+import { enemySpawnPoint, sites } from "configuration";
 import Enemy from "entities/enemy";
 import Player from "entities/player";
 import Wall from "entities/wall";
+import NeuralNetwork from "./neuralNetwork";
 
 class Population {
   enemies: Enemy[];
   bestEnemyIndex: number;
   generation: number = 1;
 
-  constructor(amount: number) {
+  constructor(amount: number, baseBrain?: NeuralNetwork) {
     this.enemies = [];
     this.bestEnemyIndex = 0;
 
     for (let i = 0; i < amount; i++) {
-      this.enemies.push(new Enemy(enemySpawnPoint.copy()));
+      this.enemies.push(new Enemy(enemySpawnPoint.copy(), baseBrain?.clone()));
     }
   }
 

@@ -10,8 +10,15 @@
     <div id="app">
       <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
-        <button id="button-network">Show/hide network visualization</button>
-        <button id="button-sensors">Show/hide sensors</button>
+        <div id="button-space">
+          <button id="button-network">Show/hide network visualization</button>
+          <button id="button-sensors">Show/hide sensors</button>
+          <button id="button-save">Export best brain</button>
+          <div id="import">
+            <label for="file-selector">Import neaural network</label>
+            <input type="file" id="button-import" accept="text/plain">
+          </div>
+        </div>
       </div>
       <div id="networkContainer">
         <canvas id="networkCanvas"></canvas>

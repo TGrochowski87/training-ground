@@ -27,6 +27,19 @@ class Matrix {
     console.log();
   };
 
+  export = (): string => {
+    let stringRepresentation = "";
+    for (let i = 0; i < this.rows; i++) {
+      let row = "";
+      for (let j = 0; j < this.cols; j++) {
+        row += this.matrix[i][j] + " ";
+      }
+      stringRepresentation += `${row}\n`;
+    }
+
+    return stringRepresentation;
+  };
+
   multiplyByScalar = (num: number): void => {
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {

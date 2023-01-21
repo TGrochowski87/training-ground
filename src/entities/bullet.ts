@@ -2,6 +2,8 @@ import { bulletMaxDistance, bulletRadius, bulletSpeed } from "configuration";
 import { getIntersection } from "utilities/mechanicsFunctions";
 import Vector2D from "utilities/vector2d";
 import Wall from "entities/wall";
+import Fighter from "./fighter";
+import { distanceBetweenPoints } from "utilities/mathExtensions";
 
 class Bullet {
   position: Vector2D;
@@ -12,16 +14,18 @@ class Bullet {
   maxDistanceTraveled: number = bulletMaxDistance;
 
   toBeDeleted: boolean = false;
+  enemyHit: boolean = false;
 
   constructor(pos: Vector2D, angle: number) {
     this.position = pos.copy();
     this.displacementVector = new Vector2D(0, -bulletSpeed).rotate(angle);
   }
 
-  update = (walls: Wall[]): void => {
+  update = (walls: Wall[], targets: Fighter[]): void => {
     const newPosition = this.position.add(this.displacementVector);
     this.distanceTraveled += bulletSpeed;
     this.checkDeleteCondition(walls, newPosition);
+    this.checkIfHit(targets);
 
     if (this.toBeDeleted === false) {
       this.position = newPosition;
@@ -43,6 +47,21 @@ class Bullet {
     if (this.detectCollisionWithWalls(walls, newPosition)) {
       this.toBeDeleted = true;
       return;
+    }
+  };
+
+  checkIfHit = (targets: Fighter[]) => {
+    for (const target of targets) {
+      if (target.isDead) {
+        continue;
+      }
+
+      const distance = distanceBetweenPoints(this.position, target.position);
+      if (distance < target.radius) {
+        target.isDead = true;
+        this.enemyHit = true;
+        this.toBeDeleted = true;
+      }
     }
   };
 

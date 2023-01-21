@@ -1,30 +1,21 @@
 import { gunPointOffset } from "configuration";
-import Wall from "entities/wall";
 import Vector2D from "utilities/vector2d";
-import Fighter from "./fighter";
-import PlayerControls from "mechanics/playerControls";
-import Enemy from "./enemy";
-import Controls from "mechanics/controls";
-import DummyControls from "mechanics/dummyControls";
+import Player from "./player";
+import Wall from "./wall";
 
-class Player extends Fighter {
-  controls: Controls;
+class DummyPlayer extends Player {
+  maxDistance: number = 100;
+  distanceInCurrentDirection: number = 0;
 
-  constructor(pos: Vector2D, isDummy: boolean = false) {
-    super(pos);
-
-    this.controls = isDummy ? new DummyControls() : new PlayerControls();
+  constructor(pos: Vector2D) {
+    super(pos, true);
   }
 
-  update = (walls: Wall[], enemies: Enemy[]): void => {
+  update = (walls: Wall[]): void => {
     if (this.isDead === false) {
       this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, this);
     }
-
-    //this.sensor.update(walls);
-    this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
-    this.bullets.forEach(bullet => bullet.update(walls, enemies));
   };
 
   draw = (ctx: CanvasRenderingContext2D): void => {
@@ -61,4 +52,4 @@ class Player extends Fighter {
   };
 }
 
-export default Player;
+export default DummyPlayer;

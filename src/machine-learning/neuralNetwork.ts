@@ -80,7 +80,7 @@ class NeuralNetwork {
     }
     let a = document.createElement("a") as HTMLAnchorElement;
     a.href = window.URL.createObjectURL(new Blob([stringRepresentation], { type: "text/plain" }));
-    a.download = "test.txt";
+    a.download = "brain.txt";
     document.body.append(a);
     a.click();
     document.body.removeChild(a);

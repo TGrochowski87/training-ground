@@ -25,10 +25,11 @@ export const sensorRayCount: number = 8;
 export const networkViewWidth: number = 1500;
 export const networkViewHeight: number = 1600;
 export const mutationRate: number = 0.05;
+export const dummySpawnPoint: Vector2D = new Vector2D(gameScreenWidth / 2 + 1080, gameScreenHeight / 2);
 export const sites: Vector2D[] = [
-  new Vector2D(50, 50),
-  new Vector2D(gameScreenWidth - 50, 50),
-  new Vector2D(gameScreenWidth - 50, gameScreenHeight - 50),
-  new Vector2D(50, gameScreenHeight - 50),
+  new Vector2D(80, 80),
+  new Vector2D(gameScreenWidth - 80, 80),
+  new Vector2D(gameScreenWidth - 80, gameScreenHeight - 80),
+  new Vector2D(80, gameScreenHeight - 80),
   new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2),
 ];

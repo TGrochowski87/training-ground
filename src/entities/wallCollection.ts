@@ -9,48 +9,15 @@ class WallCollection {
     this.collection = [];
 
     // Outer walls
-    this.collection.push(
-      new Wall(
-        new Vector2D(0, 0),
-        new Vector2D(gameScreenWidth, 0),
-        new Vector2D(0, 10),
-        new Vector2D(gameScreenWidth, 10)
-      )
-    );
-    this.collection.push(
-      new Wall(
-        new Vector2D(0, 0),
-        new Vector2D(10, 0),
-        new Vector2D(0, gameScreenHeight),
-        new Vector2D(10, gameScreenHeight)
-      )
-    );
-    this.collection.push(
-      new Wall(
-        new Vector2D(0, gameScreenHeight - 10),
-        new Vector2D(gameScreenWidth, gameScreenHeight - 10),
-        new Vector2D(0, gameScreenHeight),
-        new Vector2D(gameScreenWidth, gameScreenHeight)
-      )
-    );
-    this.collection.push(
-      new Wall(
-        new Vector2D(gameScreenWidth - 10, 0),
-        new Vector2D(gameScreenWidth, 0),
-        new Vector2D(gameScreenWidth - 10, gameScreenHeight),
-        new Vector2D(gameScreenWidth, gameScreenHeight)
-      )
-    );
-    //--------------
+    this.collection.push(new Wall(new Vector2D(0, 5), "RIGHT", gameScreenWidth));
+    this.collection.push(new Wall(new Vector2D(gameScreenWidth - 5, 0), "DOWN", gameScreenHeight));
+    this.collection.push(new Wall(new Vector2D(gameScreenWidth, gameScreenHeight - 5), "LEFT", gameScreenWidth));
+    this.collection.push(new Wall(new Vector2D(5, gameScreenHeight), "UP", gameScreenHeight));
 
-    this.collection.push(
-      new Wall(
-        new Vector2D(gameScreenWidth / 2 - 50, 50),
-        new Vector2D(gameScreenWidth / 2 + 50, 50),
-        new Vector2D(gameScreenWidth / 2 - 50, 60),
-        new Vector2D(gameScreenWidth / 2 + 50, 60)
-      )
-    );
+    // Around the player
+    this.collection.push(new Wall(new Vector2D(gameScreenWidth / 2 - 100, gameScreenHeight / 2 - 100), "RIGHT", 200));
+    this.collection.push(new Wall(new Vector2D(gameScreenWidth / 2 - 100, gameScreenHeight / 2 - 100), "DOWN", 200));
+    this.collection.push(new Wall(new Vector2D(gameScreenWidth / 2 + 100, gameScreenHeight / 2 - 100), "DOWN", 200));
   }
 
   draw = (ctx: CanvasRenderingContext2D): void => {

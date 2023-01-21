@@ -11,6 +11,6 @@ export const approachPlayer = (ai: Enemy, player: Player): number => {
 };
 
 export const explore = (ai: Enemy) => {
-  let fitness: number = ai.pointsForApproachingSite;
+  let fitness: number = ai.points;
   return fitness;
 };

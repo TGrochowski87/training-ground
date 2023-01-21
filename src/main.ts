@@ -23,9 +23,9 @@ const importBrainButton: HTMLInputElement = document.getElementById("button-impo
 const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
 
-const player: Player = new Player(new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2));
+//const player: Player = new Player(new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2));
 
-const populationCount = 20;
+const populationCount = 100;
 let population: Population = new Population(populationCount);
 
 const walls: WallCollection = new WallCollection();
@@ -34,12 +34,17 @@ let networkDrawDelay = 0;
 let showNetwork = false;
 let showSensors = true;
 
+let gameStopped = false;
+
 setupOnClicks();
 
 animate();
 
 function animate(time: number = 0) {
-  manageGameCanvas(time);
+  if (gameStopped === false) {
+    manageGameCanvas(time);
+    displaySites();
+  }
   if (showNetwork) {
     if (networkDrawDelay >= 10) {
       manageNetworkCanvas(time);
@@ -48,21 +53,19 @@ function animate(time: number = 0) {
     networkDrawDelay++;
   }
 
-  displaySites();
-
   requestAnimationFrame(animate);
 }
 
 function manageGameCanvas(time: number) {
   gameCtx.clearRect(0, 0, gameCtx.canvas.width, gameCtx.canvas.height);
 
-  player.update(walls.collection);
-  player.draw(gameCtx);
+  //player.update(walls.collection, population.enemies);
+  //player.draw(gameCtx);
 
   if (population.enemies.some(e => e.isDead === false)) {
-    population.update(walls.collection, player);
+    population.update(walls.collection);
   } else {
-    population.calculateFitness(player);
+    population.calculateFitness();
     population.neuralSelection();
   }
   population.draw(gameCtx, showSensors);
@@ -96,7 +99,7 @@ function setupOnClicks() {
   };
 
   exportBrainButton.onclick = () => {
-    population.enemies[population.bestEnemyIndex].brain.export();
+    population.enemies[0].brain.export();
   };
 
   importBrainButton.onchange = (event: Event) => {
@@ -115,7 +118,7 @@ function displaySites() {
 
     gameCtx.fillStyle = "#2358D166";
     gameCtx.beginPath();
-    gameCtx.arc(point.x, point.y, 50, 0, 2 * Math.PI);
+    gameCtx.arc(point.x, point.y, 80, 0, 2 * Math.PI);
     gameCtx.fill();
   }
 }

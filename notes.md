@@ -26,3 +26,8 @@ Teaching process:
 
 They would run around just like in first phase of the option above, but if they see me, they get a new input and get points for shooting me.
 I may be behind 3 walls: left, top and right
+
+
+# Other
+
+It may be a good idea to remove input neurons indicating wall detection. They are the only detectable entities beside Player, so this should a binary situation.

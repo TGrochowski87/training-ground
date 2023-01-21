@@ -11,16 +11,18 @@ import Wall from "./wall";
 abstract class Fighter {
   position: Vector2D;
   radius: number = playerRadius;
-  angle: number;
+  angle: number = 0.0;
   aimRay: Ray;
 
   bullets: Bullet[] = [];
   canShoot: boolean = true;
 
+  isDead: boolean;
+
   constructor(pos: Vector2D) {
     this.position = pos.copy();
-    this.angle = 0.0;
     this.aimRay = new Ray(gunPointOffset, RayType.Aim);
+    this.isDead = false;
   }
 
   protected move = (controls: Controls, walls: Wall[]): void => {
@@ -41,10 +43,10 @@ abstract class Fighter {
 
     const flip: number = controls.backward ? -1 : 1;
     if (controls.right) {
-      this.angle += 0.08 * flip;
+      this.angle += 0.05 * flip;
     }
     if (controls.left) {
-      this.angle -= 0.08 * flip;
+      this.angle -= 0.05 * flip;
     }
 
     if (controls.shoot && this.canShoot) {

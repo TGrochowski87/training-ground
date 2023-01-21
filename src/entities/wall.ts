@@ -6,18 +6,37 @@ class Wall {
   private readonly bottomLeft: Vector2D;
   private readonly bottomRight: Vector2D;
 
+  private readonly thickness: number = 10;
+
   lines: [Vector2D, Vector2D][];
 
-  constructor(
-    topLeft: Vector2D,
-    topRight: Vector2D,
-    bottomLeft: Vector2D,
-    bottomRight: Vector2D
-  ) {
-    this.topLeft = topLeft;
-    this.topRight = topRight;
-    this.bottomLeft = bottomLeft;
-    this.bottomRight = bottomRight;
+  constructor(startingPoint: Vector2D, direction: "UP" | "RIGHT" | "DOWN" | "LEFT", length: number) {
+    switch (direction) {
+      case "UP":
+        this.bottomLeft = new Vector2D(startingPoint.x - this.thickness / 2, startingPoint.y);
+        this.bottomRight = new Vector2D(startingPoint.x + this.thickness / 2, startingPoint.y);
+        this.topLeft = new Vector2D(this.bottomLeft.x, this.bottomLeft.y - length);
+        this.topRight = new Vector2D(this.bottomRight.x, this.bottomRight.y - length);
+        break;
+      case "RIGHT":
+        this.topLeft = new Vector2D(startingPoint.x, startingPoint.y + this.thickness / 2);
+        this.bottomLeft = new Vector2D(startingPoint.x, startingPoint.y - this.thickness / 2);
+        this.topRight = new Vector2D(this.topLeft.x + length, this.topLeft.y);
+        this.bottomRight = new Vector2D(this.bottomLeft.x + length, this.bottomLeft.y);
+        break;
+      case "DOWN":
+        this.topLeft = new Vector2D(startingPoint.x - this.thickness / 2, startingPoint.y);
+        this.topRight = new Vector2D(startingPoint.x + this.thickness / 2, startingPoint.y);
+        this.bottomLeft = new Vector2D(this.topLeft.x, this.topLeft.y + length);
+        this.bottomRight = new Vector2D(this.topRight.x, this.topRight.y + length);
+        break;
+      case "LEFT":
+        this.topRight = new Vector2D(startingPoint.x, startingPoint.y + this.thickness / 2);
+        this.bottomRight = new Vector2D(startingPoint.x, startingPoint.y - this.thickness / 2);
+        this.topLeft = new Vector2D(this.topRight.x - length, this.topRight.y);
+        this.bottomLeft = new Vector2D(this.bottomRight.x - length, this.bottomRight.y);
+        break;
+    }
 
     this.lines = [
       [this.topLeft, this.topRight],
@@ -29,12 +48,7 @@ class Wall {
 
   draw = (ctx: CanvasRenderingContext2D): void => {
     ctx.fillStyle = "#7D5514";
-    ctx.rect(
-      this.topLeft.x,
-      this.topLeft.y,
-      this.topRight.x - this.topLeft.x,
-      this.bottomLeft.y - this.topLeft.y
-    );
+    ctx.rect(this.topLeft.x, this.topLeft.y, this.topRight.x - this.topLeft.x, this.bottomLeft.y - this.topLeft.y);
     ctx.fill();
   };
 }

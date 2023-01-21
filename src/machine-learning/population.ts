@@ -1,39 +1,47 @@
-import { enemySpawnPoint, sites } from "configuration";
+import { dummySpawnPoint, enemySpawnPoint, gameScreenHeight, gameScreenWidth } from "configuration";
+import DummyPlayer from "entities/dummyPlayer";
 import Enemy from "entities/enemy";
-import Player from "entities/player";
 import Wall from "entities/wall";
+import Vector2D from "utilities/vector2d";
 import NeuralNetwork from "./neuralNetwork";
 
 class Population {
   enemies: Enemy[];
-  bestEnemyIndex: number;
+  dummies: DummyPlayer[];
   generation: number = 1;
 
   constructor(amount: number, baseBrain?: NeuralNetwork) {
     this.enemies = [];
-    this.bestEnemyIndex = 0;
+    this.dummies = [];
 
     for (let i = 0; i < amount; i++) {
       this.enemies.push(new Enemy(enemySpawnPoint.copy(), baseBrain?.clone()));
+      this.dummies.push(new DummyPlayer(dummySpawnPoint));
     }
   }
 
-  update = (walls: Wall[], player: Player) => {
-    for (const enemy of this.enemies) {
-      enemy.update(walls, player);
+  update = (walls: Wall[]) => {
+    console.log(this.enemies[0].points);
+
+    for (let i = 0; i < this.enemies.length; i++) {
+      this.enemies[i].update(walls, this.dummies[i]);
+      //this.dummies[i].update(walls);
     }
   };
 
   draw = (ctx: CanvasRenderingContext2D, showSensors: boolean): void => {
     this.enemies[0].draw(ctx, showSensors, true);
+    //this.dummies[0].draw(ctx);
+
     for (let i = 1; i < this.enemies.length; i++) {
       this.enemies[i].draw(ctx, showSensors, false);
+      //this.dummies[i].draw(ctx);
     }
   };
 
-  calculateFitness = (player: Player): void => {
+  calculateFitness = (): void => {
     for (let i = 0; i < this.enemies.length; i++) {
-      this.enemies[i].calculateFitness(player);
+      this.enemies[i].calculateFitness();
     }
     const fitnessRanking = this.enemies
       .map(e => e.fitness)
@@ -50,17 +58,22 @@ class Population {
 
   neuralSelection = (): void => {
     let newPopulation: Enemy[] = new Array<Enemy>(this.enemies.length);
+    let newDummies: DummyPlayer[] = new Array<DummyPlayer>(this.enemies.length);
 
-    this.setBestPlayer();
-    newPopulation[0] = this.enemies[this.bestEnemyIndex].clone();
+    const bestEnemyIndex = this.findBestPlayerIndex();
+    newPopulation[0] = this.enemies[bestEnemyIndex].clone();
+    newDummies[0] = new DummyPlayer(dummySpawnPoint);
 
     for (let i = 1; i < newPopulation.length; i++) {
       const parents = [this.selectEnemy(), this.selectEnemy()];
       newPopulation[i] = parents[0].crossover(parents[1]);
       newPopulation[i].mutate();
+
+      newDummies[i] = new DummyPlayer(dummySpawnPoint);
     }
 
     this.enemies = [...newPopulation];
+    this.dummies = [...newDummies];
     this.generation++;
   };
 
@@ -80,7 +93,7 @@ class Population {
     throw new Error("This should be unreachable.");
   };
 
-  private setBestPlayer = () => {
+  private findBestPlayerIndex = (): number => {
     const fitnessList = this.enemies.map(e => e.fitness);
     const maxFitness = Math.max(...fitnessList);
     const indexOfBest = this.enemies.findIndex(e => e.fitness === maxFitness);
@@ -89,7 +102,7 @@ class Population {
       throw Error("Could not find the index of the best Enemy.");
     }
 
-    this.bestEnemyIndex = indexOfBest;
+    return indexOfBest;
   };
 }
 

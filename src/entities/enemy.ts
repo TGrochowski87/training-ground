@@ -137,7 +137,11 @@ class Enemy extends Fighter {
 
   // ========= EVOLUTION ==========================
   calculateFitness = () => {
-    this.fitness = explore(this);
+    if (this.playerShot) {
+      this.points *= 1.5;
+    }
+
+    this.fitness = this.points;
   };
 
   clone = (): Enemy => {
@@ -161,12 +165,6 @@ class Enemy extends Fighter {
   private look = (walls: Wall[], player: Player): number[] => {
     this.sensor.update(walls, player);
     const sensorReadings: (SensorReading | null)[] = this.sensor.getReadings();
-
-    // if (sensorReadings.some(r => r?.detectedEntity === "PLAYER")) {
-    //   this.color = this.colors.danger;
-    // } else {
-    //   this.color = this.colors.normal;
-    // }
 
     if (sensorReadings.some(r => r?.detectedEntity === "PLAYER")) {
       this.playerSpotted = true;
@@ -198,11 +196,11 @@ class Enemy extends Fighter {
   private calculatePoints = () => {
     const distanceFromSiteCurrent: number = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
     if (distanceFromSiteCurrent < this.distanceFromSite) {
-      this.points += (this.distanceFromSite - distanceFromSiteCurrent) / 2;
+      this.points += (this.distanceFromSite - distanceFromSiteCurrent) / 10;
       this.distanceFromSite = distanceFromSiteCurrent;
 
       if (this.distanceFromSite < 80) {
-        this.points *= 1.3;
+        this.points += 70;
         this.currentTargetSiteIndex = (this.currentTargetSiteIndex + 1) % sites.length;
         this.distanceFromSite = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
       }
@@ -210,10 +208,6 @@ class Enemy extends Fighter {
 
     if (this.controls.shoot && this.playerSpotted === false) {
       this.points *= 0.9;
-    }
-
-    if (this.playerShot) {
-      this.points *= 1.5;
     }
   };
 }

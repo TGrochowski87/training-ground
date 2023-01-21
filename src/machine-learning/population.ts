@@ -1,8 +1,7 @@
-import { dummySpawnPoint, enemySpawnPoint, gameScreenHeight, gameScreenWidth } from "configuration";
+import { dummySpawnPoint, enemySpawnPoint } from "configuration";
 import DummyPlayer from "entities/dummyPlayer";
 import Enemy from "entities/enemy";
 import Wall from "entities/wall";
-import Vector2D from "utilities/vector2d";
 import NeuralNetwork from "./neuralNetwork";
 
 class Population {
@@ -25,17 +24,17 @@ class Population {
 
     for (let i = 0; i < this.enemies.length; i++) {
       this.enemies[i].update(walls, this.dummies[i]);
-      //this.dummies[i].update(walls);
+      this.dummies[i].update(walls);
     }
   };
 
   draw = (ctx: CanvasRenderingContext2D, showSensors: boolean): void => {
     this.enemies[0].draw(ctx, showSensors, true);
-    //this.dummies[0].draw(ctx);
+    this.dummies[0].draw(ctx);
 
     for (let i = 1; i < this.enemies.length; i++) {
       this.enemies[i].draw(ctx, showSensors, false);
-      //this.dummies[i].draw(ctx);
+      this.dummies[i].draw(ctx);
     }
   };
 

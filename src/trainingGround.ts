@@ -1,16 +1,13 @@
 import { gameScreenHeight, gameScreenWidth, networkViewHeight, networkViewWidth, sites } from "configuration";
 import WallCollection from "entities/wallCollection";
-import Player from "entities/player";
-import "style.css";
-import Vector2D from "utilities/vector2d";
 import Population from "machine-learning/population";
 import NeuralNetwork from "machine-learning/neuralNetwork";
 
-const gameCanvas: HTMLCanvasElement = document.getElementById("gameCanvas") as HTMLCanvasElement;
+const gameCanvas: HTMLCanvasElement = document.getElementById("game-canvas") as HTMLCanvasElement;
 gameCanvas.width = gameScreenWidth;
 gameCanvas.height = gameScreenHeight;
 
-const networkCanvas: HTMLCanvasElement = document.getElementById("networkCanvas") as HTMLCanvasElement;
+const networkCanvas: HTMLCanvasElement = document.getElementById("network-canvas") as HTMLCanvasElement;
 networkCanvas.width = networkViewWidth;
 networkCanvas.height = networkViewHeight;
 networkCanvas.style.display = "none";
@@ -22,8 +19,6 @@ const importBrainButton: HTMLInputElement = document.getElementById("button-impo
 
 const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
-
-//const player: Player = new Player(new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2));
 
 const populationCount = 100;
 let population: Population = new Population(populationCount);
@@ -59,9 +54,6 @@ function animate(time: number = 0) {
 function manageGameCanvas(time: number) {
   gameCtx.clearRect(0, 0, gameCtx.canvas.width, gameCtx.canvas.height);
 
-  //player.update(walls.collection, population.enemies);
-  //player.draw(gameCtx);
-
   if (population.enemies.some(e => e.isDead === false)) {
     population.update(walls.collection);
   } else {
@@ -75,7 +67,6 @@ function manageGameCanvas(time: number) {
 
 function manageNetworkCanvas(time: number) {
   networkCtx.clearRect(0, 0, networkCtx.canvas.width, networkCtx.canvas.height);
-  //networkCtx.lineDashOffset = -time / 50;
   population.enemies[0].drawNeuralNetwork(networkCtx);
 }
 

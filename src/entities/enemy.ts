@@ -8,7 +8,6 @@ import Wall from "./wall";
 import SensorReading from "models/sensorReading";
 import Player from "./player";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
-import { approachPlayer, explore } from "machine-learning/fitnessFunctions";
 
 class Enemy extends Fighter {
   id: string;
@@ -20,7 +19,6 @@ class Enemy extends Fighter {
   triggerCounter: number = 0;
 
   // Fitness components
-  ticksAlive: number = 0.0;
   pointsForBeingCloseToPlayer: number = 0.0;
   penaltyForBeingAwayFromPlayer: number = 0.0;
 
@@ -55,11 +53,6 @@ class Enemy extends Fighter {
 
   update = (walls: Wall[], player: Player): void => {
     if (this.isDead === false) {
-      if (this.ticksAlive === 3000) {
-        this.isDead = true;
-        return;
-      }
-
       if (this.playerSpotted) {
         this.triggerCounter++;
 
@@ -75,8 +68,6 @@ class Enemy extends Fighter {
       this.think([...neuralNetInputs, Number(this.playerSpotted)]);
       this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
-
-      this.ticksAlive++;
     }
     this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
     this.bullets.forEach(bullet => bullet.update(walls, [player]));

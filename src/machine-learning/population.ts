@@ -9,6 +9,8 @@ class Population {
   dummies: DummyPlayer[];
   generation: number = 1;
 
+  generationLifetime: number = 0;
+
   constructor(amount: number, baseBrain?: NeuralNetwork) {
     this.enemies = [];
     this.dummies = [];
@@ -20,12 +22,22 @@ class Population {
   }
 
   update = (walls: Wall[]) => {
+    if (this.generationLifetime === 3000) {
+      for (const enemy of this.enemies) {
+        enemy.isDead = true;
+      }
+      this.generationLifetime = 0;
+      return;
+    }
+
     console.log(this.enemies[0].points);
 
     for (let i = 0; i < this.enemies.length; i++) {
       this.enemies[i].update(walls, this.dummies[i]);
       this.dummies[i].update(walls);
     }
+
+    this.generationLifetime++;
   };
 
   draw = (ctx: CanvasRenderingContext2D, showSensors: boolean): void => {

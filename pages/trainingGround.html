@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/brain.svg" />
+    <link rel="stylesheet" type="text/css" href="../style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Training Ground</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="training-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="button-space">
+          <button id="button-network">Show/hide network visualization</button>
+          <button id="button-sensors">Show/hide sensors</button>
+          <button id="button-save">Export best brain</button>
+          <div id="import-container">
+            <label for="file-selector">Import neaural network</label>
+            <input type="file" id="button-import" accept="text/plain">
+          </div>
+        </div>
+      </div>
+      <div id="network-container">
+        <canvas id="network-canvas"></canvas>
+      </div>
+    </div>
+    <script type="module" src="/src/trainingGround.ts"></script>
+  </body>
+</html>

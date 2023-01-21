@@ -5,6 +5,7 @@ body {
 
 #app {
   min-width: fit-content;
+  min-height: 100vh;
   padding-top: 10px;
   display: flex;
   flex-direction: row;
@@ -13,12 +14,18 @@ body {
   gap: 30px;
 }
 
-#gameCanvas {
+#menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+#game-canvas {
   background-color: #b6b6b6;
   border: 2px #222222 solid;
 }
 
-#networkCanvas {
+#network-canvas {
   background-color: #888888;
   border: 6px #222222 solid;
 }
@@ -30,20 +37,8 @@ body {
   padding: 1rem 0;
 }
 
-#import {
+#import-container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-#button-network{
-  /* position: relative;
-  bottom: -20px;
-  left: -500px; */
-}
-
-#button-sensors{
-  /* position: relative;
-  bottom: -20px;
-  left: -500px; */
 }

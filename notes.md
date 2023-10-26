@@ -30,4 +30,6 @@ I may be behind 3 walls: left, top and right
 
 # Other
 
-It may be a good idea to remove input neurons indicating wall detection. They are the only detectable entities beside Player, so this should a binary situation.
+1. It may be a good idea to remove input neurons indicating wall detection. They are the only detectable entities beside Player, so this should a binary situation.
+2. I should think about giving the enemy a flat boost to fitness instead of a multiplayer to encourage finding and killing the player fast.
+3. Sensors should probably be static and not rotate with the enemy it is attached to.

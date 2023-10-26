@@ -61,7 +61,6 @@ class Enemy extends Fighter {
         }
       }
 
-      // Calculating points (should probably extract)
       this.calculatePoints();
 
       const neuralNetInputs = this.look(walls, player);

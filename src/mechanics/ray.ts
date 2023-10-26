@@ -2,6 +2,7 @@ import { aimRayLength, sensorRayLength } from "configuration";
 import Player from "entities/player";
 import Wall from "entities/wall";
 import RayType from "enums/rayType";
+import IntersectionReading from "models/intersectionReading";
 import SensorReading from "models/sensorReading";
 import { distanceBetweenPoints, pointsDistanceFromLineSegment } from "utilities/mathExtensions";
 import { getIntersection } from "utilities/mechanicsFunctions";
@@ -92,10 +93,15 @@ class Ray {
       const { lines } = walls[i];
 
       for (let j = 0; j < lines.length; j++) {
-        const intersection: SensorReading | null = getIntersection(this.start, this.end, lines[j][0], lines[j][1]);
+        const intersection: IntersectionReading | null = getIntersection(
+          this.start,
+          this.end,
+          lines[j][0],
+          lines[j][1]
+        );
 
         if (intersection) {
-          intersections.push(intersection);
+          intersections.push({ detectedEntity: "WALL", ...intersection });
         }
       }
     }

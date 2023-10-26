@@ -1,4 +1,4 @@
-import SensorReading from "models/sensorReading";
+import IntersectionReading from "models/intersectionReading";
 import Vector2D from "utilities/vector2d";
 
 export const lerp = (A: number, B: number, percentage: number): number => {
@@ -10,7 +10,7 @@ export const getIntersection = (
   endA: Vector2D,
   startB: Vector2D,
   endB: Vector2D
-): SensorReading | null => {
+): IntersectionReading | null => {
   const tTop = (endB.x - startB.x) * (startA.y - startB.y) - (endB.y - startB.y) * (startA.x - startB.x);
   const uTop = (startB.y - startA.y) * (startA.x - endA.x) - (startB.x - startA.x) * (startA.y - endA.y);
   const bottom = (endB.y - startB.y) * (endA.x - startA.x) - (endB.x - startB.x) * (endA.y - startA.y);

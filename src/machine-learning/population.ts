@@ -22,7 +22,7 @@ class Population {
   }
 
   update = (walls: Wall[]) => {
-    if (this.generationLifetime === 3000) {
+    if (this.generationLifetime === 1500) {
       for (const enemy of this.enemies) {
         enemy.isDead = true;
       }

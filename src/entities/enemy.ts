@@ -42,7 +42,7 @@ class Enemy extends Fighter {
     if (brain) {
       this.brain = brain;
     } else {
-      this.brain = new NeuralNetwork([sensorRayCount * 3 + 1, 12, 12, 5]);
+      this.brain = new NeuralNetwork([sensorRayCount * 2 + 1, 12, 12, 5]);
     }
     this.sensor = new Sensor(this);
 
@@ -167,7 +167,6 @@ class Enemy extends Fighter {
       const inputsFromReading = [
         reading === null ? 0 : 1 - reading.offset,
         reading?.detectedEntity === "PLAYER" ? 1 : 0,
-        reading?.detectedEntity === "WALL" ? 1 : 0,
       ];
 
       neuralNetInputs.push(inputsFromReading);

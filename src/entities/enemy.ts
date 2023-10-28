@@ -64,6 +64,7 @@ class Enemy extends Fighter {
       this.calculatePoints();
 
       const neuralNetInputs = this.look(walls, player);
+      // Additional input indicating if player has been spotted to allow making different decisions based on that.
       this.think([...neuralNetInputs, Number(this.playerSpotted)]);
       this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);

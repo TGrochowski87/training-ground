@@ -3,6 +3,12 @@ import WallCollection from "entities/wallCollection";
 import Population from "machine-learning/population";
 import NeuralNetwork from "machine-learning/neuralNetwork";
 
+const urlParams = new URLSearchParams(window.location.search);
+const trainingType: string | null = urlParams.get("training")!;
+if (trainingType != "MOVEMENT" && trainingType != "FULL") {
+  throw Error("Training type cannot be determined from query string.");
+}
+
 const gameCanvas: HTMLCanvasElement = document.getElementById("game-canvas") as HTMLCanvasElement;
 gameCanvas.width = gameScreenWidth;
 gameCanvas.height = gameScreenHeight;
@@ -21,7 +27,7 @@ const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
 
 const populationCount = 100;
-let population: Population = new Population(populationCount);
+let population: Population = new Population(populationCount, trainingType);
 
 const walls: WallCollection = new WallCollection();
 
@@ -117,5 +123,5 @@ function displaySites() {
 const createPopulationFromTemplate = async (file: File) => {
   const content = await file.text();
   const brain = NeuralNetwork.import(content);
-  population = new Population(populationCount, brain);
+  population = new Population(populationCount, trainingType, brain);
 };

@@ -2,6 +2,8 @@ import { dummySpawnPoint, enemySpawnPoint } from "configuration";
 import DummyPlayer from "entities/dummyPlayer";
 import Enemy from "entities/enemy";
 import Wall from "entities/wall";
+import TrainingType from "models/trainingType";
+import Vector2D from "utilities/vector2d";
 import NeuralNetwork from "./neuralNetwork";
 
 class Population {
@@ -9,15 +11,20 @@ class Population {
   dummies: DummyPlayer[];
   generation: number = 1;
 
+  trainingType: TrainingType;
+  dummySpawnPoint: Vector2D;
+
   generationLifetime: number = 0;
 
-  constructor(amount: number, baseBrain?: NeuralNetwork) {
+  constructor(amount: number, trainingType: TrainingType, baseBrain?: NeuralNetwork) {
+    this.trainingType = trainingType;
+    this.dummySpawnPoint = this.trainingType == "FULL" ? dummySpawnPoint : new Vector2D(-1000, -1000);
     this.enemies = [];
     this.dummies = [];
 
     for (let i = 0; i < amount; i++) {
       this.enemies.push(new Enemy(enemySpawnPoint.copy(), baseBrain?.clone()));
-      this.dummies.push(new DummyPlayer(dummySpawnPoint));
+      this.dummies.push(new DummyPlayer(this.dummySpawnPoint));
     }
   }
 
@@ -32,21 +39,35 @@ class Population {
 
     console.log(this.enemies[0].points);
 
-    for (let i = 0; i < this.enemies.length; i++) {
-      this.enemies[i].update(walls, this.dummies[i]);
-      this.dummies[i].update(walls);
+    if (this.trainingType == "FULL") {
+      for (let i = 0; i < this.enemies.length; i++) {
+        this.enemies[i].update(walls, this.dummies[i]);
+        this.dummies[i].update(walls);
+      }
+    } else {
+      for (let i = 0; i < this.enemies.length; i++) {
+        this.enemies[i].update(walls, this.dummies[i]);
+      }
     }
 
     this.generationLifetime++;
   };
 
   draw = (ctx: CanvasRenderingContext2D, showSensors: boolean): void => {
-    this.enemies[0].draw(ctx, showSensors, true);
-    this.dummies[0].draw(ctx);
+    if (this.trainingType == "FULL") {
+      this.enemies[0].draw(ctx, showSensors, true);
+      this.dummies[0].draw(ctx);
 
-    for (let i = 1; i < this.enemies.length; i++) {
-      this.enemies[i].draw(ctx, showSensors, false);
-      this.dummies[i].draw(ctx);
+      for (let i = 1; i < this.enemies.length; i++) {
+        this.enemies[i].draw(ctx, showSensors, false);
+        this.dummies[i].draw(ctx);
+      }
+    } else {
+      this.enemies[0].draw(ctx, showSensors, true);
+
+      for (let i = 1; i < this.enemies.length; i++) {
+        this.enemies[i].draw(ctx, showSensors, false);
+      }
     }
   };
 
@@ -73,14 +94,14 @@ class Population {
 
     const bestEnemyIndex = this.findBestPlayerIndex();
     newPopulation[0] = this.enemies[bestEnemyIndex].clone();
-    newDummies[0] = new DummyPlayer(dummySpawnPoint);
+    newDummies[0] = new DummyPlayer(this.dummySpawnPoint);
 
     for (let i = 1; i < newPopulation.length; i++) {
       const parents = [this.selectEnemy(), this.selectEnemy()];
       newPopulation[i] = parents[0].crossover(parents[1]);
       newPopulation[i].mutate();
 
-      newDummies[i] = new DummyPlayer(dummySpawnPoint);
+      newDummies[i] = new DummyPlayer(this.dummySpawnPoint);
     }
 
     this.enemies = [...newPopulation];

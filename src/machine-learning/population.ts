@@ -29,15 +29,13 @@ class Population {
   }
 
   update = (walls: Wall[]) => {
-    if (this.generationLifetime === 1500) {
+    if (this.generationLifetime === 3000) {
       for (const enemy of this.enemies) {
         enemy.isDead = true;
       }
       this.generationLifetime = 0;
       return;
     }
-
-    console.log(this.enemies[0].points);
 
     if (this.trainingType == "FULL") {
       for (let i = 0; i < this.enemies.length; i++) {

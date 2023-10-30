@@ -1,4 +1,11 @@
-import { gameScreenHeight, gameScreenWidth, networkViewHeight, networkViewWidth, sites } from "configuration";
+import {
+  gameScreenHeight,
+  gameScreenWidth,
+  networkViewHeight,
+  networkViewWidth,
+  siteRadius,
+  sites,
+} from "configuration";
 import WallCollection from "entities/wallCollection";
 import Population from "machine-learning/population";
 import NeuralNetwork from "machine-learning/neuralNetwork";
@@ -115,7 +122,7 @@ function displaySites() {
 
     gameCtx.fillStyle = "#2358D166";
     gameCtx.beginPath();
-    gameCtx.arc(point.x, point.y, 80, 0, 2 * Math.PI);
+    gameCtx.arc(point.x, point.y, siteRadius, 0, 2 * Math.PI);
     gameCtx.fill();
   }
 }

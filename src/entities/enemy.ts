@@ -1,4 +1,4 @@
-import { enemySpawnPoint, gunPointOffset, sensorRayCount, sites } from "configuration";
+import { enemySpawnPoint, gunPointOffset, sensorRayCount, siteRadius, sites } from "configuration";
 import NeuralNetwork from "machine-learning/neuralNetwork";
 import EnemyControls from "mechanics/enemyControls";
 import Sensor from "machine-learning/sensor";
@@ -8,6 +8,7 @@ import Wall from "./wall";
 import SensorReading from "models/sensorReading";
 import Player from "./player";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
+import { lerp } from "utilities/mechanicsFunctions";
 
 class Enemy extends Fighter {
   id: string;
@@ -19,14 +20,14 @@ class Enemy extends Fighter {
   triggerCounter: number = 0;
 
   // Fitness components
-  pointsForBeingCloseToPlayer: number = 0.0;
-  penaltyForBeingAwayFromPlayer: number = 0.0;
-
+  sitesVisited: number = 0;
+  lastSitePosition: Vector2D; // Initially set to spawn position.
   currentTargetSiteIndex: number;
-  distanceFromSite: number;
-  distanceFromSiteCurrent: number = 0.0;
+  needlessShots: number = 0;
+  backwardsCounter: number = 0;
+  runningBackwardsPenalties = 0;
+
   playerShot: boolean = false;
-  points: number = 0.0;
 
   fitness: number = 0.0;
 
@@ -47,8 +48,9 @@ class Enemy extends Fighter {
     this.sensor = new Sensor(this);
 
     this.controls = new EnemyControls();
+
     this.currentTargetSiteIndex = 1;
-    this.distanceFromSite = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
+    this.lastSitePosition = pos;
   }
 
   update = (walls: Wall[], player: Player): void => {
@@ -61,7 +63,24 @@ class Enemy extends Fighter {
         }
       }
 
-      this.calculatePoints();
+      if (this.isSiteReached()) {
+        this.sitesVisited++;
+        this.lastSitePosition = sites[this.currentTargetSiteIndex];
+        this.currentTargetSiteIndex = (this.currentTargetSiteIndex + 1) % sites.length;
+      }
+
+      if (this.canShoot && this.controls.shoot && this.playerSpotted == false) {
+        this.needlessShots++;
+      }
+
+      if (this.controls.backward) {
+        this.backwardsCounter++;
+
+        if (this.backwardsCounter == 100) {
+          this.runningBackwardsPenalties++;
+          this.backwardsCounter = 0;
+        }
+      }
 
       const neuralNetInputs = this.look(walls, player);
       // Additional input indicating if player has been spotted to allow making different decisions based on that.
@@ -127,13 +146,6 @@ class Enemy extends Fighter {
   };
 
   // ========= EVOLUTION ==========================
-  calculateFitness = () => {
-    if (this.playerShot) {
-      this.points *= 1.5;
-    }
-
-    this.fitness = this.points;
-  };
 
   clone = (): Enemy => {
     const clonedBrain = this.brain.clone();
@@ -181,24 +193,37 @@ class Enemy extends Fighter {
     this.controls.decideOnMove(outputs);
   };
 
-  // =============================================
+  // ========= FITNESS ===========================
 
-  private calculatePoints = () => {
-    const distanceFromSiteCurrent: number = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
-    if (distanceFromSiteCurrent < this.distanceFromSite) {
-      this.points += (this.distanceFromSite - distanceFromSiteCurrent) / 10;
-      this.distanceFromSite = distanceFromSiteCurrent;
+  calculateFitness = () => {
+    const pointsForReachingSite: number = 5;
+    let points: number = 0;
 
-      if (this.distanceFromSite < 80) {
-        this.points += 70;
-        this.currentTargetSiteIndex = (this.currentTargetSiteIndex + 1) % sites.length;
-        this.distanceFromSite = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
-      }
+    // Points for every reached site
+    points += this.sitesVisited * pointsForReachingSite;
+
+    // Points for approaching the last site
+    const distanceLeft = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
+    const initialDistance = distanceBetweenPoints(this.lastSitePosition, sites[this.currentTargetSiteIndex]);
+    points += distanceLeft > initialDistance ? 0 : lerp(0, pointsForReachingSite, 1 - distanceLeft / initialDistance);
+
+    // Penalty for needless shooting
+    points *= Math.pow(0.99, this.needlessShots);
+
+    // Penalty for running backwards
+    points *= Math.pow(0.97, this.runningBackwardsPenalties);
+
+    // Big boost for shooting the player
+    // TODO: Consider slight boost for shooting when player spotted
+    if (this.playerShot) {
+      points *= 1.5;
     }
 
-    if (this.controls.shoot && this.playerSpotted === false) {
-      this.points *= 0.9;
-    }
+    this.fitness = points;
+  };
+
+  private isSiteReached = (): boolean => {
+    return distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]) < siteRadius;
   };
 }
 

@@ -6,6 +6,7 @@ If they don't see me, they will be in exploring state.
 - They will gain more points for fitness the more area they cover exploring
 - They will gain linearly more points the closer they get to their next site
   - Seems easier 
+  - Generation lifetime should be at least long enough for the AI to be able to visit every site once. Preferably more.
 
 The engage stage is simply the `Single teaching sequence`, but the initial brain should already be trained to scan the area.
 

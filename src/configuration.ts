@@ -33,3 +33,4 @@ export const sites: Vector2D[] = [
   new Vector2D(80, gameScreenHeight - 80),
   new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2),
 ];
+export const siteRadius: number = 50;

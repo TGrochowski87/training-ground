@@ -1,8 +1,8 @@
 import IntersectionReading from "models/intersectionReading";
 import Vector2D from "utilities/vector2d";
 
-export const lerp = (A: number, B: number, percentage: number): number => {
-  return A + (B - A) * percentage;
+export const lerp = (A: number, B: number, fraction: number): number => {
+  return A + (B - A) * fraction;
 };
 
 export const getIntersection = (

@@ -1,35 +1,24 @@
-# Ways of teaching
-
-### Split the entire teaching process to stages
-
-1. Learn getting to me in a single place
-2. Learn chasing me
-3. Learn avoiding bullets
-4. Learn shooting me
-5. Save neural nets between stages, do not start form scratch every time
-
+# Calculating fitness
 
 ### Two states - explore and engage
 
-If they don't see me, they will be in exploring state. They will have more fitness the more area they cover exploring
+If they don't see me, they will be in exploring state.
+- They will gain more points for fitness the more area they cover exploring
+- They will gain linearly more points the closer they get to their next site
+  - Seems easier 
 
-How I see it now, is that by default they will be in exploring state, but when they notice the player, they will change their weights to the second matrix, dedicated for killing.
-
-Teaching process:
-  - Teach one neural network for tunning around between distant points
-  - Prepare a new training ground where every enemy in population will have its own player to shoot down
-  - Tech the second neural network to shoot
-  - Switch between matrices depending on sensors' readings
+The engage stage is simply the `Single teaching sequence`, but the initial brain should already be trained to scan the area.
 
 
 ### Single teaching sequence
 
-They would run around just like in first phase of the option above, but if they see me, they get a new input and get points for shooting me.
-I may be behind 3 walls: left, top and right
+They would run around just like in first phase of the option above, but if they see the player, they get a new input and get points for shooting them.
 
+## Ways for improvement
 
-# Other
+### Better to be considered early
+1. Now that I have introduced a new input node indicating if the player has been spotted, I should probably increase the number of inner nodes, as the value from this one new input node should have potential to change their behavior drastically.
+   - I could also switch between two dedicated matrices, but it would be even harder to train properly and I want it to be a single brain
 
-1. It may be a good idea to remove input neurons indicating wall detection. They are the only detectable entities beside Player, so this should a binary situation.
-2. I should think about giving the enemy a flat boost to fitness instead of a multiplayer to encourage finding and killing the player fast.
-3. Sensors should probably be static and not rotate with the enemy it is attached to.
+### If there is time left
+1. Next target site for exploring should be randomized with fixed seed, so they don't only learn one boring pattern.

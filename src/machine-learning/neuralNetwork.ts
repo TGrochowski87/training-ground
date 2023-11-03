@@ -1,4 +1,5 @@
 import { getRGBAFromWeight, lerp } from "utilities/mechanicsFunctions";
+import { sigmoid } from "./activationFunctions";
 import Layer from "./Layer";
 
 class NeuralNetwork {
@@ -21,11 +22,12 @@ class NeuralNetwork {
   }
 
   feedForward = (inputs: number[]): number[] => {
-    // Funkcja output z asteroid.
+    // Input
+    let outputs = this.layers[0].feedForward(inputs).map(o => sigmoid(o));
 
-    let outputs = this.layers[0].feedForward(inputs);
+    // Hidden & Output
     for (let i = 1; i < this.layers.length; i++) {
-      outputs = this.layers[i].feedForward(outputs);
+      outputs = this.layers[i].feedForward(outputs).map(o => sigmoid(o));
     }
 
     return outputs;

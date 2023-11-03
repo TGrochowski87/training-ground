@@ -19,9 +19,14 @@ They would run around just like in first phase of the option above, but if they 
 
 ### Better to be considered early
 1. Now that I have introduced a new input node indicating if the player has been spotted, I should probably increase the number of inner (hidden) nodes, as the value from this one new input node should have potential to change their behavior drastically.
-   - I could also switch between two dedicated matrices, but it would be even harder to train properly and I want it to be a single brain
+   - I could also switch between two dedicated matrices, but it would be even harder to train properly and I want it to be a single brain.
+
 2. I should try providing some identifier of the targeted site to the network. Currently AI can only train for a one generic pattern to reach any of the sites. This would allow them to make different actions based on the targeted site.
-   - The only viable option I see is to use a simple array index of the site. This would result in 3 more input nodes. (I assume I won't increase the number of sites over 7.)
+   - **The best option seems to be adding a one more input node for every sensor that would indicate the direction of the next site. This should even provide enough information for AI to try and avoid obstacles.**
+   - The other option I thought about was to use a simple array index of the site. This would result in 3 more input nodes. This option provides less information to the network and the number of nodes is dependant of the number of sites.
+
+3. 
 
 ### If there is time left
 1. Next target site for exploring should be randomized with fixed seed, so they don't only learn one boring pattern.
+2. Implement non-redundant genetic encoding (Thierens, 1996) for conventional neural network to avoid competing conventions.

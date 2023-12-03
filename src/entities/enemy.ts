@@ -1,11 +1,11 @@
 import { enemySpawnPoint, gunPointOffset, sensorRayCount, siteRadius, sites } from "configuration";
-import NeuralNetwork from "machine-learning/neuralNetwork";
+import NeuralNetwork from "machine-learning/conventional/neuralNetwork";
 import EnemyControls from "mechanics/enemyControls";
 import Sensor from "machine-learning/sensor";
 import Vector2D from "utilities/vector2d";
 import Fighter from "./fighter";
 import Wall from "./wall";
-import SensorReading from "models/sensorReading";
+import SensorReading from "models/SensorReading";
 import Player from "./player";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
 import { lerp } from "utilities/mechanicsFunctions";

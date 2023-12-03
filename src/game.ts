@@ -2,7 +2,7 @@ import { enemySpawnPoint, gameScreenHeight, gameScreenWidth } from "configuratio
 import Enemy from "entities/enemy";
 import Player from "entities/player";
 import WallCollection from "entities/wallCollection";
-import NeuralNetwork from "machine-learning/neuralNetwork";
+import NeuralNetwork from "machine-learning/conventional/neuralNetwork";
 import Vector2D from "utilities/vector2d";
 
 const appContainer: HTMLDivElement = document.getElementById("app") as HTMLDivElement;

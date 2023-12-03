@@ -3,12 +3,13 @@ import {
   gameScreenWidth,
   networkViewHeight,
   networkViewWidth,
+  populationSize,
   siteRadius,
   sites,
 } from "configuration";
 import WallCollection from "entities/wallCollection";
-import Population from "machine-learning/population";
-import NeuralNetwork from "machine-learning/neuralNetwork";
+import Population from "machine-learning/conventional/population";
+import NeuralNetwork from "machine-learning/conventional/neuralNetwork";
 
 const urlParams = new URLSearchParams(window.location.search);
 const trainingType: string | null = urlParams.get("training")!;
@@ -33,8 +34,7 @@ const importBrainButton: HTMLInputElement = document.getElementById("button-impo
 const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
 
-const populationCount = 200;
-let population: Population = new Population(populationCount, trainingType);
+let population: Population = new Population(populationSize, trainingType);
 
 const walls: WallCollection = new WallCollection();
 
@@ -130,5 +130,5 @@ function displaySites() {
 const createPopulationFromTemplate = async (file: File) => {
   const content = await file.text();
   const brain = NeuralNetwork.import(content);
-  population = new Population(populationCount, trainingType, brain);
+  population = new Population(populationSize, trainingType, brain);
 };

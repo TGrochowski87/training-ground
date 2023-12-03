@@ -1,4 +1,4 @@
-import DistanceData from "models/distanceData";
+import DistanceData from "models/DistanceData";
 import Vector2D from "utilities/vector2d";
 
 export const randomBetween = (min: number = 0, max: number = 1) => {

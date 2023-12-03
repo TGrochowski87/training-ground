@@ -2,7 +2,7 @@ import { dummySpawnPoint, enemySpawnPoint } from "configuration";
 import DummyPlayer from "entities/dummyPlayer";
 import Enemy from "entities/enemy";
 import Wall from "entities/wall";
-import TrainingType from "models/trainingType";
+import TrainingType from "models/TrainingType";
 import { randomBetween } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
 import NeuralNetwork from "./neuralNetwork";

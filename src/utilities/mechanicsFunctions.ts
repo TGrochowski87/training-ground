@@ -1,4 +1,4 @@
-import IntersectionReading from "models/intersectionReading";
+import IntersectionReading from "models/IntersectionReading";
 import Vector2D from "utilities/vector2d";
 
 export const lerp = (A: number, B: number, fraction: number): number => {

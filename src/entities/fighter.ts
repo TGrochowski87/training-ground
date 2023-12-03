@@ -2,7 +2,7 @@ import { gunPointOffset, playerRadius, playerSpeed } from "configuration";
 import RayType from "enums/rayType";
 import Controls from "mechanics/controls";
 import Ray from "mechanics/ray";
-import DistanceData from "models/distanceData";
+import DistanceData from "models/DistanceData";
 import { pointsDistanceFromLineSegment } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
 import Bullet from "./bullet";

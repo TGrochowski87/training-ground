@@ -3,7 +3,7 @@ import Ray from "mechanics/ray";
 import { lerp } from "utilities/mechanicsFunctions";
 import RayType from "enums/rayType";
 import Wall from "entities/wall";
-import SensorReading from "models/sensorReading";
+import SensorReading from "models/SensorReading";
 import Fighter from "entities/fighter";
 import Player from "entities/player";
 

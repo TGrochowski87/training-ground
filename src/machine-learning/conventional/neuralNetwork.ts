@@ -1,5 +1,5 @@
 import { getRGBAFromWeight, lerp } from "utilities/mechanicsFunctions";
-import { sigmoid } from "./activationFunctions";
+import { sigmoid } from "machine-learning/activationFunctions";
 import Layer from "./Layer";
 
 class NeuralNetwork {

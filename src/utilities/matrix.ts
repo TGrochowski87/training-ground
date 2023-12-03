@@ -1,4 +1,4 @@
-import { mutationRate } from "configuration";
+import { mutationRate, weightPerturbationChance } from "configuration";
 import { gaussianRandom, randomBetween } from "./mathExtensions";
 
 class Matrix {
@@ -186,17 +186,21 @@ class Matrix {
   mutate = (): void => {
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
-        const rand: number = Math.random();
+        if (Math.random() > mutationRate) {
+          continue;
+        }
 
-        if (rand < mutationRate) {
+        if (Math.random() < weightPerturbationChance) {
           this.matrix[i][j] += gaussianRandom() / 5;
+        } else {
+          this.matrix[i][j] = randomBetween(-1, 1);
+        }
 
-          if (this.matrix[i][j] > 1) {
-            this.matrix[i][j] = 1;
-          }
-          if (this.matrix[i][j] < -1) {
-            this.matrix[i][j] = -1;
-          }
+        if (this.matrix[i][j] > 1) {
+          this.matrix[i][j] = 1;
+        }
+        if (this.matrix[i][j] < -1) {
+          this.matrix[i][j] = -1;
         }
       }
     }

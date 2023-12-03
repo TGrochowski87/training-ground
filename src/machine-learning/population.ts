@@ -71,8 +71,8 @@ class Population {
   };
 
   calculateFitness = (): void => {
-    for (let i = 0; i < this.enemies.length; i++) {
-      this.enemies[i].calculateFitness();
+    for (const enemy of this.enemies) {
+      enemy.calculateFitness();
     }
     const fitnessRanking = this.enemies
       .map(e => e.fitness)
@@ -97,6 +97,7 @@ class Population {
 
     for (let i = 1; i < newPopulation.length; i++) {
       const parents = [this.selectEnemy(), this.selectEnemy()];
+      // TODO: Consider cloning instead of crossover at some rate.
       newPopulation[i] = parents[0].crossover(parents[1]);
       newPopulation[i].mutate();
 

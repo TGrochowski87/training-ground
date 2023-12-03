@@ -3,6 +3,7 @@ import DummyPlayer from "entities/dummyPlayer";
 import Enemy from "entities/enemy";
 import Wall from "entities/wall";
 import TrainingType from "models/trainingType";
+import { randomBetween } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
 import NeuralNetwork from "./neuralNetwork";
 
@@ -86,7 +87,7 @@ class Population {
     console.log(fitnessRanking[2]);
   };
 
-  neuralSelection = (): void => {
+  naturalSelection = (): void => {
     let newPopulation: Enemy[] = new Array<Enemy>(this.enemies.length);
     let newDummies: DummyPlayer[] = new Array<DummyPlayer>(this.enemies.length);
 
@@ -108,8 +109,8 @@ class Population {
   };
 
   private selectEnemy = (): Enemy => {
-    let fitnessSum = this.enemies.map(e => e.fitness).reduce((prev, current) => prev + current, 0);
-    const rand: number = Math.floor(Math.random() * fitnessSum);
+    const fitnessSum = this.enemies.map(e => e.fitness).reduce((prev, current) => prev + current, 0);
+    const rand: number = randomBetween(0, fitnessSum);
 
     let runningSum: number = 0.0;
     for (let i = 0; i < this.enemies.length; i++) {

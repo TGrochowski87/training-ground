@@ -33,7 +33,7 @@ const importBrainButton: HTMLInputElement = document.getElementById("button-impo
 const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
 
-const populationCount = 100;
+const populationCount = 200;
 let population: Population = new Population(populationCount, trainingType);
 
 const walls: WallCollection = new WallCollection();
@@ -71,7 +71,7 @@ function manageGameCanvas(time: number) {
     population.update(walls.collection);
   } else {
     population.calculateFitness();
-    population.neuralSelection();
+    population.naturalSelection();
   }
   population.draw(gameCtx, showSensors);
 

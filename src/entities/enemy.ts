@@ -43,7 +43,7 @@ class Enemy extends Fighter {
     if (brain) {
       this.brain = brain;
     } else {
-      this.brain = new NeuralNetwork([sensorRayCount * 2 + 1, 12, 12, 5]);
+      this.brain = new NeuralNetwork([sensorRayCount * 2, 12, 12, 5]);
     }
     this.sensor = new Sensor(this);
 
@@ -83,11 +83,11 @@ class Enemy extends Fighter {
       }
 
       const neuralNetInputs = this.look(walls, player);
-      // Additional input indicating if player has been spotted to allow making different decisions based on that.
-      this.think([...neuralNetInputs, Number(this.playerSpotted)]);
+      this.think([...neuralNetInputs]);
       this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
     }
+
     this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
     this.bullets.forEach(bullet => bullet.update(walls, [player]));
     if (this.bullets.some(b => b.enemyHit)) {
@@ -169,14 +169,13 @@ class Enemy extends Fighter {
     this.sensor.update(walls, player);
     const sensorReadings: (SensorReading | null)[] = this.sensor.getReadings();
 
-    if (sensorReadings.some(r => r?.detectedEntity === "PLAYER")) {
-      this.playerSpotted = true;
-      this.triggerCounter = 0;
-    }
-
     let neuralNetInputs: number[][] = [];
-
     for (const reading of sensorReadings) {
+      if (reading?.detectedEntity === "PLAYER") {
+        this.playerSpotted = true;
+        this.triggerCounter = 0;
+      }
+
       const inputsFromReading = [
         reading === null ? 0 : 1 - reading.offset,
         reading?.detectedEntity === "PLAYER" ? 1 : 0,

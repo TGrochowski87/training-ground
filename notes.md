@@ -25,8 +25,6 @@ They would run around just like in first phase of the option above, but if they 
    - **The best option seems to be adding a one more input node for every sensor that would indicate the direction of the next site. This should even provide enough information for AI to try and avoid obstacles.**
    - The other option I thought about was to use a simple array index of the site. This would result in 3 more input nodes. This option provides less information to the network and the number of nodes is dependant of the number of sites.
 
-3. 
-
 ### If there is time left
 1. Next target site for exploring should be randomized with fixed seed, so they don't only learn one boring pattern.
 2. Implement non-redundant genetic encoding (Thierens, 1996) for conventional neural network to avoid competing conventions.

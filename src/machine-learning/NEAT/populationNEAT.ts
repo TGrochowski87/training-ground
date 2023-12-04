@@ -9,9 +9,12 @@ import PartialConnectionData from "machine-learning/NEAT/models/PartialConnectio
 import SplitNumber from "machine-learning/NEAT/models/SplitNumber";
 import Species from "machine-learning/NEAT/species";
 import Specimen from "machine-learning/NEAT/specimen";
+import Population from "machine-learning/population";
+import { Mode } from "models/UserSettings";
 
-class Population {
+class PopulationNEAT extends Population {
   population: Species[];
+  selectedSpecies: Species;
   lastUsedSpeciesId: number = 0;
   size: number;
 
@@ -28,9 +31,12 @@ class Population {
   // It is not clear which approach is more effective.
   innovations: PartialConnectionData[] = [];
 
-  constructor(size: number) {
+  constructor(size: number, trainingMode: Mode) {
+    super();
+
     this.size = size;
     this.population = [new Species(this.lastUsedSpeciesId++)];
+    this.selectedSpecies = this.population[0];
 
     for (let i = 0; i < size; i++) {
       this.population[0].push(new Specimen());
@@ -118,6 +124,18 @@ class Population {
     return bestSpecimen;
   }
 
+  selectSpecies = (id: number) => {
+    const selectedSpecies = this.population.find(s => s.id == id);
+
+    // TODO: Might switch from removing species from list to marking as extinct.
+    if (selectedSpecies == undefined) {
+      throw Error("This species is not a part of current population.");
+    }
+
+    // TODO: Must change switch selected species in event of extinction.
+    this.selectedSpecies = selectedSpecies;
+  };
+
   private distributeOffspringBetweenSpecies = (offspring: ReadonlyArray<Specimen>) => {
     const speciesAssignments: Specimen[][] = Array.from({ length: this.population.length }, (v, k) => []);
     let representatives: Specimen[] = this.population.map(s => s.getRandomRepresentative());
@@ -141,7 +159,7 @@ class Population {
     this.replacementOfGenerations(speciesAssignments);
   };
 
-  // Might want to start adjusting after some generations.
+  // TODO: Might want to start adjusting after some generations.
   private adjustCompatibilityThreshold = () => {
     if (this.population.length > this.targetSpeciesCount) {
       this.compatibilityThreshold += this.compatibilityModifier;
@@ -271,4 +289,4 @@ class Population {
   };
 }
 
-export default Population;
+export default PopulationNEAT;

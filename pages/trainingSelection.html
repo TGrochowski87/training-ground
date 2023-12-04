@@ -9,10 +9,30 @@
   </head>
   <body>
     <div id="app">
-      <div id="training-selection">
-        <button onclick="window.location.href='./trainingGround.html?training=MOVEMENT'">Movement only</button>
-        <button onclick="window.location.href='./trainingGround.html?training=FULL'">Full training with dummy players</button>
-      </div>
+      <form id="training-selection" action="./trainingGround.html">
+        <div>
+          <p>Training mode</p>
+          <input type="radio" id="mode-movement" name="mode" value="movement" checked />
+          <label for="mode-movement" >Movement only</label>
+
+          <input type="radio" id="mode-full" name="mode" value="full" />
+          <label for="mode-full" >Full training</label>
+        </div>
+
+        <br>
+
+        <div>
+          <p>Neuroevolution method</p>
+          <input type="radio" id="method-conventional" name="method" value="conventional" checked />
+          <label for="method-conventional" >Conventional (static topology)</label>
+
+          <input type="radio" id="method-NEAT" name="method" value="NEAT" />
+          <label for="momethodde-NEAT" >NeuroEvolution of Augmenting Topologies (TWEANN)</label>
+        </div>
+        <hr />
+        <br>
+        <input type="submit" value="Begin">
+      </form>
     </div>
   </body>
 </html>

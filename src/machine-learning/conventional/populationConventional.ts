@@ -2,28 +2,31 @@ import { dummySpawnPoint, enemySpawnPoint } from "configuration";
 import DummyPlayer from "entities/dummyPlayer";
 import Enemy from "entities/enemy";
 import Wall from "entities/wall";
-import TrainingType from "models/TrainingType";
+import Population from "machine-learning/population";
+import { Mode } from "models/UserSettings";
 import { randomBetween } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
 import NeuralNetwork from "./neuralNetwork";
 
-class Population {
+class PopulationConventional extends Population {
   enemies: Enemy[];
   dummies: DummyPlayer[];
   generation: number = 1;
 
-  trainingType: TrainingType;
+  trainingMode: Mode;
   dummySpawnPoint: Vector2D;
 
   generationLifetime: number = 0;
 
-  constructor(amount: number, trainingType: TrainingType, baseBrain?: NeuralNetwork) {
-    this.trainingType = trainingType;
-    this.dummySpawnPoint = this.trainingType == "FULL" ? dummySpawnPoint : new Vector2D(-1000, -1000);
+  constructor(size: number, trainingMode: Mode, baseBrain?: NeuralNetwork) {
+    super();
+
+    this.trainingMode = trainingMode;
+    this.dummySpawnPoint = this.trainingMode == "full" ? dummySpawnPoint : new Vector2D(-1000, -1000);
     this.enemies = [];
     this.dummies = [];
 
-    for (let i = 0; i < amount; i++) {
+    for (let i = 0; i < size; i++) {
       this.enemies.push(new Enemy(enemySpawnPoint.copy(), baseBrain?.clone()));
       this.dummies.push(new DummyPlayer(this.dummySpawnPoint));
     }
@@ -38,7 +41,7 @@ class Population {
       return;
     }
 
-    if (this.trainingType == "FULL") {
+    if (this.trainingMode == "full") {
       for (let i = 0; i < this.enemies.length; i++) {
         this.enemies[i].update(walls, this.dummies[i]);
         this.dummies[i].update(walls);
@@ -53,22 +56,30 @@ class Population {
   };
 
   draw = (ctx: CanvasRenderingContext2D, showSensors: boolean): void => {
-    if (this.trainingType == "FULL") {
-      this.enemies[0].draw(ctx, showSensors, true);
-      this.dummies[0].draw(ctx);
-
+    if (this.trainingMode == "full") {
       for (let i = 1; i < this.enemies.length; i++) {
         this.enemies[i].draw(ctx, showSensors, false);
         this.dummies[i].draw(ctx);
       }
-    } else {
-      this.enemies[0].draw(ctx, showSensors, true);
 
+      // Draw the champion last to show it on top
+      this.enemies[0].draw(ctx, showSensors, true);
+      this.dummies[0].draw(ctx);
+    } else {
       for (let i = 1; i < this.enemies.length; i++) {
         this.enemies[i].draw(ctx, showSensors, false);
       }
+
+      // Draw the champion last to show it on top
+      this.enemies[0].draw(ctx, showSensors, true);
     }
   };
+
+  drawBestMembersNeuralNetwork = (ctx: CanvasRenderingContext2D): void => {
+    this.enemies[0].drawNeuralNetwork(ctx);
+  };
+
+  isPopulationExtinct = (): boolean => this.enemies.every(e => e.isDead);
 
   calculateFitness = (): void => {
     for (const enemy of this.enemies) {
@@ -109,6 +120,10 @@ class Population {
     this.generation++;
   };
 
+  exportBestNeuralNetwork(): void {
+    this.enemies[0].brain.export();
+  }
+
   private selectEnemy = (): Enemy => {
     const fitnessSum = this.enemies.map(e => e.fitness).reduce((prev, current) => prev + current, 0);
     const rand: number = randomBetween(0, fitnessSum);
@@ -138,4 +153,4 @@ class Population {
   };
 }
 
-export default Population;
+export default PopulationConventional;

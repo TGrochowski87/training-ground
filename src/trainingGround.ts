@@ -8,14 +8,12 @@ import {
   sites,
 } from "configuration";
 import WallCollection from "entities/wallCollection";
-import Population from "machine-learning/conventional/population";
+import PopulationConventional from "machine-learning/conventional/populationConventional";
 import NeuralNetwork from "machine-learning/conventional/neuralNetwork";
+import UserSettingsReader from "utilities/userSettingsReader";
+import Population from "machine-learning/population";
 
-const urlParams = new URLSearchParams(window.location.search);
-const trainingType: string | null = urlParams.get("training")!;
-if (trainingType != "MOVEMENT" && trainingType != "FULL") {
-  throw Error("Training type cannot be determined from query string.");
-}
+const userSettings = UserSettingsReader.getConfig();
 
 const gameCanvas: HTMLCanvasElement = document.getElementById("game-canvas") as HTMLCanvasElement;
 gameCanvas.width = gameScreenWidth;
@@ -34,7 +32,7 @@ const importBrainButton: HTMLInputElement = document.getElementById("button-impo
 const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
 
-let population: Population = new Population(populationSize, trainingType);
+let population: Population = new PopulationConventional(populationSize, userSettings.mode);
 
 const walls: WallCollection = new WallCollection();
 
@@ -67,7 +65,7 @@ function animate(time: number = 0) {
 function manageGameCanvas(time: number) {
   gameCtx.clearRect(0, 0, gameCtx.canvas.width, gameCtx.canvas.height);
 
-  if (population.enemies.some(e => e.isDead === false)) {
+  if (population.isPopulationExtinct() == false) {
     population.update(walls.collection);
   } else {
     population.calculateFitness();
@@ -80,7 +78,7 @@ function manageGameCanvas(time: number) {
 
 function manageNetworkCanvas(time: number) {
   networkCtx.clearRect(0, 0, networkCtx.canvas.width, networkCtx.canvas.height);
-  population.enemies[0].drawNeuralNetwork(networkCtx);
+  population.drawBestMembersNeuralNetwork(networkCtx);
 }
 
 function setupOnClicks() {
@@ -103,7 +101,7 @@ function setupOnClicks() {
   };
 
   exportBrainButton.onclick = () => {
-    population.enemies[0].brain.export();
+    population.exportBestNeuralNetwork();
   };
 
   importBrainButton.onchange = (event: Event) => {
@@ -130,5 +128,5 @@ function displaySites() {
 const createPopulationFromTemplate = async (file: File) => {
   const content = await file.text();
   const brain = NeuralNetwork.import(content);
-  population = new Population(populationSize, trainingType, brain);
+  population = new PopulationConventional(populationSize, userSettings.mode, brain);
 };

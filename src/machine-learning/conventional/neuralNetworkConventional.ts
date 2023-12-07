@@ -1,14 +1,17 @@
 import { getRGBAFromWeight, lerp } from "utilities/mechanicsFunctions";
 import { sigmoid } from "machine-learning/activationFunctions";
 import Layer from "./Layer";
+import NeuralNetwork from "machine-learning/neuralNetwork";
 
-class NeuralNetwork {
+class NeuralNetworkConventional extends NeuralNetwork {
   layers: Layer[];
   receivedNeuronCounts: number[];
 
   outputLabels: string[] = ["🠉", "🠈", "🠊", "🠋", "🔫"];
 
   constructor(neuronCounts: number[], layers?: Layer[]) {
+    super();
+
     this.layers = [];
     this.receivedNeuronCounts = [...neuronCounts];
 
@@ -21,7 +24,7 @@ class NeuralNetwork {
     }
   }
 
-  feedForward = (inputs: number[]): number[] => {
+  process = (inputs: number[]): number[] => {
     // Input
     let outputs = this.layers[0].feedForward(inputs).map(o => sigmoid(o));
 
@@ -33,13 +36,13 @@ class NeuralNetwork {
     return outputs;
   };
 
-  clone = (): NeuralNetwork => {
+  clone = (): NeuralNetworkConventional => {
     const clonedLayers = this.layers.map(l => l.clone());
-    const clone = new NeuralNetwork([...this.receivedNeuronCounts], clonedLayers);
+    const clone = new NeuralNetworkConventional([...this.receivedNeuronCounts], clonedLayers);
     return clone;
   };
 
-  crossover = (other: NeuralNetwork): NeuralNetwork => {
+  crossover = (other: NeuralNetworkConventional): NeuralNetworkConventional => {
     const childLayers: Layer[] = [];
 
     for (let i = 0; i < this.layers.length; i++) {
@@ -47,7 +50,7 @@ class NeuralNetwork {
       childLayers.push(childLayer);
     }
 
-    const child = new NeuralNetwork([...this.receivedNeuronCounts], childLayers);
+    const child = new NeuralNetworkConventional([...this.receivedNeuronCounts], childLayers);
     return child;
   };
 
@@ -74,7 +77,7 @@ class NeuralNetwork {
     }
   };
 
-  export = (): void => {
+  export = (fitness: number): void => {
     let stringRepresentation = "";
     stringRepresentation += `${this.receivedNeuronCounts.join(" ")}\n\n`;
     for (const layer of this.layers) {
@@ -82,13 +85,13 @@ class NeuralNetwork {
     }
     let a = document.createElement("a") as HTMLAnchorElement;
     a.href = window.URL.createObjectURL(new Blob([stringRepresentation], { type: "text/plain" }));
-    a.download = "brain.txt";
+    a.download = `brain-conventional-f${fitness}.txt`;
     document.body.append(a);
     a.click();
     document.body.removeChild(a);
   };
 
-  static import = (text: string): NeuralNetwork => {
+  static import = (text: string): NeuralNetworkConventional => {
     let listRepresentation = text.split("\n\n");
     const countsText = listRepresentation.splice(0, 1);
     const counts = countsText[0].split(" ").map(s => +s);
@@ -99,7 +102,7 @@ class NeuralNetwork {
       layers.push(reconstructedLayer);
     }
 
-    const reconstructedNetwork = new NeuralNetwork(counts, layers);
+    const reconstructedNetwork = new NeuralNetworkConventional(counts, layers);
     return reconstructedNetwork;
   };
 
@@ -183,4 +186,4 @@ class NeuralNetwork {
   };
 }
 
-export default NeuralNetwork;
+export default NeuralNetworkConventional;

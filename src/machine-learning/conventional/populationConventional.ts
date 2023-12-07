@@ -6,49 +6,44 @@ import Population from "machine-learning/population";
 import { Mode } from "models/UserSettings";
 import { randomBetween } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
-import NeuralNetwork from "./neuralNetwork";
+import EnemyConventional from "./enemyConventional";
+import NeuralNetworkConventional from "./neuralNetworkConventional";
 
 class PopulationConventional extends Population {
-  enemies: Enemy[];
+  members: EnemyConventional[];
   dummies: DummyPlayer[];
-  generation: number = 1;
 
-  trainingMode: Mode;
-  dummySpawnPoint: Vector2D;
+  memberColor: string = "#A77500";
 
-  generationLifetime: number = 0;
+  constructor(size: number, trainingMode: Mode, baseBrain?: NeuralNetworkConventional) {
+    super(trainingMode);
 
-  constructor(size: number, trainingMode: Mode, baseBrain?: NeuralNetwork) {
-    super();
-
-    this.trainingMode = trainingMode;
-    this.dummySpawnPoint = this.trainingMode == "full" ? dummySpawnPoint : new Vector2D(-1000, -1000);
-    this.enemies = [];
+    this.members = [];
     this.dummies = [];
 
     for (let i = 0; i < size; i++) {
-      this.enemies.push(new Enemy(enemySpawnPoint.copy(), baseBrain?.clone()));
+      this.members.push(new EnemyConventional(enemySpawnPoint.copy(), baseBrain?.clone(), false));
       this.dummies.push(new DummyPlayer(this.dummySpawnPoint));
     }
   }
 
   update = (walls: Wall[]) => {
     if (this.generationLifetime === 3000) {
-      for (const enemy of this.enemies) {
-        enemy.isDead = true;
+      for (const member of this.members) {
+        member.isDead = true;
       }
       this.generationLifetime = 0;
       return;
     }
 
     if (this.trainingMode == "full") {
-      for (let i = 0; i < this.enemies.length; i++) {
-        this.enemies[i].update(walls, this.dummies[i]);
+      for (let i = 0; i < this.members.length; i++) {
+        this.members[i].update(walls, this.dummies[i]);
         this.dummies[i].update(walls);
       }
     } else {
-      for (let i = 0; i < this.enemies.length; i++) {
-        this.enemies[i].update(walls, this.dummies[i]);
+      for (let i = 0; i < this.members.length; i++) {
+        this.members[i].update(walls, this.dummies[i]);
       }
     }
 
@@ -57,38 +52,48 @@ class PopulationConventional extends Population {
 
   draw = (ctx: CanvasRenderingContext2D, showSensors: boolean): void => {
     if (this.trainingMode == "full") {
-      for (let i = 1; i < this.enemies.length; i++) {
-        this.enemies[i].draw(ctx, showSensors, false);
+      for (let i = 1; i < this.members.length; i++) {
+        this.members[i].draw(ctx, showSensors, this.memberColor);
         this.dummies[i].draw(ctx);
       }
 
-      // Draw the champion last to show it on top
-      this.enemies[0].draw(ctx, showSensors, true);
+      // The champion is always at index 0, so draw him last, so it would be always visible.
+      this.members[0].draw(ctx, showSensors, this.memberColor);
       this.dummies[0].draw(ctx);
     } else {
-      for (let i = 1; i < this.enemies.length; i++) {
-        this.enemies[i].draw(ctx, showSensors, false);
+      for (let i = 1; i < this.members.length; i++) {
+        this.members[i].draw(ctx, showSensors, this.memberColor);
       }
 
-      // Draw the champion last to show it on top
-      this.enemies[0].draw(ctx, showSensors, true);
+      // The champion is always at index 0, so draw him last, so it would be always visible.
+      this.members[0].draw(ctx, showSensors, this.memberColor);
     }
   };
 
-  drawBestMembersNeuralNetwork = (ctx: CanvasRenderingContext2D): void => {
-    this.enemies[0].drawNeuralNetwork(ctx);
+  drawBestMembersNeuralNetwork = (ctx: CanvasRenderingContext2D, selectedSpeciesId?: number): void => {
+    this.members[0].drawBrain(ctx);
   };
 
-  isPopulationExtinct = (): boolean => this.enemies.every(e => e.isDead);
+  exportBestNeuralNetwork(): void {
+    const champion = this.members.find(m => m.isChampion);
+    if (champion == undefined) {
+      console.log("No champion to export.");
+      return;
+    }
+
+    champion.exportBrain();
+  }
+
+  isPopulationExtinct = (): boolean => this.members.every(e => e.isDead);
 
   calculateFitness = (): void => {
-    for (const enemy of this.enemies) {
-      enemy.calculateFitness();
+    for (const member of this.members) {
+      member.calculateFitness();
     }
-    const fitnessRanking = this.enemies
+    const fitnessRanking = this.members
       .map(e => e.fitness)
       .sort((a, b) => b - a)
-      .slice(0, 5);
+      .slice(0, 3);
 
     console.log("====================");
     console.log(`Generation ${this.generation}`);
@@ -99,11 +104,11 @@ class PopulationConventional extends Population {
   };
 
   naturalSelection = (): void => {
-    let newPopulation: Enemy[] = new Array<Enemy>(this.enemies.length);
-    let newDummies: DummyPlayer[] = new Array<DummyPlayer>(this.enemies.length);
+    let newPopulation: EnemyConventional[] = new Array<EnemyConventional>(this.members.length);
+    let newDummies: DummyPlayer[] = new Array<DummyPlayer>(this.members.length);
 
     const bestEnemyIndex = this.findBestPlayerIndex();
-    newPopulation[0] = this.enemies[bestEnemyIndex].clone();
+    newPopulation[0] = this.members[bestEnemyIndex].clone(true);
     newDummies[0] = new DummyPlayer(this.dummySpawnPoint);
 
     for (let i = 1; i < newPopulation.length; i++) {
@@ -115,25 +120,21 @@ class PopulationConventional extends Population {
       newDummies[i] = new DummyPlayer(this.dummySpawnPoint);
     }
 
-    this.enemies = [...newPopulation];
+    this.members = [...newPopulation];
     this.dummies = [...newDummies];
     this.generation++;
   };
 
-  exportBestNeuralNetwork(): void {
-    this.enemies[0].brain.export();
-  }
-
-  private selectEnemy = (): Enemy => {
-    const fitnessSum = this.enemies.map(e => e.fitness).reduce((prev, current) => prev + current, 0);
+  private selectEnemy = (): EnemyConventional => {
+    const fitnessSum = this.members.map(e => e.fitness).reduce((prev, current) => prev + current, 0);
     const rand: number = randomBetween(0, fitnessSum);
 
     let runningSum: number = 0.0;
-    for (let i = 0; i < this.enemies.length; i++) {
-      runningSum += this.enemies[i].fitness;
+    for (let i = 0; i < this.members.length; i++) {
+      runningSum += this.members[i].fitness;
 
       if (runningSum > rand) {
-        return this.enemies[i];
+        return this.members[i];
       }
     }
 
@@ -141,12 +142,12 @@ class PopulationConventional extends Population {
   };
 
   private findBestPlayerIndex = (): number => {
-    const fitnessList = this.enemies.map(e => e.fitness);
+    const fitnessList = this.members.map(e => e.fitness);
     const maxFitness = Math.max(...fitnessList);
-    const indexOfBest = this.enemies.findIndex(e => e.fitness === maxFitness);
+    const indexOfBest = this.members.findIndex(e => e.fitness === maxFitness);
 
     if (indexOfBest === -1) {
-      throw Error("Could not find the index of the best Enemy.");
+      throw Error("Could not find the index of the best member.");
     }
 
     return indexOfBest;

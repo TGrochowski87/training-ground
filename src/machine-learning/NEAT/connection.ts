@@ -34,4 +34,11 @@ export default class Connection {
     const clone: Connection = new Connection(this.historicalMarking, nodeFrom, nodeTo, this.weight, this.enabled);
     return clone;
   };
+
+  export = (): string => {
+    let stringRepresentation = "C\n";
+    stringRepresentation += `${this.historicalMarking} ${this.nodeFrom.id} ${this.nodeTo.id} ${this.weight} ${this.enabled}\n`;
+
+    return stringRepresentation;
+  };
 }

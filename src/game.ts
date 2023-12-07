@@ -2,7 +2,8 @@ import { enemySpawnPoint, gameScreenHeight, gameScreenWidth } from "configuratio
 import Enemy from "entities/enemy";
 import Player from "entities/player";
 import WallCollection from "entities/wallCollection";
-import NeuralNetwork from "machine-learning/conventional/neuralNetwork";
+import EnemyConventional from "machine-learning/conventional/enemyConventional";
+import NeuralNetworkConventional from "machine-learning/conventional/neuralNetworkConventional";
 import Vector2D from "utilities/vector2d";
 
 const appContainer: HTMLDivElement = document.getElementById("app") as HTMLDivElement;
@@ -21,7 +22,7 @@ importBrainButton.onchange = async (event: Event) => {
 
   const walls: WallCollection = new WallCollection();
   const player: Player = new Player(new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2));
-  const enemy: Enemy = new Enemy(enemySpawnPoint, brandNewBrain.clone());
+  const enemy: EnemyConventional = new EnemyConventional(enemySpawnPoint, brandNewBrain.clone()); // TODO: NEAT
 
   animate();
 
@@ -40,7 +41,7 @@ importBrainButton.onchange = async (event: Event) => {
     player.draw(gameCtx);
 
     enemy.update(walls.collection, player);
-    enemy.draw(gameCtx, false, false);
+    enemy.draw(gameCtx, false, "#A77500");
 
     walls.draw(gameCtx);
   }
@@ -60,8 +61,8 @@ function constructGameField(): CanvasRenderingContext2D {
   return gameCanvas.getContext("2d")!;
 }
 
-const createBrainFromTemplate = async (file: File): Promise<NeuralNetwork> => {
+const createBrainFromTemplate = async (file: File): Promise<NeuralNetworkConventional> => {
   const content = await file.text();
-  const brain = NeuralNetwork.import(content);
+  const brain = NeuralNetworkConventional.import(content);
   return brain;
 };

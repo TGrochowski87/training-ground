@@ -1,4 +1,5 @@
 import {
+  enemySpawnPoint,
   interspeciesMatingRate,
   massExtinctionThreshold,
   populationPartWithoutCrossover,
@@ -8,12 +9,15 @@ import { randomBetween } from "utilities/mathExtensions";
 import PartialConnectionData from "machine-learning/NEAT/models/PartialConnectionData";
 import SplitNumber from "machine-learning/NEAT/models/SplitNumber";
 import Species from "machine-learning/NEAT/species";
-import Specimen from "machine-learning/NEAT/specimen";
 import Population from "machine-learning/population";
 import { Mode } from "models/UserSettings";
+import Wall from "entities/wall";
+import EnemyNEAT from "./enemyNEAT";
+import NeuralNetworkNEAT from "./neuralNetworkNEAT";
 
 class PopulationNEAT extends Population {
   population: Species[];
+  generation: number = 1;
   selectedSpecies: Species;
   lastUsedSpeciesId: number = 0;
   size: number;
@@ -31,19 +35,55 @@ class PopulationNEAT extends Population {
   // It is not clear which approach is more effective.
   innovations: PartialConnectionData[] = [];
 
-  constructor(size: number, trainingMode: Mode) {
-    super();
+  constructor(size: number, trainingMode: Mode, baseBrain?: NeuralNetworkNEAT) {
+    super(trainingMode);
 
     this.size = size;
-    this.population = [new Species(this.lastUsedSpeciesId++)];
+    this.population = [new Species(this.lastUsedSpeciesId++, trainingMode)];
     this.selectedSpecies = this.population[0];
 
+    const initialPopulation: EnemyNEAT[] = [];
     for (let i = 0; i < size; i++) {
-      this.population[0].push(new Specimen());
+      initialPopulation.push(new EnemyNEAT(enemySpawnPoint.copy(), baseBrain?.clone(), false));
+    }
+    this.population[0].setNewGeneration(initialPopulation, this.dummySpawnPoint);
+  }
+
+  update = (walls: Wall[]): void => {
+    if (this.generationLifetime === 3000) {
+      for (const species of this.population) {
+        species.killAllMembers();
+      }
+      this.generationLifetime = 0;
+      return;
+    }
+
+    for (const species of this.population) {
+      species.update(walls);
+    }
+
+    this.generationLifetime++;
+  };
+
+  draw(ctx: CanvasRenderingContext2D, showSensors: boolean): void {
+    for (const species of this.population) {
+      species.draw(ctx, showSensors);
     }
   }
 
-  think = (inputs: number[], expectedOutput: number) => this.population.forEach(s => s.think(inputs, expectedOutput));
+  drawBestMembersNeuralNetwork(ctx: CanvasRenderingContext2D, selectedSpeciesId?: number): void {
+    if (selectedSpeciesId == undefined) {
+      throw Error("selectedSpeciesId must be provided when using NEAT.");
+    }
+
+    this.population[selectedSpeciesId].drawBestNeuralNetwork(ctx);
+  }
+
+  exportBestNeuralNetwork(): void {
+    this.population.forEach(s => s.exportBestNeuralNetwork());
+  }
+
+  isPopulationExtinct = (): boolean => this.population.flatMap(s => s.members).every(m => m.isDead);
 
   calculateFitness = () => {
     this.population.forEach(s => s.calculateFitness());
@@ -57,6 +97,17 @@ class PopulationNEAT extends Population {
     } else {
       this.generationsSinceLastImprovement++;
     }
+
+    const fitnessRanking = this.population
+      .flatMap(s => s.members.map(m => ({ speciesId: s.id, fitness: m.fitness })))
+      .sort((a, b) => b.fitness - a.fitness);
+
+    console.log("====================");
+    console.log(`Generation ${this.generation}`);
+    console.log("Fitness ranking:");
+    console.log(`Species: ${fitnessRanking[0].speciesId}, fitness: ${fitnessRanking[0].fitness}`);
+    console.log(`Species: ${fitnessRanking[1].speciesId}, fitness: ${fitnessRanking[1].fitness}`);
+    console.log(`Species: ${fitnessRanking[2].speciesId}, fitness: ${fitnessRanking[2].fitness}`);
   };
 
   naturalSelection = () => {
@@ -70,7 +121,7 @@ class PopulationNEAT extends Population {
       this.filterOutStagnantSpecies();
     }
 
-    const offspring: Specimen[] = [];
+    const offspring: EnemyNEAT[] = [];
     const assignedOffspringCounts: number[] = this.calculateOffspringNumberPerSpecies();
     this.population.forEach(s => s.sortMembersByAdjustedFitness());
     this.population.forEach(s => s.removeLeastPerformingMembers());
@@ -108,23 +159,7 @@ class PopulationNEAT extends Population {
     this.filterOutEmptySpecies();
   };
 
-  getMemberWithSolution = (): Specimen | undefined =>
-    this.population.map(s => s.getMemberWithSolution()).find(specimen => specimen != undefined);
-
-  getBestMember(): Specimen {
-    const bestOnes = this.population.map(s => s.getBestMember());
-    // Normal fitness used to find the best specimen regardless of species and species size.
-    const highestFitness: number = Math.max(...bestOnes.map(s => s.fitness));
-    const bestSpecimen = bestOnes.find(s => s.fitness == highestFitness);
-
-    if (bestSpecimen == undefined) {
-      throw Error("Could not determine the best specimen in the population.");
-    }
-
-    return bestSpecimen;
-  }
-
-  selectSpecies = (id: number) => {
+  selectSpeciesForNeuralNetworkDrawing = (id: number) => {
     const selectedSpecies = this.population.find(s => s.id == id);
 
     // TODO: Might switch from removing species from list to marking as extinct.
@@ -136,9 +171,9 @@ class PopulationNEAT extends Population {
     this.selectedSpecies = selectedSpecies;
   };
 
-  private distributeOffspringBetweenSpecies = (offspring: ReadonlyArray<Specimen>) => {
-    const speciesAssignments: Specimen[][] = Array.from({ length: this.population.length }, (v, k) => []);
-    let representatives: Specimen[] = this.population.map(s => s.getRandomRepresentative());
+  private distributeOffspringBetweenSpecies = (offspring: ReadonlyArray<EnemyNEAT>) => {
+    const speciesAssignments: EnemyNEAT[][] = Array.from({ length: this.population.length }, (v, k) => []);
+    let representatives: EnemyNEAT[] = this.population.map(s => s.getRandomRepresentative());
 
     for (const descendant of offspring) {
       const compatibleSpeciesIndex: number | null = this.findCompatibleSpeciesIndex(representatives, descendant);
@@ -147,7 +182,7 @@ class PopulationNEAT extends Population {
         speciesAssignments[compatibleSpeciesIndex].push(descendant);
       } else {
         const newSpeciesId: number = speciesAssignments.length;
-        const newSpecies = new Species(newSpeciesId);
+        const newSpecies = new Species(newSpeciesId, this.trainingMode);
         this.population.push(newSpecies);
 
         representatives.push(descendant);
@@ -168,13 +203,13 @@ class PopulationNEAT extends Population {
     }
   };
 
-  private replacementOfGenerations = (assignments: Specimen[][]) => {
+  private replacementOfGenerations = (assignments: EnemyNEAT[][]) => {
     for (let i = 0; i < assignments.length; i++) {
-      this.population[i].setNewGeneration(assignments[i]);
+      this.population[i].setNewGeneration(assignments[i], this.dummySpawnPoint);
     }
   };
 
-  private findCompatibleSpeciesIndex = (representatives: Specimen[], descendant: Specimen): number | null => {
+  private findCompatibleSpeciesIndex = (representatives: EnemyNEAT[], descendant: EnemyNEAT): number | null => {
     for (let i = 0; i < representatives.length; i++) {
       if (representatives[i].isCompatible(descendant, this.compatibilityThreshold)) {
         return i;
@@ -184,16 +219,16 @@ class PopulationNEAT extends Population {
     return null;
   };
 
-  private reproductionByCrossover = (speciesIndex: number): Specimen => {
-    const parents: [Specimen, Specimen] = this.selectParents(speciesIndex);
+  private reproductionByCrossover = (speciesIndex: number): EnemyNEAT => {
+    const parents: [EnemyNEAT, EnemyNEAT] = this.selectParents(speciesIndex);
     return parents[0].crossover(parents[1]);
   };
 
-  private reproductionByCloning = (speciesIndex: number): Specimen => {
+  private reproductionByCloning = (speciesIndex: number): EnemyNEAT => {
     return this.selectParent(this.population[speciesIndex]).clone();
   };
 
-  private selectParents = (speciesIndex: number): [Specimen, Specimen] => {
+  private selectParents = (speciesIndex: number): [EnemyNEAT, EnemyNEAT] => {
     const isInterspecies = Math.random() < interspeciesMatingRate;
 
     let speciesOfParent2 = this.population[speciesIndex];
@@ -212,7 +247,7 @@ class PopulationNEAT extends Population {
   /**
    * It is possible for one specimen to be selected twice.
    */
-  private selectParent = (species: Species): Specimen => {
+  private selectParent = (species: Species): EnemyNEAT => {
     const fitnessSum = species.members.map(s => s.adjustedFitness).reduce((prev, current) => prev + current, 0);
     const rand: number = randomBetween(0, fitnessSum);
 

@@ -1,5 +1,6 @@
 import IntersectionReading from "models/IntersectionReading";
 import Vector2D from "utilities/vector2d";
+import { randomBetween } from "./mathExtensions";
 
 export const lerp = (A: number, B: number, fraction: number): number => {
   return A + (B - A) * fraction;
@@ -47,6 +48,14 @@ export const polygonsIntersect = (polygon1: Vector2D[], polygon2: Vector2D[]): b
   }
 
   return false;
+};
+
+export const getRandomColor = (): string => {
+  const R = 10 * randomBetween(0, 25);
+  const G = 10 * randomBetween(0, 25);
+  const B = 10 * randomBetween(0, 25);
+
+  return `rgb(${R}, ${G}, ${B})`;
 };
 
 export const getRGBAFromWeight = (value: number): string => {

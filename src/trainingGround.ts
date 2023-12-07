@@ -9,9 +9,10 @@ import {
 } from "configuration";
 import WallCollection from "entities/wallCollection";
 import PopulationConventional from "machine-learning/conventional/populationConventional";
-import NeuralNetwork from "machine-learning/conventional/neuralNetwork";
+import NeuralNetworkConventional from "machine-learning/conventional/neuralNetworkConventional";
 import UserSettingsReader from "utilities/userSettingsReader";
 import Population from "machine-learning/population";
+import PopulationNEAT from "machine-learning/NEAT/populationNEAT";
 
 const userSettings = UserSettingsReader.getConfig();
 
@@ -32,7 +33,10 @@ const importBrainButton: HTMLInputElement = document.getElementById("button-impo
 const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
 
-let population: Population = new PopulationConventional(populationSize, userSettings.mode);
+let population: Population =
+  userSettings.method == "NEAT"
+    ? new PopulationNEAT(populationSize, userSettings.mode)
+    : new PopulationConventional(populationSize, userSettings.mode);
 
 const walls: WallCollection = new WallCollection();
 
@@ -127,6 +131,6 @@ function displaySites() {
 
 const createPopulationFromTemplate = async (file: File) => {
   const content = await file.text();
-  const brain = NeuralNetwork.import(content);
+  const brain = NeuralNetworkConventional.import(content);
   population = new PopulationConventional(populationSize, userSettings.mode, brain);
 };

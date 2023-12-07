@@ -49,6 +49,13 @@ class Node {
   clone = (): Node => {
     return new Node(this.id, this.type, this.layer, this.inputCount);
   };
+
+  export = (): string => {
+    let stringRepresentation = "N\n";
+    stringRepresentation += `${this.id} ${this.type} ${this.layer} ${this.inputCount}\n`;
+
+    return stringRepresentation;
+  };
 }
 
 export default Node;

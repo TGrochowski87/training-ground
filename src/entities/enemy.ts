@@ -1,5 +1,5 @@
 import { enemySpawnPoint, gunPointOffset, sensorRayCount, siteRadius, sites } from "configuration";
-import NeuralNetwork from "machine-learning/conventional/neuralNetwork";
+import NeuralNetworkConventional from "machine-learning/conventional/neuralNetworkConventional";
 import EnemyControls from "mechanics/enemyControls";
 import Sensor from "machine-learning/sensor";
 import Vector2D from "utilities/vector2d";
@@ -9,12 +9,13 @@ import SensorReading from "models/SensorReading";
 import Player from "./player";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
 import { lerp } from "utilities/mechanicsFunctions";
+import NeuralNetwork from "machine-learning/neuralNetwork";
 
-class Enemy extends Fighter {
-  id: string;
-  brain: NeuralNetwork;
+abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
+  brain: NN;
   sensor: Sensor;
   controls: EnemyControls;
+  isChampion: boolean;
 
   playerSpotted: boolean = false;
   triggerCounter: number = 0;
@@ -26,28 +27,21 @@ class Enemy extends Fighter {
   needlessShots: number = 0;
   backwardsCounter: number = 0;
   runningBackwardsPenalties = 0;
-
   playerShot: boolean = false;
-
   fitness: number = 0.0;
 
-  private readonly colors = {
-    normal: "#A77500",
-    danger: "#AF0D0D",
-  };
+  // Used only for when exporting.
+  // Stores the last champion's fitness while the new one is mid calculation.
+  savedChampionsFitness: number = 0.0;
 
-  constructor(pos: Vector2D, brain?: NeuralNetwork) {
+  constructor(pos: Vector2D, brain: NN, isChampion: boolean) {
     super(pos);
-    this.id = crypto.randomUUID();
 
-    if (brain) {
-      this.brain = brain;
-    } else {
-      this.brain = new NeuralNetwork([sensorRayCount * 2, 12, 12, 5]);
-    }
+    this.brain = brain;
+
     this.sensor = new Sensor(this);
-
     this.controls = new EnemyControls();
+    this.isChampion = isChampion;
 
     this.currentTargetSiteIndex = 1;
     this.lastSitePosition = pos;
@@ -95,7 +89,7 @@ class Enemy extends Fighter {
     }
   };
 
-  draw = (ctx: CanvasRenderingContext2D, showSensors: boolean, isBest: boolean = false): void => {
+  draw = (ctx: CanvasRenderingContext2D, showSensors: boolean, color: string): void => {
     if (showSensors) {
       this.sensor.draw(ctx);
     }
@@ -104,7 +98,7 @@ class Enemy extends Fighter {
     ctx.translate(this.position.x, this.position.y);
     ctx.rotate(this.angle);
 
-    ctx.fillStyle = this.playerSpotted ? this.colors.danger : this.colors.normal;
+    ctx.fillStyle = this.playerSpotted ? "#AF0D0D" : color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
     ctx.fill();
@@ -116,7 +110,7 @@ class Enemy extends Fighter {
     ctx.lineTo(8, -13);
     ctx.stroke();
 
-    if (isBest) {
+    if (this.isChampion) {
       ctx.beginPath();
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -141,30 +135,10 @@ class Enemy extends Fighter {
     this.bullets.forEach(bullet => bullet.draw(ctx));
   };
 
-  drawNeuralNetwork = (ctx: CanvasRenderingContext2D): void => {
+  drawBrain = (ctx: CanvasRenderingContext2D): void => {
     this.brain.draw(ctx);
   };
 
-  // ========= EVOLUTION ==========================
-
-  clone = (): Enemy => {
-    const clonedBrain = this.brain.clone();
-    let clone = new Enemy(enemySpawnPoint.copy(), clonedBrain);
-    clone.id = this.id;
-    return clone;
-  };
-
-  crossover = (other: Enemy): Enemy => {
-    const childBrain = this.brain.crossover(other.brain);
-    const child: Enemy = new Enemy(enemySpawnPoint.copy(), childBrain);
-    return child;
-  };
-
-  mutate = (): void => {
-    this.brain.mutate();
-  };
-
-  // ========= THINKING ==========================
   private look = (walls: Wall[], player: Player): number[] => {
     this.sensor.update(walls, player);
     const sensorReadings: (SensorReading | null)[] = this.sensor.getReadings();
@@ -188,7 +162,7 @@ class Enemy extends Fighter {
   };
 
   private think = (inputs: number[]): void => {
-    const outputs = this.brain.feedForward(inputs);
+    const outputs = this.brain.process(inputs);
     this.controls.decideOnMove(outputs);
   };
 
@@ -220,6 +194,8 @@ class Enemy extends Fighter {
 
     this.fitness = points;
   };
+
+  abstract exportBrain(): void;
 
   private isSiteReached = (): boolean => {
     return distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]) < siteRadius;

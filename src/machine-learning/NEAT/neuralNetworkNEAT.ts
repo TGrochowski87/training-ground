@@ -8,8 +8,9 @@ import {
 } from "configuration";
 import PartialConnectionData from "machine-learning/NEAT/models/PartialConnectionData";
 import Connection from "machine-learning/NEAT/connection";
-import Node from "machine-learning/NEAT/node";
+import Node, { NodeType } from "machine-learning/NEAT/node";
 import { gaussianRandom, randomBetween } from "utilities/mathExtensions";
+import NeuralNetwork from "machine-learning/neuralNetwork";
 
 type CloneProps = {
   type: "Clone";
@@ -26,7 +27,7 @@ type CreationProps = {
 
 type NeuralNetworkProps = CloneProps | CreationProps;
 
-class NeuralNetwork {
+class NeuralNetworkNEAT extends NeuralNetwork {
   // These lists are both expected to be sorted (by id/marker value).
   nodes: Node[];
   connections: Connection[];
@@ -35,6 +36,8 @@ class NeuralNetwork {
   layers: number;
 
   constructor(props: NeuralNetworkProps) {
+    super();
+
     switch (props.type) {
       case "Clone":
         this.connections = [...props.connections];
@@ -290,7 +293,7 @@ class NeuralNetwork {
    * @param other The other parent.
    * @param areEqual If false, this method is assumed to be invoked on the better parent.
    */
-  crossover = (other: NeuralNetwork, areEqual: boolean): NeuralNetwork => {
+  crossover = (other: NeuralNetworkNEAT, areEqual: boolean): NeuralNetworkNEAT => {
     let childConnections: Connection[] = [];
     let childNodes: Node[] = [];
 
@@ -331,10 +334,15 @@ class NeuralNetwork {
     childNodes = this.inferNodesFromConnections(childConnections);
 
     const layerCount: number = Math.max(...childNodes.map(n => n.layer)) + 1;
-    return new NeuralNetwork({ type: "Clone", connections: childConnections, nodes: childNodes, layers: layerCount });
+    return new NeuralNetworkNEAT({
+      type: "Clone",
+      connections: childConnections,
+      nodes: childNodes,
+      layers: layerCount,
+    });
   };
 
-  clone = (): NeuralNetwork => {
+  clone = (): NeuralNetworkNEAT => {
     const clonedNodes: Node[] = this.nodes.map(n => n.clone());
     const clonedConnections: Connection[] = this.connections.map(c => {
       const nodeFrom = clonedNodes.find(n => n.id == c.nodeFrom.id);
@@ -346,7 +354,7 @@ class NeuralNetwork {
       return c.clone(nodeFrom, nodeTo);
     });
 
-    return new NeuralNetwork({
+    return new NeuralNetworkNEAT({
       type: "Clone",
       connections: clonedConnections,
       nodes: clonedNodes,
@@ -354,7 +362,7 @@ class NeuralNetwork {
     });
   };
 
-  calculateCompatibilityDistance = (other: NeuralNetwork): number => {
+  calculateCompatibilityDistance = (other: NeuralNetworkNEAT): number => {
     const compatibilityData = this.compare(other);
 
     // Though it is stated in the original paper to normalize by gene number,
@@ -370,6 +378,76 @@ class NeuralNetwork {
       compatibilityCoefficients[2] * compatibilityData.avgDifferenceOnMatchingGenes;
 
     return compatibilityDistance;
+  };
+
+  export = (fitness: number, speciesId: number): void => {
+    let stringRepresentation = "";
+    stringRepresentation += `${this.layers}\n\n`;
+
+    for (const node of this.nodes) {
+      stringRepresentation += `${node.export()}`;
+    }
+    stringRepresentation += "\n";
+
+    for (const connection of this.connections) {
+      stringRepresentation += `${connection.export()}`;
+    }
+
+    let a = document.createElement("a") as HTMLAnchorElement;
+    a.href = window.URL.createObjectURL(new Blob([stringRepresentation], { type: "text/plain" }));
+    a.download = `brain-NEAT-s${speciesId}-f${fitness}.txt`;
+    document.body.append(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  static import = (text: string): NeuralNetworkNEAT => {
+    const listRepresentation = text.split("\n\n");
+    const layerCount: number = +listRepresentation[0];
+
+    const nodeListRepresentation = listRepresentation[1].split("N\n");
+    nodeListRepresentation.splice(0, 1);
+    const nodes: Node[] = [];
+    for (const nodeString of nodeListRepresentation) {
+      const propsStringList = nodeString.split(" ");
+      const node = new Node(
+        +propsStringList[0],
+        propsStringList[1] as NodeType,
+        +propsStringList[2],
+        +propsStringList[3]
+      );
+      nodes.push(node);
+    }
+
+    const connectionListRepresentation = listRepresentation[2].split("C\n");
+    connectionListRepresentation.splice(0, 1);
+    const connections: Connection[] = [];
+    for (const connectionString of connectionListRepresentation) {
+      const propsStringList = connectionString.split(" ");
+      const nodeFrom = nodes.find(n => n.id == +propsStringList[0]);
+      const nodeTo = nodes.find(n => n.id == +propsStringList[1]);
+
+      if (nodeFrom == undefined || nodeTo == undefined) {
+        throw Error("A node of required ID was not imported.");
+      }
+
+      const connection = new Connection(
+        +propsStringList[0],
+        nodeFrom,
+        nodeTo,
+        +propsStringList[3],
+        !!propsStringList[4]
+      );
+      connections.push(connection);
+    }
+
+    const reconstructedNetwork = new NeuralNetworkNEAT({
+      type: "Clone",
+      nodes: nodes,
+      connections: connections,
+      layers: layerCount,
+    });
+    return reconstructedNetwork;
   };
 
   private processWaitingList = (waitingList: Connection[]) => {
@@ -470,7 +548,7 @@ class NeuralNetwork {
     return false;
   };
 
-  private compare = (other: NeuralNetwork): CompatibilityDistanceData => {
+  private compare = (other: NeuralNetworkNEAT): CompatibilityDistanceData => {
     let comparisonSummary: CompatibilityDistanceData = {
       avgDifferenceOnMatchingGenes: 0,
       numberOfDisjointGenes: 0,
@@ -607,4 +685,4 @@ interface CompatibilityDistanceData {
   numberOfGenesInBiggerGenome: number;
 }
 
-export default NeuralNetwork;
+export default NeuralNetworkNEAT;

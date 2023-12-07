@@ -28,7 +28,7 @@ class PopulationNEAT extends Population {
   generationsSinceLastImprovement: number = 0;
 
   targetSpeciesCount: number = 10;
-  compatibilityThreshold: number = 3;
+  compatibilityThreshold: number = 5;
   compatibilityModifier: number = 0.3;
 
   // The list of new connections (innovations) can be also maintained for every new generation from scratch.

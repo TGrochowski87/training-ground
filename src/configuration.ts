@@ -25,16 +25,16 @@ export const sensorRayCount: number = 8;
 export const populationSize: number = 200;
 export const weightMutationRate: number = 0.5;
 export const weightPerturbationChance: number = 0.9;
-export const generationLifetime: number = 200;
+export const generationLifetime: number = 2000;
 
 // Machine Learning NEAT
-export const compatibilityCoefficients: [number, number, number] = [1.0, 1.0, 0.4];
+export const compatibilityCoefficients: [number, number, number] = [1.0, 1.0, 0.3];
 export const genomeLengthNormalizationThreshold: number = 20;
 export const massExtinctionThreshold: number = 20;
 export const speciesExtinctionThreshold: number = 15;
 export const partOfSpeciesMembersAllowedToReproduce: number = 0.5;
-export const addNodeMutationChance: number = 0.03;
-export const addConnectionMutationChance: number = 0.03;
+export const addNodeMutationChance: number = 0.06;
+export const addConnectionMutationChance: number = 0.09;
 export const inheritedConnectionStaysDisabledChance: number = 0.75;
 export const populationPartWithoutCrossover: number = 0.25;
 export const interspeciesMatingRate: number = 0.001;

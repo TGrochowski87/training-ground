@@ -1,4 +1,4 @@
-import { dummySpawnPoint, enemySpawnPoint } from "configuration";
+import { dummySpawnPoint, enemySpawnPoint, generationLifetime } from "configuration";
 import DummyPlayer from "entities/dummyPlayer";
 import Enemy from "entities/enemy";
 import Wall from "entities/wall";
@@ -28,7 +28,7 @@ class PopulationConventional extends Population {
   }
 
   update = (walls: Wall[]) => {
-    if (this.generationLifetime === 3000) {
+    if (this.generationLifetime === generationLifetime) {
       for (const member of this.members) {
         member.isDead = true;
       }
@@ -50,7 +50,7 @@ class PopulationConventional extends Population {
     this.generationLifetime++;
   };
 
-  draw = (ctx: CanvasRenderingContext2D, showSensors: boolean): void => {
+  draw = (ctx: CanvasRenderingContext2D, showSensors: boolean, selectedSpeciesId?: number): void => {
     if (this.trainingMode == "full") {
       for (let i = 1; i < this.members.length; i++) {
         this.members[i].draw(ctx, showSensors, this.memberColor);
@@ -70,7 +70,7 @@ class PopulationConventional extends Population {
     }
   };
 
-  drawBestMembersNeuralNetwork = (ctx: CanvasRenderingContext2D, selectedSpeciesId?: number): void => {
+  drawBestMembersNeuralNetwork = (ctx: CanvasRenderingContext2D, selectedSpeciesId: number): void => {
     this.members[0].drawBrain(ctx);
   };
 

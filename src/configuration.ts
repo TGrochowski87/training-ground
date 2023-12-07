@@ -25,6 +25,7 @@ export const sensorRayCount: number = 8;
 export const populationSize: number = 200;
 export const weightMutationRate: number = 0.5;
 export const weightPerturbationChance: number = 0.9;
+export const generationLifetime: number = 200;
 
 // Machine Learning NEAT
 export const compatibilityCoefficients: [number, number, number] = [1.0, 1.0, 0.4];

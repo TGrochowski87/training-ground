@@ -3,6 +3,7 @@ body {
   margin: 0;
 
   font-family: 'Roboto', sans-serif;
+  color: whitesmoke;
 }
 
 #app {
@@ -45,6 +46,24 @@ body {
   gap: 1rem;
 }
 
-#training-selection {
-  color: whitesmoke;
+#NEAT-controls {
+  display: none;
+}
+
+#NEAT-controls > div:first-of-type {
+  display: flex;
+  align-items: center;
+}
+
+#NEAT-controls > div > p {
+  margin: 0;
+}
+
+#species-selection {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
+#species-selection > button {
+  margin-right: 3px;
 }

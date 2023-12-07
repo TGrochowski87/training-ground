@@ -49,6 +49,17 @@ let gameStopped = false;
 
 setupOnClicks();
 
+// NEAT Setup
+const speciesSelectionContainer: HTMLDivElement = document.getElementById("species-selection") as HTMLDivElement;
+speciesSelectionContainer.style.width = `${gameScreenWidth}px`;
+const speciesNumberInfo: HTMLHeadingElement = document.getElementById("species-number-info") as HTMLHeadingElement;
+const showSelectedCheckbox: HTMLInputElement = document.getElementById("show-only-selected") as HTMLInputElement;
+const speciesSelectionButtons: HTMLButtonElement[] = [];
+let selectedSpeciesId: number = 0;
+if (userSettings.method == "NEAT") {
+  prepareNEATControls();
+}
+
 animate();
 
 function animate(time: number = 0) {
@@ -75,15 +86,27 @@ function manageGameCanvas(time: number) {
   } else {
     population.calculateFitness();
     population.naturalSelection();
+
+    for (const species of (population as PopulationNEAT).population) {
+      console.log("species in population ", species.id);
+    }
+
+    if (userSettings.method == "NEAT") {
+      updateButtons();
+      const highestSpeciesId = Math.max(...(population as PopulationNEAT).population.map(s => s.id));
+      for (let i = speciesSelectionButtons.length; i <= highestSpeciesId; i++) {
+        addNewSpeciesButton(i);
+      }
+    }
   }
-  population.draw(gameCtx, showSensors);
+  population.draw(gameCtx, showSensors, showSelectedCheckbox.checked ? selectedSpeciesId : undefined);
 
   walls.draw(gameCtx);
 }
 
 function manageNetworkCanvas(time: number) {
   networkCtx.clearRect(0, 0, networkCtx.canvas.width, networkCtx.canvas.height);
-  population.drawBestMembersNeuralNetwork(networkCtx, 0);
+  population.drawBestMembersNeuralNetwork(networkCtx, selectedSpeciesId);
 }
 
 function setupOnClicks() {
@@ -130,7 +153,43 @@ function displaySites() {
   }
 }
 
-const createPopulationFromTemplate = async (file: File) => {
+function prepareNEATControls() {
+  const NEATControlsContainer: HTMLDivElement = document.getElementById("NEAT-controls") as HTMLDivElement;
+  NEATControlsContainer.style.display = "block";
+  addNewSpeciesButton(0);
+}
+
+function addNewSpeciesButton(id: number) {
+  const button: HTMLButtonElement = document.createElement("button");
+  button.textContent = `Species ${id}`;
+  button.onclick = () => {
+    selectedSpeciesId = id;
+    speciesNumberInfo.textContent = `Selected species: ${id}`;
+  };
+
+  speciesSelectionContainer.appendChild(button);
+  speciesSelectionButtons[id] = button;
+}
+
+const updateButtons = () => {
+  for (let i = 0; i < speciesSelectionButtons.length; i++) {
+    if ((population as PopulationNEAT).population.some(s => s.id == i) == false) {
+      speciesSelectionButtons[i].disabled = true;
+    }
+  }
+
+  if (speciesSelectionButtons[selectedSpeciesId].disabled) {
+    for (let i = 0; i < speciesSelectionButtons.length; i++) {
+      if (speciesSelectionButtons[i].disabled == false) {
+        console.log("zmiana ", i);
+        selectedSpeciesId = i;
+        speciesNumberInfo.textContent = `Selected species: ${selectedSpeciesId}`;
+      }
+    }
+  }
+};
+
+async function createPopulationFromTemplate(file: File) {
   const content = await file.text();
 
   if (userSettings.method == "NEAT") {
@@ -140,4 +199,4 @@ const createPopulationFromTemplate = async (file: File) => {
     const brain = NeuralNetworkConventional.import(content);
     population = new PopulationConventional(populationSize, userSettings.mode, brain);
   }
-};
+}

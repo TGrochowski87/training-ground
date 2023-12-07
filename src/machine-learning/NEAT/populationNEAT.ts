@@ -1,5 +1,6 @@
 import {
   enemySpawnPoint,
+  generationLifetime,
   interspeciesMatingRate,
   massExtinctionThreshold,
   populationPartWithoutCrossover,
@@ -50,7 +51,7 @@ class PopulationNEAT extends Population {
   }
 
   update = (walls: Wall[]): void => {
-    if (this.generationLifetime === 3000) {
+    if (this.generationLifetime === generationLifetime) {
       for (const species of this.population) {
         species.killAllMembers();
       }
@@ -65,18 +66,18 @@ class PopulationNEAT extends Population {
     this.generationLifetime++;
   };
 
-  draw(ctx: CanvasRenderingContext2D, showSensors: boolean): void {
-    for (const species of this.population) {
-      species.draw(ctx, showSensors);
+  draw(ctx: CanvasRenderingContext2D, showSensors: boolean, selectedSpeciesId?: number): void {
+    if (selectedSpeciesId != undefined) {
+      this.population.find(s => s.id == selectedSpeciesId)!.draw(ctx, showSensors);
+    } else {
+      for (const species of this.population) {
+        species.draw(ctx, showSensors);
+      }
     }
   }
 
-  drawBestMembersNeuralNetwork(ctx: CanvasRenderingContext2D, selectedSpeciesId?: number): void {
-    if (selectedSpeciesId == undefined) {
-      throw Error("selectedSpeciesId must be provided when using NEAT.");
-    }
-
-    this.population[selectedSpeciesId].drawBestNeuralNetwork(ctx);
+  drawBestMembersNeuralNetwork(ctx: CanvasRenderingContext2D, selectedSpeciesId: number): void {
+    this.population.find(s => s.id == selectedSpeciesId)!.drawBestNeuralNetwork(ctx);
   }
 
   exportBestNeuralNetwork(): void {
@@ -182,13 +183,13 @@ class PopulationNEAT extends Population {
       if (compatibleSpeciesIndex != null) {
         speciesAssignments[compatibleSpeciesIndex].push(descendant);
       } else {
-        const newSpeciesId: number = speciesAssignments.length;
+        const newSpeciesId: number = this.lastUsedSpeciesId++;
         const newSpecies = new Species(newSpeciesId, this.trainingMode);
         this.population.push(newSpecies);
 
         representatives.push(descendant);
         speciesAssignments.push([]);
-        speciesAssignments[newSpeciesId].push(descendant);
+        speciesAssignments.at(-1)!.push(descendant);
       }
     }
 

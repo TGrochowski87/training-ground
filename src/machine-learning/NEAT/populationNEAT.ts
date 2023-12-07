@@ -257,7 +257,7 @@ class PopulationNEAT extends Population {
     for (let i = 0; i < species.members.length; i++) {
       runningSum += species.members[i].adjustedFitness;
 
-      if (runningSum > rand) {
+      if (runningSum >= rand) {
         return species.members[i];
       }
     }

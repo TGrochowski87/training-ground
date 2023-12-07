@@ -60,17 +60,17 @@ export const getRandomColor = (): string => {
 
 export const getRGBAFromWeight = (value: number): string => {
   const alpha = Math.abs(value);
-  const R = value < 0 ? 0 : 255;
-  const G = value > 0 ? 0 : 255;
-  const B = 100;
+  const R = value < 0 ? 155 : 0;
+  const G = value < 0 ? 0 : 255;
+  const B = value < 0 ? 255 : 0;
 
   return `rgba(${R}, ${G}, ${B}, ${alpha})`;
 };
 
 export const getRGBFromWeight = (value: number): string => {
-  const R = value < 0 ? 0 : 255;
-  const G = value > 0 ? 0 : 255;
-  const B = 100;
+  const R = value < 0 ? 155 : 0;
+  const G = value < 0 ? 0 : 255;
+  const B = value < 0 ? 255 : 0;
 
   return `rgb(${R}, ${G}, ${B})`;
 };

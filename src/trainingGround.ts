@@ -13,6 +13,7 @@ import NeuralNetworkConventional from "machine-learning/conventional/neuralNetwo
 import UserSettingsReader from "utilities/userSettingsReader";
 import Population from "machine-learning/population";
 import PopulationNEAT from "machine-learning/NEAT/populationNEAT";
+import NeuralNetworkNEAT from "machine-learning/NEAT/neuralNetworkNEAT";
 
 const userSettings = UserSettingsReader.getConfig();
 
@@ -82,7 +83,7 @@ function manageGameCanvas(time: number) {
 
 function manageNetworkCanvas(time: number) {
   networkCtx.clearRect(0, 0, networkCtx.canvas.width, networkCtx.canvas.height);
-  population.drawBestMembersNeuralNetwork(networkCtx);
+  population.drawBestMembersNeuralNetwork(networkCtx, 0);
 }
 
 function setupOnClicks() {
@@ -131,6 +132,12 @@ function displaySites() {
 
 const createPopulationFromTemplate = async (file: File) => {
   const content = await file.text();
-  const brain = NeuralNetworkConventional.import(content);
-  population = new PopulationConventional(populationSize, userSettings.mode, brain);
+
+  if (userSettings.method == "NEAT") {
+    const brain = NeuralNetworkNEAT.import(content);
+    population = new PopulationNEAT(populationSize, userSettings.mode, brain);
+  } else {
+    const brain = NeuralNetworkConventional.import(content);
+    population = new PopulationConventional(populationSize, userSettings.mode, brain);
+  }
 };

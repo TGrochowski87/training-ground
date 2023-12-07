@@ -157,6 +157,7 @@ class PopulationNEAT extends Population {
     this.adjustCompatibilityThreshold();
     this.distributeOffspringBetweenSpecies(offspring);
     this.filterOutEmptySpecies();
+    this.generation++;
   };
 
   selectSpeciesForNeuralNetworkDrawing = (id: number) => {

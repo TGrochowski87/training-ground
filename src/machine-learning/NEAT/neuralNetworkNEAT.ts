@@ -3,14 +3,20 @@ import {
   addNodeMutationChance,
   compatibilityCoefficients,
   inheritedConnectionStaysDisabledChance,
+  networkViewHeight,
+  networkViewHeightMargin,
+  networkViewWidth,
+  networkViewWidthMargin,
   weightMutationRate,
   weightPerturbationChance,
 } from "configuration";
 import PartialConnectionData from "machine-learning/NEAT/models/PartialConnectionData";
 import Connection from "machine-learning/NEAT/connection";
 import Node, { NodeType } from "machine-learning/NEAT/node";
-import { gaussianRandom, randomBetween } from "utilities/mathExtensions";
+import { distanceBetweenPoints, gaussianRandom, randomBetween } from "utilities/mathExtensions";
 import NeuralNetwork from "machine-learning/neuralNetwork";
+import { getRGBAFromWeight, lerp } from "utilities/mechanicsFunctions";
+import Vector2D from "utilities/vector2d";
 
 type CloneProps = {
   type: "Clone";
@@ -86,82 +92,82 @@ class NeuralNetworkNEAT extends NeuralNetwork {
   }
 
   draw = (ctx: CanvasRenderingContext2D) => {
-    // const layers: Node[][] = new Array<Node[]>();
-    // const nodeCoordinates: { x: number; y: number }[] = [];
-    // for (const node of this.nodes) {
-    //   const layer = node.layer;
-    //   layers[layer] = layers[layer] ?? [];
-    //   layers[layer].push(node);
-    // }
-    // for (let i = 0; i < layers.length; i++) {
-    //   const layerX: number = lerp(
-    //     canvasWidthMargin,
-    //     canvasWidth - 2 * canvasWidthMargin,
-    //     layers.length == 1 ? 0.5 : i / (layers.length - 1)
-    //   );
-    //   for (let j = 0; j < layers[i].length; j++) {
-    //     const heightPart: number = i % 2 == 0 ? j / (layers[i].length - 1) : (j + 1) / (layers[i].length + 1);
-    //     const marginShift: number = i % 2 == 0 ? 0 : -80;
-    //     const nodeY: number = lerp(
-    //       canvasHeightMargin + marginShift,
-    //       canvasHeight - 2 * canvasHeightMargin,
-    //       layers[i].length == 1 ? 0.5 : heightPart
-    //     );
-    //     nodeCoordinates[layers[i][j].id] = { x: layerX, y: nodeY };
-    //   }
-    // }
-    // for (const connection of this.connections) {
-    //   const { nodeFrom, nodeTo, weight } = connection;
-    //   const nodeFromCoordinates = nodeCoordinates[nodeFrom.id];
-    //   const nodeToCoordinates = nodeCoordinates[nodeTo.id];
-    //   if (connection.enabled) {
-    //     ctx.beginPath();
-    //     ctx.strokeStyle = "black";
-    //     ctx.moveTo(nodeFromCoordinates.x, nodeFromCoordinates.y);
-    //     ctx.lineTo(nodeToCoordinates.x, nodeToCoordinates.y);
-    //     ctx.lineWidth = 2;
-    //     ctx.strokeStyle = connection.enabled ? getRGBAFromWeight(weight) : "rgba(255, 0, 50, 1)";
-    //     ctx.stroke();
-    //   } else {
-    //     const distance: number = distanceBetweenPoints(
-    //       { x: nodeFromCoordinates.x, y: nodeFromCoordinates.y },
-    //       { x: nodeToCoordinates.x, y: nodeToCoordinates.y }
-    //     );
-    //     const [cpy1, cpx1] = [
-    //       nodeFromCoordinates.y + (nodeToCoordinates.y - nodeFromCoordinates.y) / 3 + distance / 3,
-    //       nodeFromCoordinates.x + (nodeToCoordinates.x - nodeFromCoordinates.x) / 3 + distance / 3,
-    //     ];
-    //     const [cpy2, cpx2] = [
-    //       nodeFromCoordinates.y + ((nodeToCoordinates.y - nodeFromCoordinates.y) * 2) / 3 - distance / 3,
-    //       nodeFromCoordinates.x + ((nodeToCoordinates.x - nodeFromCoordinates.x) * 2) / 3 - distance / 3,
-    //     ];
-    //     ctx.beginPath();
-    //     ctx.strokeStyle = "red";
-    //     ctx.moveTo(nodeFromCoordinates.x, nodeFromCoordinates.y);
-    //     ctx.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, nodeToCoordinates.x, nodeToCoordinates.y);
-    //     ctx.stroke();
-    //   }
-    // }
-    // for (const node of this.nodes) {
-    //   const { id } = node;
-    //   const { x, y } = nodeCoordinates[node.id];
-    //   ctx.beginPath();
-    //   ctx.arc(x, y, 20, 0, 2 * Math.PI);
-    //   ctx.fillStyle = "white";
-    //   ctx.fill();
-    //   ctx.beginPath();
-    //   ctx.strokeStyle = "black";
-    //   ctx.lineWidth = 3;
-    //   ctx.arc(x, y, 20, 0, 2 * Math.PI);
-    //   ctx.stroke();
-    //   ctx.beginPath();
-    //   ctx.textAlign = "center";
-    //   ctx.textBaseline = "middle";
-    //   ctx.fillStyle = "black";
-    //   ctx.strokeStyle = "black";
-    //   ctx.font = "16px Arial";
-    //   ctx.fillText(`${id == 0 ? "B" : id}`, x, y);
-    // }
+    const layers: Node[][] = new Array<Node[]>();
+    const nodeCoordinates: { x: number; y: number }[] = [];
+    for (const node of this.nodes) {
+      const layer = node.layer;
+      layers[layer] = layers[layer] ?? [];
+      layers[layer].push(node);
+    }
+    for (let i = 0; i < layers.length; i++) {
+      const layerX: number = lerp(
+        networkViewWidthMargin,
+        networkViewWidth - 2 * networkViewWidthMargin,
+        layers.length == 1 ? 0.5 : i / (layers.length - 1)
+      );
+      for (let j = 0; j < layers[i].length; j++) {
+        const heightPart: number = i % 2 == 0 ? j / (layers[i].length - 1) : (j + 1) / (layers[i].length + 1);
+        const marginShift: number = i % 2 == 0 ? 0 : -80;
+        const nodeY: number = lerp(
+          networkViewHeightMargin + marginShift,
+          networkViewHeight - 2 * networkViewHeightMargin,
+          layers[i].length == 1 ? 0.5 : heightPart
+        );
+        nodeCoordinates[layers[i][j].id] = { x: layerX, y: nodeY };
+      }
+    }
+    for (const connection of this.connections) {
+      const { nodeFrom, nodeTo, weight } = connection;
+      const nodeFromCoordinates = nodeCoordinates[nodeFrom.id];
+      const nodeToCoordinates = nodeCoordinates[nodeTo.id];
+      if (connection.enabled) {
+        ctx.beginPath();
+        ctx.strokeStyle = "black";
+        ctx.moveTo(nodeFromCoordinates.x, nodeFromCoordinates.y);
+        ctx.lineTo(nodeToCoordinates.x, nodeToCoordinates.y);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = connection.enabled ? getRGBAFromWeight(weight) : "rgba(255, 0, 50, 1)";
+        ctx.stroke();
+      } else {
+        const distance: number = distanceBetweenPoints(
+          new Vector2D(nodeFromCoordinates.x, nodeFromCoordinates.y),
+          new Vector2D(nodeToCoordinates.x, nodeToCoordinates.y)
+        );
+        const [cpy1, cpx1] = [
+          nodeFromCoordinates.y + (nodeToCoordinates.y - nodeFromCoordinates.y) / 3 + distance / 3,
+          nodeFromCoordinates.x + (nodeToCoordinates.x - nodeFromCoordinates.x) / 3 + distance / 3,
+        ];
+        const [cpy2, cpx2] = [
+          nodeFromCoordinates.y + ((nodeToCoordinates.y - nodeFromCoordinates.y) * 2) / 3 - distance / 3,
+          nodeFromCoordinates.x + ((nodeToCoordinates.x - nodeFromCoordinates.x) * 2) / 3 - distance / 3,
+        ];
+        ctx.beginPath();
+        ctx.strokeStyle = "red";
+        ctx.moveTo(nodeFromCoordinates.x, nodeFromCoordinates.y);
+        ctx.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, nodeToCoordinates.x, nodeToCoordinates.y);
+        ctx.stroke();
+      }
+    }
+    for (const node of this.nodes) {
+      const { id } = node;
+      const { x, y } = nodeCoordinates[node.id];
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, 2 * Math.PI);
+      ctx.fillStyle = "white";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 3;
+      ctx.arc(x, y, 20, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "black";
+      ctx.strokeStyle = "black";
+      ctx.font = "16px Arial";
+      ctx.fillText(`${id == 0 ? "B" : id}`, x, y);
+    }
   };
 
   process = (inputs: number[]): number[] => {

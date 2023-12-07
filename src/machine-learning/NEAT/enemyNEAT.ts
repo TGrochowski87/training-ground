@@ -17,7 +17,7 @@ class EnemyNEAT extends Enemy<NeuralNetworkNEAT> {
   wasChampionOfSpecies?: number;
 
   constructor(pos: Vector2D, brain?: NeuralNetworkNEAT, isChampion: boolean = false) {
-    super(pos, brain ?? new NeuralNetworkNEAT({ type: "Creation", inputs: 2, outputs: 1 }), isChampion);
+    super(pos, brain ?? new NeuralNetworkNEAT({ type: "Creation", inputs: 16, outputs: 5 }), isChampion);
 
     this.sensor = new Sensor(this);
 

@@ -61,7 +61,8 @@ class Species {
   };
 
   drawBestNeuralNetwork = (ctx: CanvasRenderingContext2D) => {
-    this.members[0].drawBrain(ctx);
+    const member = this.members.find(m => m.isChampion) ?? this.members[0];
+    member.drawBrain(ctx);
   };
 
   exportBestNeuralNetwork(): void {

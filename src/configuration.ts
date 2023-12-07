@@ -39,8 +39,10 @@ export const populationPartWithoutCrossover: number = 0.25;
 export const interspeciesMatingRate: number = 0.001;
 
 // AI Adaptation
-export const networkViewWidth: number = 800;
-export const networkViewHeight: number = 600;
+export const networkViewWidth: number = 1100;
+export const networkViewWidthMargin: number = 50;
+export const networkViewHeight: number = 900;
+export const networkViewHeightMargin: number = 30;
 export const dummySpawnPoint: Vector2D = new Vector2D(gameScreenWidth / 2 + 80, gameScreenHeight / 2);
 export const sites: Vector2D[] = [
   new Vector2D(80, 80),

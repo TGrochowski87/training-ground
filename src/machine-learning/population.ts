@@ -1,5 +1,6 @@
 import { dummySpawnPoint } from "configuration";
 import Wall from "entities/wall";
+import SiteIndexAssigner from "mechanics/siteIndexAssigner";
 import { Mode } from "models/UserSettings";
 import Vector2D from "utilities/vector2d";
 
@@ -14,6 +15,7 @@ export default abstract class Population {
     this.trainingMode = trainingMode;
 
     this.dummySpawnPoint = this.trainingMode == "full" ? dummySpawnPoint : new Vector2D(-1000, -1000);
+    SiteIndexAssigner.reset();
   }
 
   abstract update(walls: Wall[]): void;

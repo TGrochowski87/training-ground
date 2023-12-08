@@ -3,10 +3,11 @@ import { randomBetween } from "utilities/mathExtensions";
 
 class SiteIndexAssigner {
   static unvisitedSites: number[];
-  static siteTargetSequence: number[] = [firstSiteIndex];
+  static siteTargetSequence: number[];
 
   // Static constructor
-  public static _initialize() {
+  public static reset() {
+    SiteIndexAssigner.siteTargetSequence = [firstSiteIndex];
     SiteIndexAssigner.fillUnvisitedSitesList();
   }
 
@@ -38,5 +39,5 @@ class SiteIndexAssigner {
   };
 }
 
-SiteIndexAssigner._initialize();
+SiteIndexAssigner.reset();
 export default SiteIndexAssigner;

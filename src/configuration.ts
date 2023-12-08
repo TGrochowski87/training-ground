@@ -23,7 +23,7 @@ export const sensorRayCount: number = 8;
 
 // Machine Learning
 export const populationSize: number = 200;
-export const weightMutationRate: number = 0.5;
+export const weightMutationRate: number = 0.1;
 export const weightPerturbationChance: number = 0.9;
 export const generationLifetime: number = 2000;
 

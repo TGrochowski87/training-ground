@@ -12,13 +12,11 @@ import NeuralNetworkConventional from "./neuralNetworkConventional";
 
 class EnemyConventional extends Enemy<NeuralNetworkConventional> {
   constructor(pos: Vector2D, brain?: NeuralNetworkConventional, isChampion: boolean = false) {
-    super(pos, brain ?? new NeuralNetworkConventional([sensorRayCount * 2, 12, 12, 5]), isChampion);
+    super(pos, brain ?? new NeuralNetworkConventional([sensorRayCount * 2 + 1, 12, 12, 5]), isChampion);
 
     this.sensor = new Sensor(this);
-
     this.controls = new EnemyControls();
 
-    this.currentTargetSiteIndex = 1;
     this.lastSitePosition = pos;
   }
 

@@ -87,10 +87,6 @@ function manageGameCanvas(time: number) {
     population.calculateFitness();
     population.naturalSelection();
 
-    for (const species of (population as PopulationNEAT).population) {
-      console.log("species in population ", species.id);
-    }
-
     if (userSettings.method == "NEAT") {
       updateButtons();
       const highestSpeciesId = Math.max(...(population as PopulationNEAT).population.map(s => s.id));

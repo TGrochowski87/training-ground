@@ -17,7 +17,8 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   controls: EnemyControls;
   isChampion: boolean;
 
-  playerSpottedOnSensors: number[] = [];
+  playerSpottedOnSensors: number[];
+  distanceToTargetSector: number;
 
   // Fitness components
   sitesVisited: number = 0;
@@ -45,6 +46,8 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
 
     this.currentTargetSiteIndex = 1;
     this.lastSitePosition = pos;
+
+    this.distanceToTargetSector = this.calculateDistanceToTargetSector();
   }
 
   update = (walls: Wall[], player: Player): void => {
@@ -55,6 +58,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.sitesVisited++;
         this.lastSitePosition = sites[this.currentTargetSiteIndex];
         this.currentTargetSiteIndex = (this.currentTargetSiteIndex + 1) % sites.length;
+        this.distanceToTargetSector = 0.0;
+      } else {
+        this.distanceToTargetSector = this.calculateDistanceToTargetSector();
       }
 
       if (this.canShoot && this.controls.shoot && this.playerSpottedOnSensors.every(x => x == 0.0)) {
@@ -71,8 +77,8 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       }
 
       const neuralNetInputs = this.look(walls, player);
-      this.think([...neuralNetInputs]);
-      //this.move(this.controls, walls);
+      this.think([...neuralNetInputs, this.distanceToTargetSector]);
+      this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
     }
 
@@ -80,12 +86,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.bullets.forEach(bullet => bullet.update(walls, [player]));
     if (this.bullets.some(b => b.enemyHit)) {
       this.playerShot = true;
-    }
-  };
-
-  private updatePlayerPositionInfo = () => {
-    for (let i = 0; i < sensorRayCount; i++) {
-      this.playerSpottedOnSensors[i] = Math.max(0.0, this.playerSpottedOnSensors[i] - 0.02);
     }
   };
 
@@ -139,6 +139,39 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.brain.draw(ctx);
   };
 
+  calculateFitness = () => {
+    const pointsForReachingSite: number = 5;
+    let points: number = 0;
+
+    // Points for every reached site
+    points += this.sitesVisited * pointsForReachingSite;
+
+    // Points for approaching the last site
+    points += pointsForReachingSite * this.distanceToTargetSector;
+
+    // Penalty for needless shooting
+    points *= Math.pow(0.99, this.needlessShots);
+
+    // Penalty for running backwards
+    points *= Math.pow(0.97, this.runningBackwardsPenalties);
+
+    // Big boost for shooting the player
+    // TODO: Consider slight boost for shooting when player spotted
+    if (this.playerShot) {
+      points *= 1.5;
+    }
+
+    this.fitness = points;
+  };
+
+  abstract exportBrain(): void;
+
+  private calculateDistanceToTargetSector = (): number => {
+    const distanceLeft = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
+    const initialDistance = distanceBetweenPoints(this.lastSitePosition, sites[this.currentTargetSiteIndex]);
+    return distanceLeft > initialDistance ? 0 : 1 - distanceLeft / initialDistance;
+  };
+
   private look = (walls: Wall[], player: Player): number[] => {
     this.sensor.update(walls, player);
     const sensorReadings: (SensorReading | null)[] = this.sensor.getReadings();
@@ -165,36 +198,11 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.controls.decideOnMove(outputs);
   };
 
-  // ========= FITNESS ===========================
-
-  calculateFitness = () => {
-    const pointsForReachingSite: number = 5;
-    let points: number = 0;
-
-    // Points for every reached site
-    points += this.sitesVisited * pointsForReachingSite;
-
-    // Points for approaching the last site
-    const distanceLeft = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
-    const initialDistance = distanceBetweenPoints(this.lastSitePosition, sites[this.currentTargetSiteIndex]);
-    points += distanceLeft > initialDistance ? 0 : lerp(0, pointsForReachingSite, 1 - distanceLeft / initialDistance);
-
-    // Penalty for needless shooting
-    points *= Math.pow(0.99, this.needlessShots);
-
-    // Penalty for running backwards
-    points *= Math.pow(0.97, this.runningBackwardsPenalties);
-
-    // Big boost for shooting the player
-    // TODO: Consider slight boost for shooting when player spotted
-    if (this.playerShot) {
-      points *= 1.5;
+  private updatePlayerPositionInfo = () => {
+    for (let i = 0; i < sensorRayCount; i++) {
+      this.playerSpottedOnSensors[i] = Math.max(0.0, this.playerSpottedOnSensors[i] - 0.02);
     }
-
-    this.fitness = points;
   };
-
-  abstract exportBrain(): void;
 
   private isSiteReached = (): boolean => {
     return distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]) < siteRadius;

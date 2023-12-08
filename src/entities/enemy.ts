@@ -1,12 +1,4 @@
-import {
-  enemySpawnPoint,
-  gameScreenHeight,
-  gameScreenWidth,
-  gunPointOffset,
-  sensorRayCount,
-  siteRadius,
-  sites,
-} from "configuration";
+import { enemySpawnPoint, gunPointOffset, sensorRayCount, siteRadius, sites } from "configuration";
 import NeuralNetworkConventional from "machine-learning/conventional/neuralNetworkConventional";
 import EnemyControls from "mechanics/enemyControls";
 import Sensor from "machine-learning/sensor";
@@ -15,7 +7,7 @@ import Fighter from "./fighter";
 import Wall from "./wall";
 import SensorReading from "models/SensorReading";
 import Player from "./player";
-import { distanceBetweenPoints, pointsDistanceFromLineSegment } from "utilities/mathExtensions";
+import { distanceBetweenPoints } from "utilities/mathExtensions";
 import { lerp } from "utilities/mechanicsFunctions";
 import NeuralNetwork from "machine-learning/neuralNetwork";
 
@@ -40,8 +32,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   // Used only for when exporting.
   // Stores the last champion's fitness while the new one is mid calculation.
   savedChampionsFitness: number = 0.0;
-
-  intersectionPoints: (Vector2D | null)[] = Array.from({ length: sensorRayCount }, () => null);
 
   constructor(pos: Vector2D, brain: NN, isChampion: boolean) {
     super(pos);
@@ -93,26 +83,15 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     }
   };
 
+  private updatePlayerPositionInfo = () => {
+    for (let i = 0; i < sensorRayCount; i++) {
+      this.playerSpottedOnSensors[i] = Math.max(0.0, this.playerSpottedOnSensors[i] - 0.02);
+    }
+  };
+
   draw = (ctx: CanvasRenderingContext2D, showSensors: boolean, color: string): void => {
     if (showSensors) {
       this.sensor.draw(ctx);
-    }
-
-    for (let i = 0; i < this.intersectionPoints.length; i++) {
-      if (this.intersectionPoints[i] == null) continue;
-
-      ctx.lineWidth = 1;
-
-      ctx.beginPath();
-      ctx.strokeStyle = "orange";
-      ctx.moveTo(this.sensor.rays[i].start.x, this.sensor.rays[i].start.y);
-      ctx.lineTo(this.intersectionPoints[i]!.x, this.intersectionPoints[i]!.y);
-      ctx.stroke();
-
-      ctx.fillStyle = "green";
-      ctx.beginPath();
-      ctx.arc(this.intersectionPoints[i]!.x, this.intersectionPoints[i]!.y, 3, 0, Math.PI * 2);
-      ctx.fill();
     }
 
     ctx.save();
@@ -170,26 +149,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.playerSpottedOnSensors[i] = 1.0;
       }
 
-      // ===== SYF =======
-
-      const ray = this.sensor.rays[i];
-      const newLength = Math.sqrt(Math.pow(gameScreenWidth, 2) + Math.pow(gameScreenHeight, 2));
-      const test = pointsDistanceFromLineSegment(
-        sites[this.currentTargetSiteIndex],
-        ray.start,
-        new Vector2D(
-          ray.start.x + Math.sin(ray.angle + this.angle) * newLength,
-          ray.start.y - Math.cos(ray.angle + this.angle) * newLength
-        )
-      );
-      this.intersectionPoints[i] = test.intersectionPoint;
-
-      // ===== SYF =======
-
       const inputsFromReading = [
         sensorReadings[i] == null ? 0 : 1 - sensorReadings[i]!.offset,
         this.playerSpottedOnSensors[i],
-        1,
       ];
 
       neuralNetInputs.push(inputsFromReading);
@@ -233,12 +195,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   };
 
   abstract exportBrain(): void;
-
-  private updatePlayerPositionInfo = () => {
-    for (let i = 0; i < sensorRayCount; i++) {
-      this.playerSpottedOnSensors[i] = Math.max(0.0, this.playerSpottedOnSensors[i] - 0.02);
-    }
-  };
 
   private isSiteReached = (): boolean => {
     return distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]) < siteRadius;

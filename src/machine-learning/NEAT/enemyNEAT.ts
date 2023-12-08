@@ -23,6 +23,7 @@ class EnemyNEAT extends Enemy<NeuralNetworkNEAT> {
 
     this.controls = new EnemyControls();
 
+    this.currentTargetSiteIndex = 1;
     this.lastSitePosition = pos;
   }
 

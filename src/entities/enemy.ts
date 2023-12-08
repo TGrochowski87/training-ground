@@ -8,8 +8,8 @@ import Wall from "./wall";
 import SensorReading from "models/SensorReading";
 import Player from "./player";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
-import { lerp } from "utilities/mechanicsFunctions";
 import NeuralNetwork from "machine-learning/neuralNetwork";
+import SiteIndexAssigner from "mechanics/siteIndexAssigner";
 
 abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   brain: NN;
@@ -18,12 +18,14 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   isChampion: boolean;
 
   playerSpottedOnSensors: number[];
-  distanceToTargetSector: number;
+
+  distanceToTargetSite: number;
+  currentTargetSiteIndex: number;
+  lastSitePosition: Vector2D; // Initially set to spawn position.
+  currentTargetSiteSequenceIndex: number;
 
   // Fitness components
   sitesVisited: number = 0;
-  lastSitePosition: Vector2D; // Initially set to spawn position.
-  currentTargetSiteIndex: number;
   needlessShots: number = 0;
   backwardsCounter: number = 0;
   runningBackwardsPenalties = 0;
@@ -44,10 +46,11 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.controls = new EnemyControls();
     this.isChampion = isChampion;
 
-    this.currentTargetSiteIndex = 1;
+    this.currentTargetSiteIndex = SiteIndexAssigner.getNextTargetSiteIndex(0);
+    this.currentTargetSiteSequenceIndex = 1;
     this.lastSitePosition = pos;
 
-    this.distanceToTargetSector = this.calculateDistanceToTargetSector();
+    this.distanceToTargetSite = this.calculateDistanceToTargetSector();
   }
 
   update = (walls: Wall[], player: Player): void => {
@@ -57,10 +60,11 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       if (this.isSiteReached()) {
         this.sitesVisited++;
         this.lastSitePosition = sites[this.currentTargetSiteIndex];
-        this.currentTargetSiteIndex = (this.currentTargetSiteIndex + 1) % sites.length;
-        this.distanceToTargetSector = 0.0;
+        this.currentTargetSiteIndex = SiteIndexAssigner.getNextTargetSiteIndex(this.currentTargetSiteSequenceIndex);
+        this.currentTargetSiteSequenceIndex++;
+        this.distanceToTargetSite = 0.0;
       } else {
-        this.distanceToTargetSector = this.calculateDistanceToTargetSector();
+        this.distanceToTargetSite = this.calculateDistanceToTargetSector();
       }
 
       if (this.canShoot && this.controls.shoot && this.playerSpottedOnSensors.every(x => x == 0.0)) {
@@ -77,7 +81,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       }
 
       const neuralNetInputs = this.look(walls, player);
-      this.think([...neuralNetInputs, this.distanceToTargetSector]);
+      this.think([...neuralNetInputs, this.distanceToTargetSite]);
       this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
     }
@@ -147,7 +151,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points += this.sitesVisited * pointsForReachingSite;
 
     // Points for approaching the last site
-    points += pointsForReachingSite * this.distanceToTargetSector;
+    points += pointsForReachingSite * this.distanceToTargetSite;
 
     // Penalty for needless shooting
     points *= Math.pow(0.99, this.needlessShots);

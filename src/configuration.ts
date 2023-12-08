@@ -3,7 +3,7 @@ import Vector2D from "utilities/vector2d";
 // Game
 export const gameScreenWidth: number = 700;
 export const gameScreenHeight: number = 700;
-export const enemySpawnPoint: Vector2D = new Vector2D(100, 100);
+export const enemySpawnPoint: Vector2D = new Vector2D(100, 100); // firstSiteIndex should be changed with this setting.
 
 // Fighter
 export const playerSpeed: number = 4;
@@ -23,7 +23,7 @@ export const sensorRayCount: number = 8;
 
 // Machine Learning
 export const populationSize: number = 200;
-export const weightMutationRate: number = 0.1;
+export const weightMutationRate: number = 0.2;
 export const weightPerturbationChance: number = 0.9;
 export const generationLifetime: number = 3000;
 
@@ -52,4 +52,5 @@ export const sites: Vector2D[] = [
   new Vector2D(80, gameScreenHeight - 80),
   new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2),
 ];
+export const firstSiteIndex: number = 0;
 export const siteRadius: number = 50;

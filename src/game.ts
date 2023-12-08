@@ -4,6 +4,10 @@ import Player from "entities/player";
 import WallCollection from "entities/wallCollection";
 import EnemyConventional from "machine-learning/conventional/enemyConventional";
 import NeuralNetworkConventional from "machine-learning/conventional/neuralNetworkConventional";
+import EnemyNEAT from "machine-learning/NEAT/enemyNEAT";
+import NeuralNetworkNEAT from "machine-learning/NEAT/neuralNetworkNEAT";
+import NeuralNetwork from "machine-learning/neuralNetwork";
+import { Method } from "models/UserSettings";
 import Vector2D from "utilities/vector2d";
 
 const appContainer: HTMLDivElement = document.getElementById("app") as HTMLDivElement;
@@ -12,6 +16,7 @@ const trainingContainer: HTMLDivElement = document.getElementById("training-cont
 const importBrainButton: HTMLInputElement = document.getElementById("button-import") as HTMLInputElement;
 
 let gameStopped = false;
+let brainType: Method = "conventional";
 
 importBrainButton.onchange = async (event: Event) => {
   let file = (<HTMLInputElement>event.target).files![0];
@@ -22,7 +27,10 @@ importBrainButton.onchange = async (event: Event) => {
 
   const walls: WallCollection = new WallCollection();
   const player: Player = new Player(new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2));
-  const enemy: EnemyConventional = new EnemyConventional(enemySpawnPoint, brandNewBrain.clone()); // TODO: NEAT
+  const enemy: Enemy<NeuralNetwork> =
+    brainType == "conventional"
+      ? new EnemyConventional(enemySpawnPoint.copy(), (brandNewBrain as NeuralNetworkConventional).clone())
+      : new EnemyNEAT(enemySpawnPoint.copy(), (brandNewBrain as NeuralNetworkNEAT).clone()); // TODO: NEAT
 
   animate();
 
@@ -61,8 +69,13 @@ function constructGameField(): CanvasRenderingContext2D {
   return gameCanvas.getContext("2d")!;
 }
 
-const createBrainFromTemplate = async (file: File): Promise<NeuralNetworkConventional> => {
+const createBrainFromTemplate = async (file: File): Promise<NeuralNetwork> => {
   const content = await file.text();
-  const brain = NeuralNetworkConventional.import(content);
-  return brain;
+
+  if (file.name.includes("NEAT")) {
+    brainType = "NEAT";
+    return NeuralNetworkNEAT.import(content);
+  }
+
+  return NeuralNetworkConventional.import(content);
 };

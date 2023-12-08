@@ -430,8 +430,8 @@ class NeuralNetworkNEAT extends NeuralNetwork {
     const connections: Connection[] = [];
     for (const connectionString of connectionListRepresentation) {
       const propsStringList = connectionString.split(" ");
-      const nodeFrom = nodes.find(n => n.id == +propsStringList[0]);
-      const nodeTo = nodes.find(n => n.id == +propsStringList[1]);
+      const nodeFrom = nodes.find(n => n.id == +propsStringList[1]);
+      const nodeTo = nodes.find(n => n.id == +propsStringList[2]);
 
       if (nodeFrom == undefined || nodeTo == undefined) {
         throw Error("A node of required ID was not imported.");

@@ -26,6 +26,7 @@ class PopulationNEAT extends Population {
   populationFitness: number = 0.0;
   bestPopulationFitness: number = 0.0;
   generationsSinceLastImprovement: number = 0;
+  speciesOfTopMember: number | undefined;
 
   targetSpeciesCount: number = 10;
   compatibilityThreshold: number = 5;
@@ -109,6 +110,8 @@ class PopulationNEAT extends Population {
     console.log(`Species: ${fitnessRanking[0].speciesId}, fitness: ${fitnessRanking[0].fitness}`);
     console.log(`Species: ${fitnessRanking[1].speciesId}, fitness: ${fitnessRanking[1].fitness}`);
     console.log(`Species: ${fitnessRanking[2].speciesId}, fitness: ${fitnessRanking[2].fitness}`);
+
+    this.speciesOfTopMember = fitnessRanking[0].speciesId;
   };
 
   naturalSelection = () => {
@@ -133,7 +136,8 @@ class PopulationNEAT extends Population {
         offspringLeftToProduce * populationPartWithoutCrossover
       );
 
-      const champion = this.population[i].cloneChampion();
+      const speciesId = this.population[i].id;
+      const champion = this.population[i].cloneChampion(speciesId == this.speciesOfTopMember);
       if (champion != null) {
         offspringLeftToProduce--;
         offspring.push(champion);

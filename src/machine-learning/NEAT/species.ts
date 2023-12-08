@@ -108,8 +108,8 @@ class Species {
   /**
    * Should be done after sorting.
    */
-  cloneChampion = (): EnemyNEAT | null => {
-    if (this.members.length <= 5) {
+  cloneChampion = (evenIfSmallPopulation: boolean): EnemyNEAT | null => {
+    if (evenIfSmallPopulation == false && this.members.length <= 5) {
       return null;
     }
 

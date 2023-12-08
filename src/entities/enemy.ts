@@ -17,8 +17,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   controls: EnemyControls;
   isChampion: boolean;
 
-  playerSpotted: boolean = false;
-  triggerCounter: number = 0;
+  playerSpottedOnSensors: number[] = [];
 
   // Fitness components
   sitesVisited: number = 0;
@@ -40,6 +39,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.brain = brain;
 
     this.sensor = new Sensor(this);
+    this.playerSpottedOnSensors = Array.from({ length: sensorRayCount }, () => 0.0);
     this.controls = new EnemyControls();
     this.isChampion = isChampion;
 
@@ -49,13 +49,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
 
   update = (walls: Wall[], player: Player): void => {
     if (this.isDead === false) {
-      if (this.playerSpotted) {
-        this.triggerCounter++;
-
-        if (this.triggerCounter === 30) {
-          this.playerSpotted = false;
-        }
-      }
+      this.updatePlayerPositionInfo();
 
       if (this.isSiteReached()) {
         this.sitesVisited++;
@@ -63,7 +57,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.currentTargetSiteIndex = (this.currentTargetSiteIndex + 1) % sites.length;
       }
 
-      if (this.canShoot && this.controls.shoot && this.playerSpotted == false) {
+      if (this.canShoot && this.controls.shoot && this.playerSpottedOnSensors.every(x => x == 0.0)) {
         this.needlessShots++;
       }
 
@@ -78,7 +72,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
 
       const neuralNetInputs = this.look(walls, player);
       this.think([...neuralNetInputs]);
-      this.move(this.controls, walls);
+      //this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
     }
 
@@ -86,6 +80,12 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.bullets.forEach(bullet => bullet.update(walls, [player]));
     if (this.bullets.some(b => b.enemyHit)) {
       this.playerShot = true;
+    }
+  };
+
+  private updatePlayerPositionInfo = () => {
+    for (let i = 0; i < sensorRayCount; i++) {
+      this.playerSpottedOnSensors[i] = Math.max(0.0, this.playerSpottedOnSensors[i] - 0.02);
     }
   };
 
@@ -98,7 +98,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     ctx.translate(this.position.x, this.position.y);
     ctx.rotate(this.angle);
 
-    ctx.fillStyle = this.playerSpotted ? "#AF0D0D" : color;
+    ctx.fillStyle = this.playerSpottedOnSensors.some(x => x > 0.0) ? "#AF0D0D" : color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
     ctx.fill();
@@ -144,15 +144,14 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     const sensorReadings: (SensorReading | null)[] = this.sensor.getReadings();
 
     let neuralNetInputs: number[][] = [];
-    for (const reading of sensorReadings) {
-      if (reading?.detectedEntity === "PLAYER") {
-        this.playerSpotted = true;
-        this.triggerCounter = 0;
+    for (let i = 0; i < sensorRayCount; i++) {
+      if (sensorReadings[i]?.detectedEntity === "PLAYER") {
+        this.playerSpottedOnSensors[i] = 1.0;
       }
 
       const inputsFromReading = [
-        reading === null ? 0 : 1 - reading.offset,
-        reading?.detectedEntity === "PLAYER" ? 1 : 0,
+        sensorReadings[i] == null ? 0 : 1 - sensorReadings[i]!.offset,
+        this.playerSpottedOnSensors[i],
       ];
 
       neuralNetInputs.push(inputsFromReading);

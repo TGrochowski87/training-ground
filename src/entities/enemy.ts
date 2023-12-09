@@ -154,7 +154,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   };
 
   calculateFitness = () => {
-    const pointsForReachingSite: number = 5;
+    const pointsForReachingSite: number = 10;
     let points: number = 0;
 
     // Points for every reached site

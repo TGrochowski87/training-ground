@@ -1,6 +1,5 @@
 import {
   enemySpawnPoint,
-  generationLifetime,
   interspeciesMatingRate,
   massExtinctionThreshold,
   populationPartWithoutCrossover,
@@ -60,7 +59,7 @@ class PopulationNEAT extends Population {
   }
 
   update = (walls: Wall[]): void => {
-    if (this.generationLifetime === generationLifetime) {
+    if (this.generationLifetime === this.maxGenerationLifetime) {
       for (const species of this.population) {
         species.killAllMembers();
       }
@@ -170,6 +169,10 @@ class PopulationNEAT extends Population {
     this.adjustCompatibilityThreshold();
     this.distributeOffspringBetweenSpecies(offspring);
     this.filterOutEmptySpecies();
+
+    if (this.generation % this.numberOfGenerationsBetweenIncrease == 0) {
+      this.maxGenerationLifetime += this.generationLifetimeIncrease;
+    }
     this.generation++;
   };
 

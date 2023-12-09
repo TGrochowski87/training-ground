@@ -1,4 +1,4 @@
-import { enemySpawnPoint, generationLifetime } from "configuration";
+import { enemySpawnPoint } from "configuration";
 import DummyPlayer from "entities/dummyPlayer";
 import Wall from "entities/wall";
 import Population from "machine-learning/population";
@@ -26,7 +26,7 @@ class PopulationConventional extends Population {
   }
 
   update = (walls: Wall[]) => {
-    if (this.generationLifetime === generationLifetime) {
+    if (this.generationLifetime === this.maxGenerationLifetime) {
       for (const member of this.members) {
         member.isDead = true;
       }
@@ -120,6 +120,10 @@ class PopulationConventional extends Population {
 
     this.members = [...newPopulation];
     this.dummies = [...newDummies];
+
+    if (this.generation % this.numberOfGenerationsBetweenIncrease == 0) {
+      this.maxGenerationLifetime += this.generationLifetimeIncrease;
+    }
     this.generation++;
   };
 

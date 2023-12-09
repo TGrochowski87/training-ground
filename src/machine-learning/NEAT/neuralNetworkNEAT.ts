@@ -278,8 +278,9 @@ class NeuralNetworkNEAT extends NeuralNetwork {
     const randomConnectionFrom: Node = randomConnection.nodeFrom;
     const randomConnectionTo: Node = randomConnection.nodeTo;
 
-    const newNodeLayer = randomConnectionFrom.layer + 1;
-    const newNode: Node = new Node(this.nodes.length, "Hidden", newNodeLayer, 0);
+    const newNodeLayer: number = randomConnectionFrom.layer + 1;
+    const newNodeId: number = Math.max(...this.nodes.map(n => n.id)) + 1;
+    const newNode: Node = new Node(newNodeId, "Hidden", newNodeLayer, 0);
 
     // The new node would be put in the same layer as its target node, so new layer must be created.
     if (newNodeLayer == randomConnectionTo.layer) {

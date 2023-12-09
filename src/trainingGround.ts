@@ -177,7 +177,6 @@ const updateButtons = () => {
   if (speciesSelectionButtons[selectedSpeciesId].disabled) {
     for (let i = 0; i < speciesSelectionButtons.length; i++) {
       if (speciesSelectionButtons[i].disabled == false) {
-        console.log("zmiana ", i);
         selectedSpeciesId = i;
         speciesNumberInfo.textContent = `Selected species: ${selectedSpeciesId}`;
       }

@@ -1,12 +1,7 @@
-import { sensorRayCount, sites, gunPointOffset, enemySpawnPoint, siteRadius } from "configuration";
+import { sensorRayCount, enemySpawnPoint } from "configuration";
 import Enemy from "entities/enemy";
-import Player from "entities/player";
-import Wall from "entities/wall";
 import Sensor from "machine-learning/sensor";
 import EnemyControls from "mechanics/enemyControls";
-import SensorReading from "models/SensorReading";
-import { distanceBetweenPoints } from "utilities/mathExtensions";
-import { lerp } from "utilities/mechanicsFunctions";
 import Vector2D from "utilities/vector2d";
 import NeuralNetworkConventional from "./neuralNetworkConventional";
 

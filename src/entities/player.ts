@@ -6,6 +6,7 @@ import PlayerControls from "mechanics/playerControls";
 import Enemy from "./enemy";
 import Controls from "mechanics/controls";
 import DummyControls from "mechanics/dummyControls";
+import NeuralNetwork from "machine-learning/neuralNetwork";
 
 class Player extends Fighter {
   controls: Controls;
@@ -16,7 +17,7 @@ class Player extends Fighter {
     this.controls = isDummy ? new DummyControls() : new PlayerControls();
   }
 
-  update = (walls: Wall[], enemies: Enemy[]): void => {
+  update = (walls: Wall[], enemies: Enemy<NeuralNetwork>[]): void => {
     if (this.isDead === false) {
       this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, this);

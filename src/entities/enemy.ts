@@ -1,5 +1,4 @@
-import { enemySpawnPoint, gunPointOffset, sensorRayCount, siteRadius, sites } from "configuration";
-import NeuralNetworkConventional from "machine-learning/conventional/neuralNetworkConventional";
+import { gunPointOffset, sensorRayCount, siteRadius, sites } from "configuration";
 import EnemyControls from "mechanics/enemyControls";
 import Sensor from "machine-learning/sensor";
 import Vector2D from "utilities/vector2d";

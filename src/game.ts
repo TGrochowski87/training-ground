@@ -30,7 +30,7 @@ importBrainButton.onchange = async (event: Event) => {
   const enemy: Enemy<NeuralNetwork> =
     brainType == "conventional"
       ? new EnemyConventional(enemySpawnPoint.copy(), (brandNewBrain as NeuralNetworkConventional).clone())
-      : new EnemyNEAT(enemySpawnPoint.copy(), (brandNewBrain as NeuralNetworkNEAT).clone()); // TODO: NEAT
+      : new EnemyNEAT(enemySpawnPoint.copy(), (brandNewBrain as NeuralNetworkNEAT).clone());
 
   animate();
 
@@ -54,8 +54,6 @@ importBrainButton.onchange = async (event: Event) => {
     walls.draw(gameCtx);
   }
 };
-
-//const gameCanvas: HTMLCanvasElement = document.getElementById("game-canvas") as HTMLCanvasElement;
 
 function constructGameField(): CanvasRenderingContext2D {
   const gameCanvas: HTMLCanvasElement = document.createElement("canvas");

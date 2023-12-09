@@ -64,6 +64,17 @@ body {
   display: flex;
   flex-wrap: wrap;
 }
+
 #species-selection > button {
   margin-right: 3px;
+}
+
+#scenario-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#scenario-selection > button {
+  margin-right: auto;
 }

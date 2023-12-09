@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/brain.svg" />
+    <link rel="stylesheet" type="text/css" href="../style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Training Ground</title>
+  </head>
+  <body>
+    <div id="app">
+      <form id="scenario-selection" action="./evaluation.html">
+        <h3>Choose scenario</h3>
+
+        <div>
+          <input type="radio" id="scenario-one" name="scenario" value="one" checked />
+          <label for="scenario-one" >Scenario 1: Solo training ground</label>
+        </div>
+        
+        <div>
+          <input type="radio" id="scenario-two" name="scenario" value="two" />
+          <label for="scenario-two" >Scenario 2: Straight corridor</label>
+        </div>
+          
+        <div>
+          <input type="radio" id="scenario-tree" name="scenario" value="three" />
+          <label for="scenario-tree" >Scenario 3: Straight corridor with obstacles</label>
+        </div>
+        
+        <div>
+          <input type="radio" id="scenario-four" name="scenario" value="four" />
+          <label for="scenario-four" >Scenario 4: Winding corridor</label>
+        </div>
+
+        <button type="submit">Begin</button>
+      </form>
+    </div>
+    <script type="module" src="/src/evaluation/evaluation.ts"></script>
+  </body>
+</html>

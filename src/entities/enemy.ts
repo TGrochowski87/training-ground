@@ -20,6 +20,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   playerSpottedOnSensors: number[];
 
   distanceToTargetSite: number;
+  previousDistanceToTargetSite: number;
   currentTargetSiteIndex: number;
   lastSitePosition: Vector2D; // Initially set to spawn position.
   currentTargetSiteSequenceIndex: number;
@@ -52,6 +53,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.lastSitePosition = pos;
 
     this.distanceToTargetSite = this.calculateDistanceToTargetSector();
+    this.previousDistanceToTargetSite = this.distanceToTargetSite;
   }
 
   update = (walls: Wall[], player: Player): void => {
@@ -63,9 +65,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.lastSitePosition = sites[this.currentTargetSiteIndex];
         this.currentTargetSiteIndex = SiteIndexAssigner.getNextTargetSiteIndex(this.currentTargetSiteSequenceIndex);
         this.currentTargetSiteSequenceIndex++;
-        this.distanceToTargetSite = 0.0;
+        this.updateDistanceToTargetSite(0.0);
       } else {
-        this.distanceToTargetSite = this.calculateDistanceToTargetSector();
+        this.updateDistanceToTargetSite(this.calculateDistanceToTargetSector());
       }
 
       if (this.canShoot && this.controls.shoot && this.playerSpottedOnSensors.every(x => x == 0.0)) {
@@ -90,7 +92,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       }
 
       const neuralNetInputs = this.look(walls, player);
-      this.think([...neuralNetInputs, this.distanceToTargetSite]);
+      this.think([...neuralNetInputs, +(this.distanceToTargetSite < this.previousDistanceToTargetSite)]);
       this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
     }
@@ -160,7 +162,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points += this.sitesVisited * pointsForReachingSite;
 
     // Points for approaching the last site
-    points += pointsForReachingSite * this.distanceToTargetSite;
+    points += pointsForReachingSite * (1 - this.distanceToTargetSite);
 
     // Penalty for needless shooting
     points *= Math.pow(0.99, this.needlessShots);
@@ -179,10 +181,15 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
 
   abstract exportBrain(): void;
 
+  private updateDistanceToTargetSite = (value: number) => {
+    this.previousDistanceToTargetSite = this.distanceToTargetSite;
+    this.distanceToTargetSite = value;
+  };
+
   private calculateDistanceToTargetSector = (): number => {
     const distanceLeft = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
     const initialDistance = distanceBetweenPoints(this.lastSitePosition, sites[this.currentTargetSiteIndex]);
-    return distanceLeft > initialDistance ? 0 : 1 - distanceLeft / initialDistance;
+    return distanceLeft > initialDistance ? 0 : distanceLeft / initialDistance;
   };
 
   private look = (walls: Wall[], player: Player): number[] => {

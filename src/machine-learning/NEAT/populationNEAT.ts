@@ -49,6 +49,14 @@ class PopulationNEAT extends Population {
       initialPopulation.push(new EnemyNEAT(enemySpawnPoint.copy(), baseBrain?.clone(), false));
     }
     this.population[0].setNewGeneration(initialPopulation, this.dummySpawnPoint);
+
+    // Prevent historical marking duplication when importing.
+    if (baseBrain) {
+      const importedInnovations: PartialConnectionData[] = baseBrain.connections
+        .filter(c => c.nodeFrom.type == "Hidden" || c.nodeTo.type == "Hidden")
+        .map(c => ({ historicalMarking: c.historicalMarking, nodeFrom: c.nodeFrom.id, nodeTo: c.nodeTo.id }));
+      this.innovations.push(...importedInnovations);
+    }
   }
 
   update = (walls: Wall[]): void => {

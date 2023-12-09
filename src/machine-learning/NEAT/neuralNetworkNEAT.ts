@@ -303,9 +303,15 @@ class NeuralNetworkNEAT extends NeuralNetwork {
     let childConnections: Connection[] = [];
     let childNodes: Node[] = [];
 
-    const currentNodes: readonly Node[] = this.nodes.length > other.nodes.length ? this.nodes : other.nodes;
-    for (const node of currentNodes) {
+    for (const node of this.nodes) {
       childNodes[node.id] = node.clone();
+    }
+
+    // If connections can be taken from any network, we need all possible nodes
+    if (areEqual) {
+      for (const node of other.nodes) {
+        childNodes[node.id] ??= node.clone();
+      }
     }
 
     for (let i = 0; i <= Connection.globalMaxHistoricalMarking; i++) {
@@ -316,7 +322,7 @@ class NeuralNetworkNEAT extends NeuralNetwork {
 
       // For matching connections the parent is chosen randomly
       if ((connectionInThis && connectionInOther) || areEqual) {
-        chosenConnection = Math.random() >= 0.5 ? connectionInThis : connectionInOther;
+        chosenConnection = Math.random() > 0.5 ? connectionInThis : connectionInOther;
       }
       // Disjoint and excess genes
       else {
@@ -324,6 +330,7 @@ class NeuralNetworkNEAT extends NeuralNetwork {
       }
 
       if (chosenConnection) {
+        // nodeFrom and nodeTo must be reassigned to use the shared pool and have proper references.
         const nodeFrom: Node = childNodes[chosenConnection.nodeFrom.id];
         const nodeTo: Node = childNodes[chosenConnection.nodeTo.id];
         let connection: Connection = chosenConnection.clone(nodeFrom, nodeTo);

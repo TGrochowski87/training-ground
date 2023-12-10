@@ -81,20 +81,27 @@ function animate(time: number = 0) {
 function manageGameCanvas(time: number) {
   gameCtx.clearRect(0, 0, gameCtx.canvas.width, gameCtx.canvas.height);
 
-  if (population.isPopulationExtinct() == false) {
-    population.update(walls.collection);
-  } else {
-    population.calculateFitness();
-    population.naturalSelection();
+  try {
+    if (population.isPopulationExtinct() == false) {
+      population.update(walls.collection);
+    } else {
+      population.calculateFitness();
+      population.naturalSelection();
 
-    if (userSettings.method == "NEAT") {
-      updateButtons();
-      const highestSpeciesId = Math.max(...(population as PopulationNEAT).population.map(s => s.id));
-      for (let i = speciesSelectionButtons.length; i <= highestSpeciesId; i++) {
-        addNewSpeciesButton(i);
+      if (userSettings.method == "NEAT") {
+        updateButtons();
+        const highestSpeciesId = Math.max(...(population as PopulationNEAT).population.map(s => s.id));
+        for (let i = speciesSelectionButtons.length; i <= highestSpeciesId; i++) {
+          addNewSpeciesButton(i);
+        }
       }
     }
+  } catch (error) {
+    console.log(`Exception thrown by generation ${population.generation}. Saving the best neural networks.`);
+    population.exportBestNeuralNetwork();
+    console.error(error);
   }
+
   population.draw(gameCtx, showSensors, showSelectedCheckbox.checked ? selectedSpeciesId : undefined);
 
   walls.draw(gameCtx);

@@ -304,10 +304,15 @@ class PopulationNEAT extends Population {
 
     const speciesLeft: Species[] = [];
     for (let i = 0; i < this.population.length; i++) {
-      if (this.population[i].generationsSinceLastImprovement >= speciesExtinctionThreshold) {
-        console.log(`Species ${this.population[i].id} went extinct.`);
+      const species = this.population[i];
+
+      if (
+        species.generationsSinceLastImprovement >= speciesExtinctionThreshold &&
+        species.id != this.speciesOfTopMember // Save the species of the best member of the whole generation.
+      ) {
+        console.log(`Species ${species.id} went extinct.`);
       } else {
-        speciesLeft.push(this.population[i]);
+        speciesLeft.push(species);
       }
     }
 
@@ -317,10 +322,12 @@ class PopulationNEAT extends Population {
   private filterOutEmptySpecies = () => {
     const speciesLeft: Species[] = [];
     for (let i = 0; i < this.population.length; i++) {
-      if (this.population[i].members.length == 0) {
-        console.log(`Species ${this.population[i].id} went extinct.`);
+      const species = this.population[i];
+
+      if (species.members.length == 0) {
+        console.log(`Species ${species.id} went extinct.`);
       } else {
-        speciesLeft.push(this.population[i]);
+        speciesLeft.push(species);
       }
     }
 

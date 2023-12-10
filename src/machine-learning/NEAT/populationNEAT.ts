@@ -174,6 +174,7 @@ class PopulationNEAT extends Population {
 
     if (this.generation % this.numberOfGenerationsBetweenIncrease == 0) {
       this.maxGenerationLifetime += this.generationLifetimeIncrease;
+      console.log(`Generation lifetime increased to ${this.maxGenerationLifetime}`);
     }
     this.generation++;
   };

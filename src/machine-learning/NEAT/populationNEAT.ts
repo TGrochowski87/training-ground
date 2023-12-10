@@ -14,6 +14,7 @@ import { Mode } from "models/UserSettings";
 import Wall from "entities/wall";
 import EnemyNEAT from "./enemyNEAT";
 import NeuralNetworkNEAT from "./neuralNetworkNEAT";
+import Connection from "./connection";
 
 class PopulationNEAT extends Population {
   population: Species[];
@@ -49,12 +50,13 @@ class PopulationNEAT extends Population {
     }
     this.population[0].setNewGeneration(initialPopulation, this.dummySpawnPoint);
 
-    // Prevent historical marking duplication when importing.
+    // Prevent historical marking duplication when imported.
     if (baseBrain) {
       const importedInnovations: PartialConnectionData[] = baseBrain.connections
         .filter(c => c.nodeFrom.type == "Hidden" || c.nodeTo.type == "Hidden")
         .map(c => ({ historicalMarking: c.historicalMarking, nodeFrom: c.nodeFrom.id, nodeTo: c.nodeTo.id }));
-      this.innovations.push(...importedInnovations);
+      this.innovations = [...importedInnovations];
+      Connection.globalMaxHistoricalMarking = Math.max(...importedInnovations.map(i => i.historicalMarking));
     }
   }
 

@@ -3,7 +3,7 @@ import Vector2D from "utilities/vector2d";
 // Game
 export const gameScreenWidth: number = 700;
 export const gameScreenHeight: number = 700;
-export const enemySpawnPoint: Vector2D = new Vector2D(100, 100); // firstSiteIndex should be changed with this setting.
+export const enemySpawnPoint: Vector2D = new Vector2D(100, 100); // SiteIndexAssigner should be adjusted with this setting.
 
 // Fighter
 export const playerSpeed: number = 4;
@@ -51,5 +51,4 @@ export const sites: Vector2D[] = [
   new Vector2D(80, gameScreenHeight - 80),
   new Vector2D(gameScreenWidth / 2, gameScreenHeight / 2),
 ];
-export const firstSiteIndex: number = 0;
 export const siteRadius: number = 50;

@@ -18,7 +18,7 @@ export default abstract class Population {
     this.trainingMode = trainingMode;
 
     this.dummySpawnPoint = this.trainingMode == "full" ? dummySpawnPoint : new Vector2D(-1000, -1000);
-    SiteIndexAssigner.reset();
+    SiteIndexAssigner.reset(sites);
   }
 
   abstract update(walls: Wall[]): void;

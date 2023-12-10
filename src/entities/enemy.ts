@@ -27,9 +27,8 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   // Fitness components
   sitesVisited: number = 0;
   needlessShots: number = 0;
-  backwardsCounter: number = 0;
-  backwardsDisabledCounter: number = 0;
-  runningBackwardsPenalties = 0;
+  backwardCounter: number = 0;
+  forwardCounter: number = 0;
   playerShot: boolean = false;
   fitness: number = 0.0;
 
@@ -51,7 +50,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.currentTargetSiteSequenceIndex = 1;
     this.lastSitePosition = pos;
 
-    this.distanceToTargetSite = this.calculateDistanceToTargetSector();
+    this.distanceToTargetSite = this.calculateDistanceToTargetSite();
     this.previousDistanceToTargetSite = this.distanceToTargetSite;
   }
 
@@ -66,28 +65,17 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.currentTargetSiteSequenceIndex++;
         this.updateDistanceToTargetSite(0.0);
       } else {
-        this.updateDistanceToTargetSite(this.calculateDistanceToTargetSector());
+        this.updateDistanceToTargetSite(this.calculateDistanceToTargetSite());
       }
 
       if (this.canShoot && this.controls.shoot && this.playerSpottedOnSensors.every(x => x == 0.0)) {
         this.needlessShots++;
       }
 
-      if (this.controls.backward) {
-        this.backwardsDisabledCounter = 0;
-        this.backwardsCounter++;
-
-        if (this.backwardsCounter == 100) {
-          this.runningBackwardsPenalties++;
-          this.backwardsCounter = 0;
-        }
-      } else if (this.controls.forward) {
-        // To not penalize running backwards when needed
-        this.backwardsDisabledCounter++;
-
-        if (this.backwardsDisabledCounter == 20) {
-          this.backwardsCounter = 0;
-        }
+      if (this.controls.backward && this.controls.forward == false) {
+        this.backwardCounter++;
+      } else if (this.controls.backward == false && this.controls.forward) {
+        this.forwardCounter++;
       }
 
       const neuralNetInputs = this.look(walls, player);
@@ -166,8 +154,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     // Penalty for needless shooting
     points *= Math.pow(0.99, this.needlessShots);
 
-    // Penalty for running backwards
-    points *= Math.pow(0.95, this.runningBackwardsPenalties);
+    // High penalty for running backwards
+    const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.5 : 0;
+    points *= 1 - runningBackwardsPenalty;
 
     // Big boost for shooting the player
     // TODO: Consider slight boost for shooting when player spotted
@@ -185,10 +174,10 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.distanceToTargetSite = value;
   };
 
-  private calculateDistanceToTargetSector = (): number => {
+  private calculateDistanceToTargetSite = (): number => {
     const distanceLeft = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
     const initialDistance = distanceBetweenPoints(this.lastSitePosition, sites[this.currentTargetSiteIndex]);
-    return distanceLeft > initialDistance ? 0 : distanceLeft / initialDistance;
+    return distanceLeft > initialDistance ? 1 : distanceLeft / initialDistance;
   };
 
   private look = (walls: Wall[], player: Player): number[] => {

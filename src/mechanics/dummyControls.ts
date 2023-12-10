@@ -1,11 +1,13 @@
 import Controls from "./controls";
 
 class DummyControls extends Controls {
-  constructor() {
+  constructor(shouldMove: boolean) {
     super();
 
-    this.forward = true;
-    this.left = true;
+    if (shouldMove) {
+      this.forward = true;
+      this.left = true;
+    }
   }
 }
 

@@ -11,10 +11,10 @@ import NeuralNetwork from "machine-learning/neuralNetwork";
 class Player extends Fighter {
   controls: Controls;
 
-  constructor(pos: Vector2D, isDummy: boolean = false) {
+  constructor(pos: Vector2D, isDummy: boolean = false, shouldDummyMove: boolean = true) {
     super(pos);
 
-    this.controls = isDummy ? new DummyControls() : new PlayerControls();
+    this.controls = isDummy ? new DummyControls(shouldDummyMove) : new PlayerControls();
   }
 
   update = (walls: Wall[], enemies: Enemy<NeuralNetwork>[]): void => {

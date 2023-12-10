@@ -10,7 +10,7 @@ import NeuralNetwork from "machine-learning/neuralNetwork";
 import SiteIndexAssigner from "mechanics/siteIndexAssigner";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
-import { resourcesScenario1, ScenarioResources } from "./resources";
+import { resourcesScenario1, resourcesScenario2, ScenarioResources } from "./resources";
 
 const appContainer: HTMLDivElement = document.getElementById("app") as HTMLDivElement;
 const importContainer: HTMLDivElement = document.getElementById("import-container") as HTMLDivElement;
@@ -21,21 +21,27 @@ const urlParams = new URLSearchParams(window.location.search);
 const scenario: string = urlParams.get("scenario")!;
 let resources: ScenarioResources;
 let dummyExists: boolean = false;
-let sitesExist: boolean = false;
 let currentLifespan: number = 0;
-let currentTargetSiteIndex: number = 1;
+let currentTargetSiteSequenceIndex: number = 1;
 let sitesReachedCounter: number = 0;
 
 switch (scenario) {
   case "one":
     resources = resourcesScenario1;
-    sitesExist = true;
     SiteIndexAssigner.siteTargetSequence = Array.from({ length: 10 }, () => [0, 1, 2, 3, 4]).flat();
+    break;
+
+  case "two":
+    resources = resourcesScenario2;
+    SiteIndexAssigner.siteTargetSequence = [0, 1];
     break;
 
   default:
     break;
 }
+
+SiteIndexAssigner.reset(resources!.sites);
+dummyExists = resources!.dummyPos != undefined;
 
 importBrainButton.onchange = async (event: Event) => {
   let file = (<HTMLInputElement>event.target).files![0];
@@ -60,9 +66,6 @@ importBrainButton.onchange = async (event: Event) => {
       return;
     }
     manageGameCanvas(time);
-    if (sitesExist) {
-      displaySites(gameCtx);
-    }
     currentLifespan++;
 
     requestAnimationFrame(animate);
@@ -70,6 +73,8 @@ importBrainButton.onchange = async (event: Event) => {
 
   function manageGameCanvas(time: number) {
     gameCtx.clearRect(0, 0, gameCtx.canvas.width, gameCtx.canvas.height);
+
+    displaySites(gameCtx);
 
     if (dummyExists) {
       dummy.update(walls);
@@ -80,16 +85,15 @@ importBrainButton.onchange = async (event: Event) => {
     enemy.draw(gameCtx, false, "#A77500");
 
     if (
-      resources.sites &&
       distanceBetweenPoints(
         enemy.position,
-        resources.sites[SiteIndexAssigner.siteTargetSequence[currentTargetSiteIndex]]
+        resources.sites[SiteIndexAssigner.siteTargetSequence[currentTargetSiteSequenceIndex]]
       ) < siteRadius
     ) {
       console.log(
-        `Reached site ${SiteIndexAssigner.siteTargetSequence[currentTargetSiteIndex]}, Time in frames: ${currentLifespan}`
+        `Reached site ${SiteIndexAssigner.siteTargetSequence[currentTargetSiteSequenceIndex]}, Time in frames: ${currentLifespan}`
       );
-      currentTargetSiteIndex++;
+      currentTargetSiteSequenceIndex++;
       sitesReachedCounter++;
     }
 
@@ -105,8 +109,8 @@ function constructGameField(): CanvasRenderingContext2D {
   trainingContainer.append(gameCanvas);
   appContainer.removeChild(importContainer);
 
-  gameCanvas.width = gameScreenWidth;
-  gameCanvas.height = gameScreenHeight;
+  gameCanvas.width = resources.fieldSize.x;
+  gameCanvas.height = resources.fieldSize.y;
 
   return gameCanvas.getContext("2d")!;
 }

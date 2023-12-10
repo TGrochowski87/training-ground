@@ -10,7 +10,6 @@ import PartialConnectionData from "machine-learning/NEAT/models/PartialConnectio
 import SplitNumber from "machine-learning/NEAT/models/SplitNumber";
 import Species from "machine-learning/NEAT/species";
 import Population from "machine-learning/population";
-import { Mode } from "models/UserSettings";
 import Wall from "entities/wall";
 import EnemyNEAT from "./enemyNEAT";
 import NeuralNetworkNEAT from "./neuralNetworkNEAT";
@@ -37,18 +36,18 @@ class PopulationNEAT extends Population {
   // It is not clear which approach is more effective.
   innovations: PartialConnectionData[] = [];
 
-  constructor(size: number, trainingMode: Mode, baseBrain?: NeuralNetworkNEAT) {
-    super(trainingMode);
+  constructor(size: number, baseBrain?: NeuralNetworkNEAT) {
+    super();
 
     this.size = size;
-    this.population = [new Species(this.lastUsedSpeciesId++, trainingMode)];
+    this.population = [new Species(this.lastUsedSpeciesId++)];
     this.selectedSpecies = this.population[0];
 
     const initialPopulation: EnemyNEAT[] = [];
     for (let i = 0; i < size; i++) {
       initialPopulation.push(new EnemyNEAT(enemySpawnPoint.copy(), baseBrain?.clone(), false));
     }
-    this.population[0].setNewGeneration(initialPopulation, this.dummySpawnPoint);
+    this.population[0].setNewGeneration(initialPopulation);
 
     // Prevent historical marking duplication when imported.
     if (baseBrain) {
@@ -66,11 +65,20 @@ class PopulationNEAT extends Population {
         species.killAllMembers();
       }
       this.generationLifetime = 0;
+      this.currentDummySpawnSiteSequenceIndex = 0;
+      this.dummiesAreMoving = false;
       return;
     }
 
     for (const species of this.population) {
-      species.update(walls);
+      if (
+        this.generationLifetime >= this.timeWhenDummiesFirstAppear &&
+        this.generationLifetime % this.dummiesRespawnInterval == 0
+      ) {
+        species.update(walls, this.getNewDummies(species.members.length));
+      } else {
+        species.update(walls);
+      }
     }
 
     this.generationLifetime++;
@@ -78,10 +86,12 @@ class PopulationNEAT extends Population {
 
   draw(ctx: CanvasRenderingContext2D, showSensors: boolean, selectedSpeciesId?: number): void {
     if (selectedSpeciesId != undefined) {
-      this.population.find(s => s.id == selectedSpeciesId)!.draw(ctx, showSensors);
+      this.population
+        .find(s => s.id == selectedSpeciesId)!
+        .draw(ctx, showSensors, this.generationLifetime > this.timeWhenDummiesFirstAppear);
     } else {
       for (const species of this.population) {
-        species.draw(ctx, showSensors);
+        species.draw(ctx, showSensors, this.generationLifetime > this.timeWhenDummiesFirstAppear);
       }
     }
   }
@@ -202,7 +212,7 @@ class PopulationNEAT extends Population {
         speciesAssignments[compatibleSpeciesIndex].push(descendant);
       } else {
         const newSpeciesId: number = this.lastUsedSpeciesId++;
-        const newSpecies = new Species(newSpeciesId, this.trainingMode);
+        const newSpecies = new Species(newSpeciesId);
         this.population.push(newSpecies);
 
         representatives.push(descendant);
@@ -225,7 +235,7 @@ class PopulationNEAT extends Population {
 
   private replacementOfGenerations = (assignments: EnemyNEAT[][]) => {
     for (let i = 0; i < assignments.length; i++) {
-      this.population[i].setNewGeneration(assignments[i], this.dummySpawnPoint);
+      this.population[i].setNewGeneration(assignments[i]);
     }
   };
 

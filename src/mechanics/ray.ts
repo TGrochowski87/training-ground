@@ -117,7 +117,7 @@ class Ray {
 
   private getReadingForIntersectionWithPlayer = (player: Player): SensorReading | null => {
     const distanceFromPlayerCenter = pointsDistanceFromLineSegment(player.position, this.start, this.end);
-    if (distanceFromPlayerCenter.distance <= player.radius) {
+    if (distanceFromPlayerCenter.distance <= player.radius && player.isDead == false) {
       return {
         x: distanceFromPlayerCenter.intersectionPoint.x,
         y: distanceFromPlayerCenter.intersectionPoint.y,

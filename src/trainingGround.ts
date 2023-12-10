@@ -10,12 +10,12 @@ import {
 import WallCollection from "entities/wallCollection";
 import PopulationConventional from "machine-learning/conventional/populationConventional";
 import NeuralNetworkConventional from "machine-learning/conventional/neuralNetworkConventional";
-import UserSettingsReader from "utilities/userSettingsReader";
 import Population from "machine-learning/population";
 import PopulationNEAT from "machine-learning/NEAT/populationNEAT";
 import NeuralNetworkNEAT from "machine-learning/NEAT/neuralNetworkNEAT";
 
-const userSettings = UserSettingsReader.getConfig();
+const urlParams = new URLSearchParams(window.location.search);
+const methodString: string = urlParams.get("method")!;
 
 const gameCanvas: HTMLCanvasElement = document.getElementById("game-canvas") as HTMLCanvasElement;
 gameCanvas.width = gameScreenWidth;
@@ -35,9 +35,7 @@ const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
 
 let population: Population =
-  userSettings.method == "NEAT"
-    ? new PopulationNEAT(populationSize, userSettings.mode)
-    : new PopulationConventional(populationSize, userSettings.mode);
+  methodString == "NEAT" ? new PopulationNEAT(populationSize) : new PopulationConventional(populationSize);
 
 const walls: WallCollection = new WallCollection();
 
@@ -56,7 +54,7 @@ const speciesNumberInfo: HTMLHeadingElement = document.getElementById("species-n
 const showSelectedCheckbox: HTMLInputElement = document.getElementById("show-only-selected") as HTMLInputElement;
 const speciesSelectionButtons: HTMLButtonElement[] = [];
 let selectedSpeciesId: number = 0;
-if (userSettings.method == "NEAT") {
+if (methodString == "NEAT") {
   prepareNEATControls();
 }
 
@@ -88,7 +86,7 @@ function manageGameCanvas(time: number) {
       population.calculateFitness();
       population.naturalSelection();
 
-      if (userSettings.method == "NEAT") {
+      if (methodString == "NEAT") {
         updateButtons();
         const highestSpeciesId = Math.max(...(population as PopulationNEAT).population.map(s => s.id));
         for (let i = speciesSelectionButtons.length; i <= highestSpeciesId; i++) {
@@ -194,11 +192,11 @@ const updateButtons = () => {
 async function createPopulationFromTemplate(file: File) {
   const content = await file.text();
 
-  if (userSettings.method == "NEAT") {
+  if (methodString == "NEAT") {
     const brain = NeuralNetworkNEAT.import(content);
-    population = new PopulationNEAT(populationSize, userSettings.mode, brain);
+    population = new PopulationNEAT(populationSize, brain);
   } else {
     const brain = NeuralNetworkConventional.import(content);
-    population = new PopulationConventional(populationSize, userSettings.mode, brain);
+    population = new PopulationConventional(populationSize, brain);
   }
 }

@@ -29,7 +29,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   needlessShots: number = 0;
   backwardCounter: number = 0;
   forwardCounter: number = 0;
-  playerShot: boolean = false;
+  playerShotCounter: number = 0;
   fitness: number = 0.0;
 
   // Used only for when exporting.
@@ -87,7 +87,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
     this.bullets.forEach(bullet => bullet.update(walls, [player]));
     if (this.bullets.some(b => b.enemyHit)) {
-      this.playerShot = true;
+      this.playerShotCounter++;
     }
   };
 
@@ -152,7 +152,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points += pointsForReachingSite * (1 - this.distanceToTargetSite);
 
     // Penalty for needless shooting
-    points *= Math.pow(0.99, this.needlessShots);
+    points *= Math.pow(0.98, this.needlessShots);
 
     // High penalty for running backwards
     const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.5 : 0;
@@ -160,9 +160,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
 
     // Big boost for shooting the player
     // TODO: Consider slight boost for shooting when player spotted
-    if (this.playerShot) {
-      points *= 1.5;
-    }
+    points = points + points * 0.2 * this.playerShotCounter;
 
     this.fitness = points;
   };

@@ -43,7 +43,6 @@ export const networkViewWidth: number = 1100;
 export const networkViewWidthMargin: number = 50;
 export const networkViewHeight: number = 900;
 export const networkViewHeightMargin: number = 30;
-export const dummySpawnPoint: Vector2D = new Vector2D(gameScreenWidth / 2 + 80, gameScreenHeight / 2);
 export const sites: Vector2D[] = [
   new Vector2D(80, 80),
   new Vector2D(gameScreenWidth - 80, 80),

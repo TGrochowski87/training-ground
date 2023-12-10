@@ -7,7 +7,7 @@ class DummyPlayer extends Player {
   maxDistance: number = 100;
   distanceInCurrentDirection: number = 0;
 
-  constructor(pos: Vector2D, shouldMove: boolean = true) {
+  constructor(pos: Vector2D, shouldMove: boolean) {
     super(pos, true, shouldMove);
   }
 

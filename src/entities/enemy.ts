@@ -8,7 +8,7 @@ import SensorReading from "models/SensorReading";
 import Player from "./player";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
 import NeuralNetwork from "machine-learning/neuralNetwork";
-import SiteIndexAssigner from "mechanics/siteIndexAssigner";
+import TargetSiteDealer from "mechanics/TargetSiteDealer";
 
 abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   brain: NN;
@@ -20,7 +20,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
 
   distanceToTargetSite: number;
   previousDistanceToTargetSite: number;
-  currentTargetSiteIndex: number;
+  currentSitePosition: Vector2D;
   lastSitePosition: Vector2D; // Initially set to spawn position.
   currentTargetSiteSequenceIndex: number;
 
@@ -46,7 +46,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.controls = new EnemyControls();
     this.isChampion = isChampion;
 
-    this.currentTargetSiteIndex = SiteIndexAssigner.getNextTargetSiteIndex(0);
+    this.currentSitePosition = TargetSiteDealer.getNextTargetSite(0);
     this.currentTargetSiteSequenceIndex = 1;
     this.lastSitePosition = pos;
 
@@ -60,8 +60,8 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
 
       if (this.isSiteReached()) {
         this.sitesVisited++;
-        this.lastSitePosition = sites[this.currentTargetSiteIndex];
-        this.currentTargetSiteIndex = SiteIndexAssigner.getNextTargetSiteIndex(this.currentTargetSiteSequenceIndex);
+        this.lastSitePosition = this.currentSitePosition;
+        this.currentSitePosition = TargetSiteDealer.getNextTargetSite(this.currentTargetSiteSequenceIndex);
         this.currentTargetSiteSequenceIndex++;
         this.updateDistanceToTargetSite(0.0);
       } else {
@@ -173,8 +173,8 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   };
 
   private calculateDistanceToTargetSite = (): number => {
-    const distanceLeft = distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]);
-    const initialDistance = distanceBetweenPoints(this.lastSitePosition, sites[this.currentTargetSiteIndex]);
+    const distanceLeft = distanceBetweenPoints(this.position, this.currentSitePosition);
+    const initialDistance = distanceBetweenPoints(this.lastSitePosition, this.currentSitePosition);
     return distanceLeft > initialDistance ? 1 : distanceLeft / initialDistance;
   };
 
@@ -211,7 +211,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   };
 
   private isSiteReached = (): boolean => {
-    return distanceBetweenPoints(this.position, sites[this.currentTargetSiteIndex]) < siteRadius;
+    return distanceBetweenPoints(this.position, this.currentSitePosition) < siteRadius;
   };
 }
 

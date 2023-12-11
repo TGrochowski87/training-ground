@@ -7,6 +7,7 @@ export interface ScenarioResources {
   fieldSize: Vector2D;
   lifespan: number;
   sites: Vector2D[];
+  specialInitialSequence?: number[];
   dummyPos?: Vector2D;
 }
 
@@ -26,6 +27,7 @@ export const resourcesScenario1: ScenarioResources = {
   fieldSize: new Vector2D(gameScreenWidth, gameScreenHeight),
   lifespan: 3000,
   sites: sites,
+  specialInitialSequence: Array.from({ length: 10 }, () => [0, 1, 2, 3, 4]).flat(),
 };
 
 const scenario2FieldSize: Vector2D = new Vector2D(1600, 200);
@@ -43,5 +45,5 @@ export const resourcesScenario2: ScenarioResources = {
     new Vector2D(100, scenario2FieldSize.y / 2),
     new Vector2D(scenario2FieldSize.x - 100, scenario2FieldSize.y / 2),
   ],
-  dummyPos: new Vector2D(scenario2FieldSize.x - 100, scenario2FieldSize.y / 2),
+  //dummyPos: new Vector2D(scenario2FieldSize.x - 100, scenario2FieldSize.y / 2),
 };

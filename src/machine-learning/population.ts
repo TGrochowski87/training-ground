@@ -1,7 +1,7 @@
 import { sites } from "configuration";
 import DummyPlayer from "entities/dummyPlayer";
 import Wall from "entities/wall";
-import SiteIndexAssigner from "mechanics/siteIndexAssigner";
+import TargetSiteDealer from "mechanics/TargetSiteDealer";
 import { randomBetween } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
 
@@ -20,7 +20,7 @@ export default abstract class Population {
   dummiesAreMoving: boolean = false;
 
   constructor() {
-    SiteIndexAssigner.reset(sites);
+    TargetSiteDealer.initialize(sites);
   }
 
   protected getNewDummies = (dummyArrayLength: number): DummyPlayer[] => {

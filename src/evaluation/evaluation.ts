@@ -7,7 +7,7 @@ import NeuralNetworkConventional from "machine-learning/conventional/neuralNetwo
 import EnemyNEAT from "machine-learning/NEAT/enemyNEAT";
 import NeuralNetworkNEAT from "machine-learning/NEAT/neuralNetworkNEAT";
 import NeuralNetwork from "machine-learning/neuralNetwork";
-import SiteIndexAssigner from "mechanics/siteIndexAssigner";
+import TargetSiteDealer from "mechanics/TargetSiteDealer";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
 import { resourcesScenario1, resourcesScenario2, ScenarioResources } from "./resources";
@@ -28,19 +28,17 @@ let sitesReachedCounter: number = 0;
 switch (scenario) {
   case "one":
     resources = resourcesScenario1;
-    SiteIndexAssigner.siteTargetSequence = Array.from({ length: 10 }, () => [0, 1, 2, 3, 4]).flat();
     break;
 
   case "two":
     resources = resourcesScenario2;
-    SiteIndexAssigner.siteTargetSequence = [0, 1];
     break;
 
   default:
     break;
 }
 
-SiteIndexAssigner.reset(resources!.sites);
+TargetSiteDealer.initialize(resources!.sites, resources!.specialInitialSequence);
 dummyExists = resources!.dummyPos != undefined;
 
 importBrainButton.onchange = async (event: Event) => {
@@ -51,7 +49,7 @@ importBrainButton.onchange = async (event: Event) => {
   const gameCtx = constructGameField();
 
   const walls: Wall[] = resources.walls;
-  const dummy: DummyPlayer = new DummyPlayer(dummyExists ? resources.dummyPos! : new Vector2D(-1000, -1000));
+  const dummy: DummyPlayer = new DummyPlayer(dummyExists ? resources.dummyPos! : new Vector2D(-1000, -1000), false);
   const enemy: Enemy<NeuralNetwork> =
     brandNewBrain instanceof NeuralNetworkConventional
       ? new EnemyConventional(new Vector2D(100, 100), (brandNewBrain as NeuralNetworkConventional).clone())
@@ -87,11 +85,11 @@ importBrainButton.onchange = async (event: Event) => {
     if (
       distanceBetweenPoints(
         enemy.position,
-        resources.sites[SiteIndexAssigner.siteTargetSequence[currentTargetSiteSequenceIndex]]
+        resources.sites[TargetSiteDealer.siteTargetSequence[currentTargetSiteSequenceIndex]]
       ) < siteRadius
     ) {
       console.log(
-        `Reached site ${SiteIndexAssigner.siteTargetSequence[currentTargetSiteSequenceIndex]}, Time in frames: ${currentLifespan}`
+        `Reached site ${TargetSiteDealer.siteTargetSequence[currentTargetSiteSequenceIndex]}, Time in frames: ${currentLifespan}`
       );
       currentTargetSiteSequenceIndex++;
       sitesReachedCounter++;

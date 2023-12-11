@@ -28,6 +28,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   sitesVisited: number = 0;
   needlessShots: number = 0;
   justifiedShots: number = 0;
+  shotsAtPlayer: number = 0;
   backwardCounter: number = 0;
   forwardCounter: number = 0;
   playerShotCounter: number = 0;
@@ -73,7 +74,18 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
           this.needlessShots++;
         } else {
-          this.justifiedShots++;
+          // Move the player by the rotation of this enemy and check if it is in front by comparing Y.
+          const playerRelativePos = player.position.add(new Vector2D(-this.position.x, -this.position.y));
+          const x = playerRelativePos.x * Math.cos(this.angle) + playerRelativePos.y * Math.sin(this.angle);
+          const y = playerRelativePos.y * Math.cos(this.angle) - playerRelativePos.x * Math.sin(this.angle);
+
+          const playerResultPos = new Vector2D(x, y).add(this.position);
+
+          if (playerResultPos.y < this.position.y) {
+            this.shotsAtPlayer++;
+          } else {
+            this.justifiedShots++;
+          }
         }
       }
 
@@ -149,6 +161,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   calculateFitness = () => {
     const pointsForReachingSite: number = 10;
     const pointsForJustifiedShots: number = 0.5;
+    const pointsForShotsAtPlayer: number = 2;
     let points: number = 0;
 
     // Points for every reached site
@@ -166,6 +179,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
 
     // Slight boost for shooting when the player is spotted
     points += pointsForJustifiedShots * this.justifiedShots;
+
+    // Bigger boost for shooting at player
+    points += pointsForShotsAtPlayer * this.shotsAtPlayer;
 
     // Big boost for shooting the player
     points = points + points * 0.2 * this.playerShotCounter;

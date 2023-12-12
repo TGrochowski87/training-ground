@@ -105,6 +105,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.bullets.forEach(bullet => bullet.update(walls, [player]));
     if (this.bullets.some(b => b.enemyHit)) {
       this.playerShotCounter++;
+      for (let i = 0; i < this.playerSpottedOnSensors.length; i++) {
+        this.playerSpottedOnSensors[i] = 0.0;
+      }
     }
   };
 
@@ -184,7 +187,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points += pointsForShotsAtPlayer * this.shotsAtPlayer;
 
     // Big boost for shooting the player
-    points = points + points * 0.2 * this.playerShotCounter;
+    points *= 1 + 0.2 * this.playerShotCounter;
 
     this.fitness = points;
   };

@@ -27,7 +27,7 @@ export const weightMutationRate: number = 0.2;
 export const weightPerturbationChance: number = 0.9;
 
 // Machine Learning NEAT
-export const compatibilityCoefficients: [number, number, number] = [1.0, 1.0, 0.3];
+export const compatibilityCoefficients: [number, number, number] = [0.8, 0.8, 0.1];
 export const genomeLengthNormalizationThreshold: number = 20;
 export const massExtinctionThreshold: number = 20;
 export const speciesExtinctionThreshold: number = 15;

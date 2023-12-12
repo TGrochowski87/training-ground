@@ -45,5 +45,50 @@ export const resourcesScenario2: ScenarioResources = {
     new Vector2D(100, scenario2FieldSize.y / 2),
     new Vector2D(scenario2FieldSize.x - 100, scenario2FieldSize.y / 2),
   ],
-  //dummyPos: new Vector2D(scenario2FieldSize.x - 100, scenario2FieldSize.y / 2),
+  dummyPos: new Vector2D(scenario2FieldSize.x - 100, scenario2FieldSize.y / 2),
+};
+
+const scenario3FieldSize: Vector2D = new Vector2D(1600, 300);
+export const resourcesScenario3: ScenarioResources = {
+  walls: [
+    // Outer walls
+    new Wall(new Vector2D(0, 5), "RIGHT", scenario3FieldSize.x),
+    new Wall(new Vector2D(scenario3FieldSize.x - 5, 0), "DOWN", scenario3FieldSize.y),
+    new Wall(new Vector2D(scenario3FieldSize.x, scenario3FieldSize.y - 5), "LEFT", scenario3FieldSize.x),
+    new Wall(new Vector2D(5, scenario3FieldSize.y), "UP", scenario3FieldSize.y),
+
+    // Obstacles
+    new Wall(new Vector2D(350, 0), "DOWN", scenario3FieldSize.y - 100),
+    new Wall(new Vector2D(700, 100), "DOWN", scenario3FieldSize.y - 100),
+    new Wall(new Vector2D(1050, 0), "DOWN", scenario3FieldSize.y - 100),
+    new Wall(new Vector2D(1400, 100), "DOWN", scenario3FieldSize.y - 100),
+  ],
+  fieldSize: scenario3FieldSize,
+  lifespan: 3000,
+  sites: [
+    new Vector2D(100, scenario3FieldSize.y / 2),
+    new Vector2D(scenario3FieldSize.x - 100, scenario3FieldSize.y / 2),
+  ],
+  dummyPos: new Vector2D(scenario3FieldSize.x - 100, scenario3FieldSize.y / 2),
+};
+
+const scenario4FieldSize: Vector2D = new Vector2D(800, 800);
+export const resourcesScenario4: ScenarioResources = {
+  walls: [
+    // Outer walls
+    new Wall(new Vector2D(0, 5), "RIGHT", scenario4FieldSize.x),
+    new Wall(new Vector2D(scenario4FieldSize.x - 5, 0), "DOWN", scenario4FieldSize.y),
+    new Wall(new Vector2D(scenario4FieldSize.x, scenario4FieldSize.y - 5), "LEFT", scenario4FieldSize.x),
+    new Wall(new Vector2D(5, scenario4FieldSize.y), "UP", scenario4FieldSize.y),
+
+    // Inner
+    new Wall(new Vector2D(0, 250), "RIGHT", scenario4FieldSize.x - 200),
+    new Wall(new Vector2D(scenario4FieldSize.x - 200, 250), "DOWN", scenario4FieldSize.y - 450),
+    new Wall(new Vector2D(scenario4FieldSize.x - 200, 600), "LEFT", scenario4FieldSize.x - 400),
+    new Wall(new Vector2D(200, 600), "UP", scenario4FieldSize.y - 450),
+  ],
+  fieldSize: scenario4FieldSize,
+  lifespan: 3000,
+  sites: [new Vector2D(100, 100), new Vector2D(100, 350)],
+  dummyPos: new Vector2D(100, 350),
 };

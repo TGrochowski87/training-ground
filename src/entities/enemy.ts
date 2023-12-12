@@ -8,7 +8,7 @@ import SensorReading from "models/SensorReading";
 import Player from "./player";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
 import NeuralNetwork from "machine-learning/neuralNetwork";
-import TargetSiteDealer from "mechanics/TargetSiteDealer";
+import TargetSiteDealer from "mechanics/targetSiteDealer";
 
 abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   brain: NN;

@@ -22,7 +22,6 @@ class TargetSiteDealer {
   static getNextTargetSite = (lastTargetSiteSequenceIndex: number): Vector2D => {
     if (lastTargetSiteSequenceIndex == TargetSiteDealer.siteTargetSequence.length - 1) {
       TargetSiteDealer.siteTargetSequence.push(TargetSiteDealer.getNextRandomSiteIndex());
-      console.log(`Current site sequence: ${TargetSiteDealer.siteTargetSequence}`);
     }
     return TargetSiteDealer.siteList[TargetSiteDealer.siteTargetSequence[lastTargetSiteSequenceIndex + 1]];
   };

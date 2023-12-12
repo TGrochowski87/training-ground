@@ -1,7 +1,7 @@
 import { sites } from "configuration";
 import DummyPlayer from "entities/dummyPlayer";
 import Wall from "entities/wall";
-import TargetSiteDealer from "mechanics/TargetSiteDealer";
+import TargetSiteDealer from "mechanics/targetSiteDealer";
 import { randomBetween } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
 

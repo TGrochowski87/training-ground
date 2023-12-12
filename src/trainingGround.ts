@@ -13,6 +13,7 @@ import NeuralNetworkConventional from "machine-learning/conventional/neuralNetwo
 import Population from "machine-learning/population";
 import PopulationNEAT from "machine-learning/NEAT/populationNEAT";
 import NeuralNetworkNEAT from "machine-learning/NEAT/neuralNetworkNEAT";
+import TargetSiteDealer from "mechanics/targetSiteDealer";
 
 const urlParams = new URLSearchParams(window.location.search);
 const methodString: string = urlParams.get("method")!;
@@ -85,6 +86,8 @@ function manageGameCanvas(time: number) {
     } else {
       population.calculateFitness();
       population.naturalSelection();
+
+      console.log(`Current site sequence: ${TargetSiteDealer.siteTargetSequence}`);
 
       if (methodString == "NEAT") {
         updateButtons();

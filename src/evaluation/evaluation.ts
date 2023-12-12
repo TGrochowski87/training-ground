@@ -1,4 +1,4 @@
-import { gameScreenHeight, gameScreenWidth, siteRadius } from "configuration";
+import { siteRadius } from "configuration";
 import DummyPlayer from "entities/dummyPlayer";
 import Enemy from "entities/enemy";
 import Wall from "entities/wall";
@@ -7,10 +7,16 @@ import NeuralNetworkConventional from "machine-learning/conventional/neuralNetwo
 import EnemyNEAT from "machine-learning/NEAT/enemyNEAT";
 import NeuralNetworkNEAT from "machine-learning/NEAT/neuralNetworkNEAT";
 import NeuralNetwork from "machine-learning/neuralNetwork";
-import TargetSiteDealer from "mechanics/TargetSiteDealer";
+import TargetSiteDealer from "mechanics/targetSiteDealer";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
 import Vector2D from "utilities/vector2d";
-import { resourcesScenario1, resourcesScenario2, ScenarioResources } from "./resources";
+import {
+  resourcesScenario1,
+  resourcesScenario2,
+  resourcesScenario3,
+  resourcesScenario4,
+  ScenarioResources,
+} from "./resources";
 
 const appContainer: HTMLDivElement = document.getElementById("app") as HTMLDivElement;
 const importContainer: HTMLDivElement = document.getElementById("import-container") as HTMLDivElement;
@@ -21,9 +27,12 @@ const urlParams = new URLSearchParams(window.location.search);
 const scenario: string = urlParams.get("scenario")!;
 let resources: ScenarioResources;
 let dummyExists: boolean = false;
-let currentLifespan: number = 0;
+let dummyAlive: boolean = true;
+let currentLifetime: number = 0;
 let currentTargetSiteSequenceIndex: number = 1;
 let sitesReachedCounter: number = 0;
+
+const dummyIncluded: boolean = urlParams.get("with-dummy") ? true : false;
 
 switch (scenario) {
   case "one":
@@ -34,22 +43,29 @@ switch (scenario) {
     resources = resourcesScenario2;
     break;
 
+  case "three":
+    resources = resourcesScenario3;
+    break;
+
+  case "four":
+    resources = resourcesScenario4;
+    break;
+
   default:
     break;
 }
 
 TargetSiteDealer.initialize(resources!.sites, resources!.specialInitialSequence);
-dummyExists = resources!.dummyPos != undefined;
+dummyExists = dummyIncluded && resources!.dummyPos != undefined;
 
 importBrainButton.onchange = async (event: Event) => {
   let file = (<HTMLInputElement>event.target).files![0];
 
   const brandNewBrain = await createBrainFromTemplate(file);
-
   const gameCtx = constructGameField();
 
-  const walls: Wall[] = resources.walls;
-  const dummy: DummyPlayer = new DummyPlayer(dummyExists ? resources.dummyPos! : new Vector2D(-1000, -1000), false);
+  const walls: Wall[] = resources!.walls;
+  const dummy: DummyPlayer = new DummyPlayer(dummyExists ? resources!.dummyPos! : new Vector2D(-1000, -1000), false);
   const enemy: Enemy<NeuralNetwork> =
     brandNewBrain instanceof NeuralNetworkConventional
       ? new EnemyConventional(new Vector2D(100, 100), (brandNewBrain as NeuralNetworkConventional).clone())
@@ -58,13 +74,12 @@ importBrainButton.onchange = async (event: Event) => {
   animate();
 
   function animate(time: number = 0) {
-    if (currentLifespan >= resources.lifespan) {
-      console.log("Time's up!");
-      console.log(`The AI reached ${sitesReachedCounter} sites.`);
+    if (checkEndingConditions()) {
       return;
     }
+
     manageGameCanvas(time);
-    currentLifespan++;
+    currentLifetime++;
 
     requestAnimationFrame(animate);
   }
@@ -82,22 +97,53 @@ importBrainButton.onchange = async (event: Event) => {
     enemy.update(walls, dummy);
     enemy.draw(gameCtx, false, "#A77500");
 
-    if (
-      distanceBetweenPoints(
-        enemy.position,
-        resources.sites[TargetSiteDealer.siteTargetSequence[currentTargetSiteSequenceIndex]]
-      ) < siteRadius
-    ) {
+    for (const wall of walls) {
+      wall.draw(gameCtx);
+    }
+
+    realTimeScoreTracking();
+  }
+
+  function realTimeScoreTracking(): void {
+    const distanceToSite: number = distanceBetweenPoints(
+      enemy.position,
+      resources.sites[TargetSiteDealer.siteTargetSequence[currentTargetSiteSequenceIndex]]
+    );
+    if (distanceToSite < siteRadius) {
       console.log(
-        `Reached site ${TargetSiteDealer.siteTargetSequence[currentTargetSiteSequenceIndex]}, Time in frames: ${currentLifespan}`
+        `Reached site ${TargetSiteDealer.siteTargetSequence[currentTargetSiteSequenceIndex]}, Time in frames: ${currentLifetime}`
       );
       currentTargetSiteSequenceIndex++;
       sitesReachedCounter++;
     }
 
-    for (const wall of walls) {
-      wall.draw(gameCtx);
+    if (dummyAlive && dummy.isDead) {
+      console.log("Dummy shot!");
+      dummyAlive = false;
     }
+  }
+
+  function checkEndingConditions(): boolean {
+    let evaluationFinished: boolean = false;
+
+    if (currentLifetime >= resources.lifespan) {
+      console.log("================================");
+      console.log("Time's up!");
+      console.log(`The AI reached ${sitesReachedCounter} sites.`);
+      evaluationFinished = true;
+    }
+
+    if (enemy.currentTargetSiteSequenceIndex == TargetSiteDealer.siteList.length) {
+      console.log("================================");
+      console.log(`Site reached in ${currentLifetime} frames.`);
+      evaluationFinished = true;
+    }
+
+    if (evaluationFinished && dummyAlive == false) {
+      console.log("The AI managed to shoot down the dummy.");
+    }
+
+    return evaluationFinished;
   }
 };
 

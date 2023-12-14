@@ -164,6 +164,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   calculateFitness = () => {
     const pointsForReachingSite: number = 10;
     const pointsForJustifiedShots: number = 0.02;
+    const negativePointsForNeedlessShots: number = 0.02;
     const pointsForShotsAtPlayer: number = 1;
     let points: number = 0;
 
@@ -174,7 +175,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points += pointsForReachingSite * (1 - this.distanceToTargetSite);
 
     // Penalty for needless shooting
-    points *= Math.pow(0.98, this.needlessShots);
+    points -= Math.pow(this.needlessShots, 2) * negativePointsForNeedlessShots;
 
     // High penalty for running backwards
     const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.2 : 0;

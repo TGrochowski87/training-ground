@@ -133,9 +133,10 @@ importBrainButton.onchange = async (event: Event) => {
       evaluationFinished = true;
     }
 
-    if (enemy.currentTargetSiteSequenceIndex == TargetSiteDealer.siteList.length) {
+    const lastSiteIndex = resources.specialInitialSequence?.length ?? resources.sites.length;
+    if (enemy.currentTargetSiteSequenceIndex == lastSiteIndex) {
       console.log("================================");
-      console.log(`Site reached in ${currentLifetime} frames.`);
+      console.log(`The last site reached in ${currentLifetime} frames.`);
       evaluationFinished = true;
     }
 
@@ -160,7 +161,9 @@ function constructGameField(): CanvasRenderingContext2D {
 }
 
 function displaySites(ctx: CanvasRenderingContext2D) {
-  for (const point of resources.sites!) {
+  for (let i = 0; i < resources.sites!.length; i++) {
+    const point = resources.sites![i];
+
     ctx.fillStyle = "#2358D1";
     ctx.beginPath();
     ctx.arc(point.x, point.y, 8, 0, 2 * Math.PI);
@@ -170,6 +173,14 @@ function displaySites(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.arc(point.x, point.y, siteRadius, 0, 2 * Math.PI);
     ctx.fill();
+
+    ctx.beginPath();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "white";
+    ctx.font = "16px Arial";
+    ctx.fillText(`${i}`, point.x, point.y);
   }
 }
 

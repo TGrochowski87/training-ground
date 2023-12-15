@@ -144,7 +144,9 @@ function setupOnClicks() {
 }
 
 function displaySites() {
-  for (const point of sites) {
+  for (let i = 0; i < sites.length; i++) {
+    const point = sites[i];
+
     gameCtx.fillStyle = "#2358D1";
     gameCtx.beginPath();
     gameCtx.arc(point.x, point.y, 8, 0, 2 * Math.PI);
@@ -154,6 +156,14 @@ function displaySites() {
     gameCtx.beginPath();
     gameCtx.arc(point.x, point.y, siteRadius, 0, 2 * Math.PI);
     gameCtx.fill();
+
+    gameCtx.beginPath();
+    gameCtx.textAlign = "center";
+    gameCtx.textBaseline = "middle";
+    gameCtx.fillStyle = "white";
+    gameCtx.strokeStyle = "white";
+    gameCtx.font = "16px Arial";
+    gameCtx.fillText(`${i}`, point.x, point.y);
   }
 }
 

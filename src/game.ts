@@ -7,7 +7,6 @@ import NeuralNetworkConventional from "machine-learning/conventional/neuralNetwo
 import EnemyNEAT from "machine-learning/NEAT/enemyNEAT";
 import NeuralNetworkNEAT from "machine-learning/NEAT/neuralNetworkNEAT";
 import NeuralNetwork from "machine-learning/neuralNetwork";
-import { Method } from "models/UserSettings";
 import Vector2D from "utilities/vector2d";
 
 const appContainer: HTMLDivElement = document.getElementById("app") as HTMLDivElement;
@@ -16,7 +15,7 @@ const trainingContainer: HTMLDivElement = document.getElementById("training-cont
 const importBrainButton: HTMLInputElement = document.getElementById("button-import") as HTMLInputElement;
 
 let gameStopped = false;
-let brainType: Method = "conventional";
+let brainType: string = "conventional";
 
 importBrainButton.onchange = async (event: Event) => {
   let file = (<HTMLInputElement>event.target).files![0];

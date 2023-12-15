@@ -6,18 +6,18 @@ class WallCollection {
   collection: Wall[];
 
   constructor() {
-    this.collection = [];
+    this.collection = [
+      // Outer walls
+      new Wall(new Vector2D(0, 5), "RIGHT", gameScreenWidth),
+      new Wall(new Vector2D(gameScreenWidth - 5, 0), "DOWN", gameScreenHeight),
+      new Wall(new Vector2D(gameScreenWidth, gameScreenHeight - 5), "LEFT", gameScreenWidth),
+      new Wall(new Vector2D(5, gameScreenHeight), "UP", gameScreenHeight),
 
-    // Outer walls
-    this.collection.push(new Wall(new Vector2D(0, 5), "RIGHT", gameScreenWidth));
-    this.collection.push(new Wall(new Vector2D(gameScreenWidth - 5, 0), "DOWN", gameScreenHeight));
-    this.collection.push(new Wall(new Vector2D(gameScreenWidth, gameScreenHeight - 5), "LEFT", gameScreenWidth));
-    this.collection.push(new Wall(new Vector2D(5, gameScreenHeight), "UP", gameScreenHeight));
-
-    // Around the player
-    this.collection.push(new Wall(new Vector2D(gameScreenWidth / 2 - 100, gameScreenHeight / 2 - 100), "RIGHT", 200));
-    this.collection.push(new Wall(new Vector2D(gameScreenWidth / 2 - 100, gameScreenHeight / 2 - 100), "DOWN", 200));
-    this.collection.push(new Wall(new Vector2D(gameScreenWidth / 2 + 100, gameScreenHeight / 2 - 100), "DOWN", 200));
+      // Around the player
+      new Wall(new Vector2D(gameScreenWidth / 2 - 100, (gameScreenHeight * 3) / 4 - 100), "RIGHT", 200),
+      new Wall(new Vector2D(gameScreenWidth / 2 - 100, (gameScreenHeight * 3) / 4 - 100), "DOWN", 200),
+      new Wall(new Vector2D(gameScreenWidth / 2 + 100, (gameScreenHeight * 3) / 4 - 100), "DOWN", 200),
+    ];
   }
 
   draw = (ctx: CanvasRenderingContext2D): void => {

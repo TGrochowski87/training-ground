@@ -22,7 +22,7 @@ export const sensorRaySpread: number = Math.PI * 2;
 export const sensorRayCount: number = 8;
 
 // Machine Learning
-export const populationSize: number = 200;
+export const populationSize: number = 400;
 export const weightMutationRate: number = 0.2;
 export const weightPerturbationChance: number = 0.9;
 

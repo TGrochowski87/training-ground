@@ -22,7 +22,6 @@ class PopulationNEAT extends Population {
   lastUsedSpeciesId: number = 0;
   size: number;
 
-  populationFitness: number = 0.0;
   bestPopulationFitness: number = 0.0;
   generationsSinceLastImprovement: number = 0;
   speciesOfTopMember: number | undefined;
@@ -108,12 +107,12 @@ class PopulationNEAT extends Population {
 
   calculateFitness = () => {
     this.population.forEach(s => s.calculateFitness());
-    this.populationFitness = this.population
+    const populationFitness = this.population
       .map(s => s.collectiveAdjustedFitness)
       .reduce((prev, current) => prev + current, 0);
 
-    if (this.populationFitness > this.bestPopulationFitness) {
-      this.bestPopulationFitness = this.populationFitness;
+    if (populationFitness > this.bestPopulationFitness) {
+      this.bestPopulationFitness = populationFitness;
       this.generationsSinceLastImprovement = 0;
     } else {
       this.generationsSinceLastImprovement++;
@@ -342,8 +341,12 @@ class PopulationNEAT extends Population {
    * @returns
    */
   private calculateOffspringNumberPerSpecies = (): number[] => {
+    const populationFitness = this.population
+      .map(s => s.collectiveAdjustedFitness)
+      .reduce((prev, current) => prev + current, 0);
+
     const fitnesses = this.population.map(s => s.collectiveAdjustedFitness);
-    const contributions = fitnesses.map(f => (f / this.populationFitness) * 100);
+    const contributions = fitnesses.map(f => (f / populationFitness) * 100);
     const rawMemberCounts = contributions.map(c => (c * this.size) / 100);
     let countValuesSplitByComma: SplitNumber[] = rawMemberCounts.map(c => {
       return { integer: Math.floor(c), decimal: c % 1 };

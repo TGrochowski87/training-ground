@@ -193,7 +193,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.fitness = points;
   };
 
-  abstract exportBrain(): void;
+  abstract exportBrain(generation: number): void;
 
   private updateDistanceToTargetSite = (value: number) => {
     this.previousDistanceToTargetSite = this.distanceToTargetSite;

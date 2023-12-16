@@ -54,10 +54,10 @@ class Species {
     member.drawBrain(ctx);
   };
 
-  exportBestNeuralNetwork(): void {
+  exportBestNeuralNetwork(generation: number): void {
     const champions = this.members.filter(m => m.isChampion);
     for (const champion of champions) {
-      champion.exportBrain();
+      champion.exportBrain(generation);
     }
   }
 

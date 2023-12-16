@@ -77,7 +77,7 @@ class PopulationConventional extends Population {
       return;
     }
 
-    champion.exportBrain();
+    champion.exportBrain(this.generation);
   }
 
   isPopulationExtinct = (): boolean => this.members.every(e => e.isDead);

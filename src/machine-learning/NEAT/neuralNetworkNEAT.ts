@@ -395,7 +395,7 @@ class NeuralNetworkNEAT extends NeuralNetwork {
     return compatibilityDistance;
   };
 
-  export = (fitness: number, speciesId: number): void => {
+  export = (fitness: number, generation: number, speciesId: number): void => {
     let stringRepresentation = "";
     stringRepresentation += `${this.layers}\n\n`;
 
@@ -410,7 +410,7 @@ class NeuralNetworkNEAT extends NeuralNetwork {
 
     let a = document.createElement("a") as HTMLAnchorElement;
     a.href = window.URL.createObjectURL(new Blob([stringRepresentation], { type: "text/plain" }));
-    a.download = `brain-NEAT-s${speciesId}-f${fitness}.txt`;
+    a.download = `brain-NEAT-g${generation}-s${speciesId}-f${fitness}.txt`;
     document.body.append(a);
     a.click();
     document.body.removeChild(a);

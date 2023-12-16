@@ -101,7 +101,7 @@ class PopulationNEAT extends Population {
   }
 
   exportBestNeuralNetwork(): void {
-    this.population.forEach(s => s.exportBestNeuralNetwork());
+    this.population.forEach(s => s.exportBestNeuralNetwork(this.generation));
   }
 
   isPopulationExtinct = (): boolean => this.population.flatMap(s => s.members).every(m => m.isDead);

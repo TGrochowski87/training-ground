@@ -77,7 +77,7 @@ class NeuralNetworkConventional extends NeuralNetwork {
     }
   };
 
-  export = (fitness: number): void => {
+  export = (fitness: number, generation: number): void => {
     let stringRepresentation = "";
     stringRepresentation += `${this.receivedNeuronCounts.join(" ")}\n\n`;
     for (const layer of this.layers) {
@@ -85,7 +85,7 @@ class NeuralNetworkConventional extends NeuralNetwork {
     }
     let a = document.createElement("a") as HTMLAnchorElement;
     a.href = window.URL.createObjectURL(new Blob([stringRepresentation], { type: "text/plain" }));
-    a.download = `brain-conventional-f${fitness}.txt`;
+    a.download = `brain-conventional-g${generation}-f${fitness}.txt`;
     document.body.append(a);
     a.click();
     document.body.removeChild(a);

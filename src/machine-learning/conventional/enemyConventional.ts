@@ -36,8 +36,8 @@ class EnemyConventional extends Enemy<NeuralNetworkConventional> {
     this.brain.mutate();
   };
 
-  exportBrain = (): void => {
-    this.brain.export(this.savedChampionsFitness);
+  exportBrain = (generation: number): void => {
+    this.brain.export(this.savedChampionsFitness, generation);
   };
 }
 

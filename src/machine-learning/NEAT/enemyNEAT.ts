@@ -59,8 +59,8 @@ class EnemyNEAT extends Enemy<NeuralNetworkNEAT> {
 
   setAdjustedFitness = (value: number) => (this.adjustedFitness = value);
 
-  exportBrain = (): void => {
-    this.brain.export(this.savedChampionsFitness, this.wasChampionOfSpecies!);
+  exportBrain = (generation: number): void => {
+    this.brain.export(this.savedChampionsFitness, generation, this.wasChampionOfSpecies!);
   };
 }
 

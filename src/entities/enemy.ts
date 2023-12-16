@@ -190,7 +190,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     // Big boost for shooting the player
     points *= 1 + 0.2 * this.playerShotCounter;
 
-    this.fitness = points;
+    this.fitness = points > 0 ? points : 0;
   };
 
   abstract exportBrain(generation: number): void;

@@ -5,7 +5,7 @@ import TargetSiteDealer from "mechanics/targetSiteDealer";
 export default abstract class Population {
   generation: number = 1;
   generationLifetime: number = 0;
-  maxGenerationLifetime: number = 1000;
+  maxGenerationLifetime: number = 200;
   generationLifetimeIncrease: number = 200;
   numberOfGenerationsBetweenIncrease: number = 20;
 

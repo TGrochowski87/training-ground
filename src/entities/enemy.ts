@@ -30,6 +30,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   sitesVisited: number = 0;
   needlessShots: number = 0;
   justifiedShots: number = 0;
+  playerWasSpotted: boolean = false;
   shotsAtPlayer: number = 0;
   backwardCounter: number = 0;
   forwardCounter: number = 0;
@@ -207,6 +208,11 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     // Big boost for shooting the player
     points *= 1 + 0.2 * this.playerShotCounter;
 
+    // Big penalty for not shooting at all
+    if (this.playerWasSpotted && this.justifiedShots == 0 && this.needlessShots == 0) {
+      points *= 0.7;
+    }
+
     this.fitness = points > 0 ? points : 0;
   };
 
@@ -231,6 +237,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     for (let i = 0; i < sensorRayCount; i++) {
       if (sensorReadings[i]?.detectedEntity === "PLAYER") {
         this.playerSpottedOnSensors[i] = 1.0;
+        this.playerWasSpotted = true;
       }
 
       const inputsFromReading = [

@@ -266,12 +266,12 @@ class PopulationNEAT extends Population {
    * It is possible for one specimen to be selected twice.
    */
   private selectParent = (species: Species): EnemyNEAT => {
-    const fitnessSum = species.members.map(s => s.adjustedFitness).reduce((prev, current) => prev + current, 0);
+    const fitnessSum = species.members.map(s => Math.pow(s.fitness, 2)).reduce((prev, current) => prev + current, 0);
     const rand: number = randomBetween(0, fitnessSum);
 
     let runningSum: number = 0.0;
     for (let i = 0; i < species.members.length; i++) {
-      runningSum += species.members[i].adjustedFitness;
+      runningSum += Math.pow(species.members[i].fitness, 2);
 
       if (runningSum >= rand) {
         return species.members[i];

@@ -114,12 +114,12 @@ class PopulationConventional extends Population {
   };
 
   private selectEnemy = (): EnemyConventional => {
-    const fitnessSum = this.members.map(e => e.fitness).reduce((prev, current) => prev + current, 0);
+    const fitnessSum = this.members.map(e => Math.pow(e.fitness, 2)).reduce((prev, current) => prev + current, 0);
     const rand: number = randomBetween(0, fitnessSum);
 
     let runningSum: number = 0.0;
     for (let i = 0; i < this.members.length; i++) {
-      runningSum += this.members[i].fitness;
+      runningSum += Math.pow(this.members[i].fitness, 2);
 
       if (runningSum > rand) {
         return this.members[i];

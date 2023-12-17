@@ -30,12 +30,15 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   sitesVisited: number = 0;
   needlessShots: number = 0;
   justifiedShots: number = 0;
-  playerWasSpotted: boolean = false;
+  playerWasSpottedAtAll: boolean = false;
   shotsAtPlayer: number = 0;
   shotsWithoutReachingNextSite: number = 0;
   backwardCounter: number = 0;
   forwardCounter: number = 0;
   playerShotCounter: number = 0;
+  playerIgnoredCounter: number = 0;
+  playerWasSpotted: boolean = false;
+  playerAliveAfterSpotted: number = 0;
   fitness: number = 0.0;
 
   // Used only for when exporting.
@@ -61,6 +64,8 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   }
 
   update = (walls: Wall[], player: Player, lifetime?: number): void => {
+    // TODO: Clean this method up...
+
     if (this.isDead === false) {
       this.updatePlayerPositionInfo();
 
@@ -126,9 +131,22 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
     this.bullets.forEach(bullet => bullet.update(walls, [player]));
     if (this.bullets.some(b => b.enemyHit)) {
+      this.playerAliveAfterSpotted = 0;
+      this.playerWasSpotted = false;
       this.playerShotCounter++;
       for (let i = 0; i < this.playerSpottedOnSensors.length; i++) {
         this.playerSpottedOnSensors[i] = 0.0;
+      }
+    }
+
+    if (this.playerWasSpotted) {
+      if (this.playerAliveAfterSpotted == 100) {
+        this.playerIgnoredCounter++;
+
+        this.playerAliveAfterSpotted = 0;
+        this.playerWasSpotted = false;
+      } else {
+        this.playerAliveAfterSpotted++;
       }
     }
   };
@@ -212,8 +230,11 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     // Big boost for shooting the player
     points *= 1 + 0.2 * this.playerShotCounter;
 
+    // Penalty for ignoring the player
+    points *= 1 - 0.1 * this.playerIgnoredCounter;
+
     // Big penalty for not shooting at all
-    if (this.playerWasSpotted && this.justifiedShots == 0 && this.needlessShots == 0) {
+    if (this.playerWasSpottedAtAll && this.justifiedShots == 0 && this.needlessShots == 0) {
       points *= 0.7;
     }
 
@@ -241,6 +262,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     for (let i = 0; i < sensorRayCount; i++) {
       if (sensorReadings[i]?.detectedEntity === "PLAYER") {
         this.playerSpottedOnSensors[i] = 1.0;
+        this.playerWasSpottedAtAll = true;
         this.playerWasSpotted = true;
       }
 

@@ -22,7 +22,7 @@ export const sensorRaySpread: number = Math.PI * 2;
 export const sensorRayCount: number = 8;
 
 // Machine Learning
-export const populationSize: number = 400;
+export const populationSize: number = 200;
 export const weightMutationRate: number = 0.2;
 export const weightPerturbationChance: number = 0.9;
 export const timeWhenDummiesStartMoving: number = 3000;
@@ -30,7 +30,7 @@ export const timeWhenDummiesStartMoving: number = 3000;
 // Machine Learning NEAT
 export const compatibilityCoefficients: [number, number, number] = [0.8, 0.8, 0.1];
 export const genomeLengthNormalizationThreshold: number = 20;
-export const massExtinctionThreshold: number = 20;
+export const massExtinctionThreshold: number = 15;
 export const speciesExtinctionThreshold: number = 15;
 export const partOfSpeciesMembersAllowedToReproduce: number = 0.5;
 export const addNodeMutationChance: number = 0.06;

@@ -187,7 +187,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     const pointsForReachingSite: number = 10;
     const pointsForJustifiedShots: number = 0.02;
     const negativePointsForNeedlessShots: number = 0.02;
-    const pointsForShotsAtPlayer: number = 1;
+    const pointsForShotsAtPlayer: number = 0.6;
     let points: number = 0;
 
     // Points for every reached site

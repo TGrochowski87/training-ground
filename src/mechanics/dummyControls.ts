@@ -9,6 +9,16 @@ class DummyControls extends Controls {
       this.left = true;
     }
   }
+
+  stop = () => {
+    this.forward = false;
+    this.left = false;
+  };
+
+  go = () => {
+    this.forward = true;
+    this.left = true;
+  };
 }
 
 export default DummyControls;

@@ -7,8 +7,10 @@ class DummyPlayer extends Player {
   maxDistance: number = 100;
   distanceInCurrentDirection: number = 0;
 
-  constructor(pos: Vector2D, shouldMove: boolean) {
+  constructor(pos: Vector2D, shouldMove: boolean, startsDead: boolean) {
     super(pos, true, shouldMove);
+
+    this.isDead = startsDead;
   }
 
   update = (walls: Wall[]): void => {

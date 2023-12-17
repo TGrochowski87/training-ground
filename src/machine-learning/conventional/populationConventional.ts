@@ -21,7 +21,7 @@ class PopulationConventional extends Population {
 
     for (let i = 0; i < size; i++) {
       this.members.push(new EnemyConventional(enemySpawnPoint.copy(), baseBrain?.clone(), false));
-      this.dummies.push(new DummyPlayer(new Vector2D(-1000, -1000), false));
+      this.dummies.push(new DummyPlayer(new Vector2D(-1000, -1000), false, true));
     }
   }
 
@@ -31,20 +31,11 @@ class PopulationConventional extends Population {
         member.isDead = true;
       }
       this.generationLifetime = 0;
-      this.currentDummySpawnSiteSequenceIndex = 0;
-      this.dummiesAreMoving = false;
       return;
     }
 
-    if (
-      this.generationLifetime >= this.timeWhenDummiesFirstAppear &&
-      this.generationLifetime % this.dummiesRespawnInterval == 0
-    ) {
-      this.dummies = [...this.getNewDummies(this.members.length)];
-    }
-
     for (let i = 0; i < this.members.length; i++) {
-      this.members[i].update(walls, this.dummies[i]);
+      this.members[i].update(walls, this.dummies[i], this.generationLifetime);
       this.dummies[i].update(walls);
     }
 
@@ -54,16 +45,12 @@ class PopulationConventional extends Population {
   draw = (ctx: CanvasRenderingContext2D, showSensors: boolean, selectedSpeciesId?: number): void => {
     for (let i = 1; i < this.members.length; i++) {
       this.members[i].draw(ctx, showSensors, this.memberColor);
-      if (this.generationLifetime > this.timeWhenDummiesFirstAppear) {
-        this.dummies[i].draw(ctx);
-      }
+      this.dummies[i].draw(ctx);
     }
 
     // The champion is always at index 0, so draw him last, so it would be always visible.
     this.members[0].draw(ctx, showSensors, this.memberColor);
-    if (this.generationLifetime > this.timeWhenDummiesFirstAppear) {
-      this.dummies[0].draw(ctx);
-    }
+    this.dummies[0].draw(ctx);
   };
 
   drawBestMembersNeuralNetwork = (ctx: CanvasRenderingContext2D, selectedSpeciesId: number): void => {
@@ -105,7 +92,7 @@ class PopulationConventional extends Population {
 
     const bestEnemyIndex = this.findBestPlayerIndex();
     newPopulation[0] = this.members[bestEnemyIndex].clone(true);
-    newDummies[0] = new DummyPlayer(new Vector2D(-1000, -1000), false);
+    newDummies[0] = new DummyPlayer(new Vector2D(-1000, -1000), false, true);
 
     for (let i = 1; i < newPopulation.length; i++) {
       const parents = [this.selectEnemy(), this.selectEnemy()];
@@ -113,7 +100,7 @@ class PopulationConventional extends Population {
       newPopulation[i] = parents[0].crossover(parents[1]);
       newPopulation[i].mutate();
 
-      newDummies[i] = new DummyPlayer(new Vector2D(-1000, -1000), false);
+      newDummies[i] = new DummyPlayer(new Vector2D(-1000, -1000), false, true);
     }
 
     this.members = [...newPopulation];

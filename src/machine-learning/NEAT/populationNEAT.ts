@@ -64,20 +64,11 @@ class PopulationNEAT extends Population {
         species.killAllMembers();
       }
       this.generationLifetime = 0;
-      this.currentDummySpawnSiteSequenceIndex = 0;
-      this.dummiesAreMoving = false;
       return;
     }
 
     for (const species of this.population) {
-      if (
-        this.generationLifetime >= this.timeWhenDummiesFirstAppear &&
-        this.generationLifetime % this.dummiesRespawnInterval == 0
-      ) {
-        species.update(walls, this.getNewDummies(species.members.length));
-      } else {
-        species.update(walls);
-      }
+      species.update(walls, this.generationLifetime);
     }
 
     this.generationLifetime++;
@@ -85,12 +76,10 @@ class PopulationNEAT extends Population {
 
   draw(ctx: CanvasRenderingContext2D, showSensors: boolean, selectedSpeciesId?: number): void {
     if (selectedSpeciesId != undefined) {
-      this.population
-        .find(s => s.id == selectedSpeciesId)!
-        .draw(ctx, showSensors, this.generationLifetime > this.timeWhenDummiesFirstAppear);
+      this.population.find(s => s.id == selectedSpeciesId)!.draw(ctx, showSensors);
     } else {
       for (const species of this.population) {
-        species.draw(ctx, showSensors, this.generationLifetime > this.timeWhenDummiesFirstAppear);
+        species.draw(ctx, showSensors);
       }
     }
   }

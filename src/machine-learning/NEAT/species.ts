@@ -23,30 +23,22 @@ class Species {
     this.memberColor = getRandomColor();
   }
 
-  update = (walls: Wall[], newDummies?: DummyPlayer[]): void => {
-    if (newDummies != undefined) {
-      this.dummies = [...newDummies];
-    }
-
+  update = (walls: Wall[], lifetime: number): void => {
     for (let i = 0; i < this.members.length; i++) {
-      this.members[i].update(walls, this.dummies[i]);
+      this.members[i].update(walls, this.dummies[i], lifetime);
       this.dummies[i].update(walls);
     }
   };
 
-  draw = (ctx: CanvasRenderingContext2D, showSensors: boolean, drawDummies: boolean) => {
+  draw = (ctx: CanvasRenderingContext2D, showSensors: boolean) => {
     for (let i = 1; i < this.members.length; i++) {
       this.members[i].draw(ctx, showSensors, this.memberColor);
-      if (drawDummies) {
-        this.dummies[i].draw(ctx);
-      }
+      this.dummies[i].draw(ctx);
     }
 
     // The champion is always at index 0, so draw him last, so it would be always visible.
     this.members[0].draw(ctx, showSensors, this.memberColor);
-    if (drawDummies) {
-      this.dummies[0].draw(ctx);
-    }
+    this.dummies[0].draw(ctx);
   };
 
   drawBestNeuralNetwork = (ctx: CanvasRenderingContext2D) => {
@@ -118,7 +110,7 @@ class Species {
 
     this.dummies = [];
     for (let i = 0; i < newGeneration.length; i++) {
-      this.dummies.push(new DummyPlayer(new Vector2D(-1000, -1000), false));
+      this.dummies.push(new DummyPlayer(new Vector2D(-1000, -1000), false, true));
     }
   };
 }

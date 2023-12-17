@@ -1,4 +1,4 @@
-import { gunPointOffset, sensorRayCount, siteRadius, sites } from "configuration";
+import { gunPointOffset, sensorRayCount, siteRadius, sites, timeWhenDummiesStartMoving } from "configuration";
 import EnemyControls from "mechanics/enemyControls";
 import Sensor from "machine-learning/sensor";
 import Vector2D from "utilities/vector2d";
@@ -9,6 +9,8 @@ import Player from "./player";
 import { distanceBetweenPoints } from "utilities/mathExtensions";
 import NeuralNetwork from "machine-learning/neuralNetwork";
 import TargetSiteDealer from "mechanics/targetSiteDealer";
+import DummyPlayer from "./dummyPlayer";
+import DummyControls from "mechanics/dummyControls";
 
 abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   brain: NN;
@@ -56,7 +58,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.previousDistanceToTargetSite = this.distanceToTargetSite;
   }
 
-  update = (walls: Wall[], player: Player): void => {
+  update = (walls: Wall[], player: Player, lifetime?: number): void => {
     if (this.isDead === false) {
       this.updatePlayerPositionInfo();
 
@@ -66,6 +68,21 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.currentSitePosition = TargetSiteDealer.getNextTargetSite(this.currentTargetSiteSequenceIndex);
         this.currentTargetSiteSequenceIndex++;
         this.updateDistanceToTargetSite(0.0);
+
+        if (player instanceof DummyPlayer && player.isDead && this.currentTargetSiteSequenceIndex % 2 == 0) {
+          if (lifetime == undefined) {
+            throw Error("Lifetime must be provided to enemy's update while training.");
+          }
+
+          if (lifetime >= timeWhenDummiesStartMoving) {
+            player.position = this.currentSitePosition.add(new Vector2D(60, 0));
+            (player.controls as DummyControls).go();
+          } else {
+            player.position = this.currentSitePosition;
+          }
+          player.angle = 0;
+          player.isDead = false;
+        }
       } else {
         this.updateDistanceToTargetSite(this.calculateDistanceToTargetSite());
       }

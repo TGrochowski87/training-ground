@@ -92,14 +92,14 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
           this.needlessShots++;
         } else {
-          // Move the player by the rotation of this enemy and check if it is in front by comparing Y.
+          // Move the player by the rotation of this enemy and check if it is in front by comparing coordinates.
           const playerRelativePos = player.position.add(new Vector2D(-this.position.x, -this.position.y));
           const x = playerRelativePos.x * Math.cos(this.angle) + playerRelativePos.y * Math.sin(this.angle);
           const y = playerRelativePos.y * Math.cos(this.angle) - playerRelativePos.x * Math.sin(this.angle);
 
           const playerResultPos = new Vector2D(x, y).add(this.position);
 
-          if (playerResultPos.y < this.position.y) {
+          if (playerResultPos.y < this.position.y && Math.abs(playerResultPos.x - this.position.x) <= 30) {
             this.shotsAtPlayer++;
           } else {
             this.justifiedShots++;

@@ -88,7 +88,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.updateDistanceToTargetSite(this.calculateDistanceToTargetSite());
       }
 
-      if (this.canShoot && this.controls.shoot) {
+      if (this.currentWeaponCooldown <= 0 && this.controls.shoot) {
         if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
           this.needlessShots++;
         } else {

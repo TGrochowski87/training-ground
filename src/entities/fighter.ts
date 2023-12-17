@@ -15,7 +15,8 @@ abstract class Fighter {
   aimRay: Ray;
 
   bullets: Bullet[] = [];
-  canShoot: boolean = true;
+  weaponCooldown: number = 10;
+  currentWeaponCooldown: number = 0;
 
   isDead: boolean;
 
@@ -49,14 +50,13 @@ abstract class Fighter {
       this.angle -= 0.05 * flip;
     }
 
-    if (controls.shoot && this.canShoot) {
-      this.canShoot = false;
+    if (controls.shoot && this.currentWeaponCooldown <= 0) {
+      this.currentWeaponCooldown = this.weaponCooldown;
       const bullet = new Bullet(this.position.add(gunPointOffset.rotate(this.angle)), this.angle);
       this.bullets.push(bullet);
-      setTimeout(() => {
-        this.canShoot = true;
-      }, 200);
     }
+
+    this.currentWeaponCooldown--;
   };
 
   private applyCollisionToDisplacementVector = (walls: Wall[], displacementVector: Vector2D): Vector2D => {

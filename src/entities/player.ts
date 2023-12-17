@@ -23,7 +23,6 @@ class Player extends Fighter {
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, this);
     }
 
-    //this.sensor.update(walls);
     this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
     this.bullets.forEach(bullet => bullet.update(walls, enemies));
   };

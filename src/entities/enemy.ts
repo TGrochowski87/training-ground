@@ -32,6 +32,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   justifiedShots: number = 0;
   playerWasSpotted: boolean = false;
   shotsAtPlayer: number = 0;
+  shotsWithoutReachingNextSite: number = 0;
   backwardCounter: number = 0;
   forwardCounter: number = 0;
   playerShotCounter: number = 0;
@@ -69,6 +70,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.currentSitePosition = TargetSiteDealer.getNextTargetSite(this.currentTargetSiteSequenceIndex);
         this.currentTargetSiteSequenceIndex++;
         this.updateDistanceToTargetSite(0.0);
+        this.shotsWithoutReachingNextSite = 0;
 
         if (player instanceof DummyPlayer && player.isDead && this.currentTargetSiteSequenceIndex % 2 == 0) {
           if (lifetime == undefined) {
@@ -91,7 +93,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       if (this.currentWeaponCooldown <= 0 && this.controls.shoot) {
         if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
           this.needlessShots++;
-        } else {
+        } else if (this.shotsWithoutReachingNextSite <= 30) {
+          this.shotsWithoutReachingNextSite++;
+
           // Move the player by the rotation of this enemy and check if it is in front by comparing coordinates.
           const playerRelativePos = player.position.add(new Vector2D(-this.position.x, -this.position.y));
           const x = playerRelativePos.x * Math.cos(this.angle) + playerRelativePos.y * Math.sin(this.angle);

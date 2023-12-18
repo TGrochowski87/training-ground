@@ -231,7 +231,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points *= 1 + 0.2 * this.playerShotCounter;
 
     // Penalty for ignoring the player
-    points *= 1 - 0.1 * this.playerIgnoredCounter;
+    points *= Math.max(0, 1 - 0.05 * this.playerIgnoredCounter);
 
     // Big penalty for not shooting at all
     if (this.playerWasSpottedAtAll && this.justifiedShots == 0 && this.needlessShots == 0) {

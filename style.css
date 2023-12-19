@@ -78,3 +78,9 @@ body {
 #scenario-selection > button {
   margin-right: auto;
 }
+
+#timer-space {
+  position: absolute;
+  top: 40px;
+  left: 20px;
+}

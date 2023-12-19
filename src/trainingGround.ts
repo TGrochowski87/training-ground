@@ -32,6 +32,10 @@ const sensorDisplayButton: HTMLButtonElement = document.getElementById("button-s
 const exportBrainButton: HTMLButtonElement = document.getElementById("button-save") as HTMLButtonElement;
 const importBrainButton: HTMLInputElement = document.getElementById("button-import") as HTMLInputElement;
 
+const timerText: HTMLHeadingElement = document.getElementById("timer") as HTMLHeadingElement;
+const date = new Date();
+timerText.textContent = `Start: ${date.getHours()}:${date.getMinutes()}`;
+
 const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;
 

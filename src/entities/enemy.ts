@@ -39,13 +39,15 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   playerWasSpottedAtAll: boolean = false;
   shotsAtPlayer: number = 0;
   shotsWithoutReachingNextSite: number = 0;
-  backwardCounter: number = 0;
-  forwardCounter: number = 0;
   playerShotCounter: number = 0;
   playerIgnoredCounter: number = 0;
   playerWasSpotted: boolean = false;
   playerAliveAfterSpotted: number = 0;
   fitness: number = 0.0;
+
+  rotatesDone: [boolean, boolean] = [false, false];
+  backwardCounter: number = 0;
+  forwardCounter: number = 0;
 
   // Used only for when exporting.
   // Stores the last champion's fitness while the new one is mid calculation.
@@ -133,6 +135,12 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.backwardCounter++;
       } else if (this.controls.backward == false && this.controls.forward) {
         this.forwardCounter++;
+      }
+      if (this.rotatesDone[0] == false) {
+        this.rotatesDone[0] = this.controls.left;
+      }
+      if (this.rotatesDone[1] == false) {
+        this.rotatesDone[1] = this.controls.right;
       }
 
       const neuralNetInputs = this.look(walls, player);
@@ -230,6 +238,10 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     // High penalty for running backwards
     const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.2 : 0;
     points *= 1 - runningBackwardsPenalty;
+
+    // Penalty for rotating always in only one direction
+    const runningInCirclesPenalty = this.rotatesDone.some(x => x == false) ? 0.2 : 0;
+    points *= 1 - runningInCirclesPenalty;
 
     // Penalty for needless shooting
     points -= Math.pow(this.needlessShots, 2) * negativePointsForNeedlessShots;

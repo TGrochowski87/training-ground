@@ -34,7 +34,7 @@ const importBrainButton: HTMLInputElement = document.getElementById("button-impo
 
 const timerText: HTMLHeadingElement = document.getElementById("timer") as HTMLHeadingElement;
 const date = new Date();
-timerText.textContent = `Start: ${date.getHours()}:${date.getMinutes()}`;
+timerText.textContent = `Start: ${date.getHours()}:${date.getMinutes().toString().padStart(2, "0")}`;
 
 const gameCtx = gameCanvas.getContext("2d")!;
 const networkCtx = networkCanvas.getContext("2d")!;

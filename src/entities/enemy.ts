@@ -1,10 +1,4 @@
-import {
-  gunPointOffset,
-  maxLifetimeWhenDummiesAppear,
-  sensorRayCount,
-  siteIndexAfterWhichDummiesStartMoving,
-  siteRadius,
-} from "configuration";
+import { gunPointOffset, sensorRayCount, siteRadius, sites, timeWhenDummiesStartMoving } from "configuration";
 import EnemyControls from "mechanics/enemyControls";
 import Sensor from "machine-learning/sensor";
 import Vector2D from "utilities/vector2d";
@@ -71,7 +65,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.previousDistanceToTargetSite = this.distanceToTargetSite;
   }
 
-  update = (walls: Wall[], player: Player, maxLifetime?: number): void => {
+  update = (walls: Wall[], player: Player, lifetime?: number): void => {
     // TODO: Clean this method up...
 
     if (this.isDead === false) {
@@ -85,14 +79,12 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.updateDistanceToTargetSite(0.0);
         this.shotsWithoutReachingNextSite = 0;
 
-        if (
-          maxLifetime &&
-          maxLifetime >= maxLifetimeWhenDummiesAppear &&
-          player instanceof DummyPlayer &&
-          player.isDead &&
-          this.currentTargetSiteSequenceIndex % 2 == 0
-        ) {
-          if (this.currentTargetSiteSequenceIndex > siteIndexAfterWhichDummiesStartMoving) {
+        if (player instanceof DummyPlayer && player.isDead && this.currentTargetSiteSequenceIndex % 2 == 0) {
+          if (lifetime == undefined) {
+            throw Error("Lifetime must be provided to enemy's update while training.");
+          }
+
+          if (lifetime >= timeWhenDummiesStartMoving) {
             player.position = this.currentSitePosition.add(new Vector2D(60, 0));
             (player.controls as DummyControls).go();
           } else {
@@ -105,12 +97,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.updateDistanceToTargetSite(this.calculateDistanceToTargetSite());
       }
 
-      if (
-        maxLifetime &&
-        maxLifetime >= maxLifetimeWhenDummiesAppear &&
-        this.currentWeaponCooldown <= 0 &&
-        this.controls.shoot
-      ) {
+      if (this.currentWeaponCooldown <= 0 && this.controls.shoot) {
         if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
           this.needlessShots++;
         } else if (this.shotsWithoutReachingNextSite <= 30) {

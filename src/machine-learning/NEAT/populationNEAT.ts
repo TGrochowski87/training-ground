@@ -68,7 +68,7 @@ class PopulationNEAT extends Population {
     }
 
     for (const species of this.population) {
-      species.update(walls, this.maxGenerationLifetime);
+      species.update(walls, this.generationLifetime);
     }
 
     this.generationLifetime++;

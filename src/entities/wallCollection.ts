@@ -13,10 +13,14 @@ class WallCollection {
       new Wall(new Vector2D(gameScreenWidth, gameScreenHeight - 5), "LEFT", gameScreenWidth),
       new Wall(new Vector2D(5, gameScreenHeight), "UP", gameScreenHeight),
 
-      // Around the player
-      new Wall(new Vector2D(gameScreenWidth / 2 - 100, (gameScreenHeight * 3) / 4 - 100), "RIGHT", 200),
+      // Around the sector
+      new Wall(new Vector2D(gameScreenWidth / 2 - 100, (gameScreenHeight * 3) / 4 - 100), "RIGHT", 100),
       new Wall(new Vector2D(gameScreenWidth / 2 - 100, (gameScreenHeight * 3) / 4 - 100), "DOWN", 200),
       new Wall(new Vector2D(gameScreenWidth / 2 + 100, (gameScreenHeight * 3) / 4 - 100), "DOWN", 200),
+
+      new Wall(new Vector2D(gameScreenWidth / 2, (gameScreenHeight * 3) / 4 - 100), "UP", 300),
+      new Wall(new Vector2D(0, (gameScreenHeight * 3) / 4 - 30), "RIGHT", 150),
+      new Wall(new Vector2D(gameScreenWidth - 200, (gameScreenHeight * 1) / 4), "RIGHT", 200),
     ];
   }
 

@@ -79,7 +79,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.updateDistanceToTargetSite(0.0);
         this.shotsWithoutReachingNextSite = 0;
 
-        if (player instanceof DummyPlayer && player.isDead && this.currentTargetSiteSequenceIndex % 2 == 0) {
+        if (player instanceof DummyPlayer && player.isDead && this.currentTargetSiteSequenceIndex % 3 == 0) {
           if (lifetime == undefined) {
             throw Error("Lifetime must be provided to enemy's update while training.");
           }

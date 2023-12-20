@@ -2,7 +2,7 @@ import Vector2D from "utilities/vector2d";
 
 // Game
 export const gameScreenWidth: number = 700;
-export const gameScreenHeight: number = 1410;
+export const gameScreenHeight: number = 1010;
 export const enemySpawnPoint: Vector2D = new Vector2D(100, 100); // SiteIndexAssigner should be adjusted with this setting.
 
 // Fighter

@@ -35,7 +35,7 @@ class PopulationConventional extends Population {
     }
 
     for (let i = 0; i < this.members.length; i++) {
-      this.members[i].update(walls, this.dummies[i], this.generationLifetime);
+      this.members[i].update(walls, this.dummies[i], this.maxGenerationLifetime);
       this.dummies[i].update(walls);
     }
 

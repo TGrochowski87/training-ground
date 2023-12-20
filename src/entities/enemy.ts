@@ -103,7 +103,12 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.updateDistanceToTargetSite(this.calculateDistanceToTargetSite());
       }
 
-      if (this.currentWeaponCooldown <= 0 && this.controls.shoot) {
+      if (
+        maxLifetime &&
+        maxLifetime >= maxLifetimeWhenDummiesAppear &&
+        this.currentWeaponCooldown <= 0 &&
+        this.controls.shoot
+      ) {
         if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
           this.needlessShots++;
         } else if (this.shotsWithoutReachingNextSite <= 30) {
@@ -222,12 +227,12 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     // Points for approaching the last site
     points += pointsForReachingSite * (1 - this.distanceToTargetSite);
 
-    // Penalty for needless shooting
-    points -= Math.pow(this.needlessShots, 2) * negativePointsForNeedlessShots;
-
     // High penalty for running backwards
     const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.2 : 0;
     points *= 1 - runningBackwardsPenalty;
+
+    // Penalty for needless shooting
+    points -= Math.pow(this.needlessShots, 2) * negativePointsForNeedlessShots;
 
     // Slight boost for shooting when the player is spotted
     points += pointsForJustifiedShots * this.justifiedShots;

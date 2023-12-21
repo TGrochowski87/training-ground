@@ -23,9 +23,9 @@ class Species {
     this.memberColor = getRandomColor();
   }
 
-  update = (walls: Wall[], generation: number, lifetime: number): void => {
+  update = (walls: Wall[], lifetime: number): void => {
     for (let i = 0; i < this.members.length; i++) {
-      this.members[i].update(walls, this.dummies[i], generation, lifetime);
+      this.members[i].update(walls, this.dummies[i], lifetime);
       this.dummies[i].update(walls);
     }
   };

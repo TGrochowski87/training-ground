@@ -11,20 +11,13 @@ class Vector2D {
     return new Vector2D(Math.cos(angle), Math.sin(angle));
   };
 
-  visualize = (
-    ctx: CanvasRenderingContext2D,
-    startingPos: Vector2D,
-    visualMultiplier: number = 1
-  ): void => {
+  visualize = (ctx: CanvasRenderingContext2D, startingPos: Vector2D, visualMultiplier: number = 1): void => {
     const displayVector = this.multiply(visualMultiplier);
     ctx.strokeStyle = "yellow";
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(startingPos.x, startingPos.y);
-    ctx.lineTo(
-      startingPos.x + displayVector.x,
-      startingPos.y + displayVector.y
-    );
+    ctx.lineTo(startingPos.x + displayVector.x, startingPos.y + displayVector.y);
     ctx.stroke();
   };
 
@@ -41,6 +34,10 @@ class Vector2D {
 
   multiply = (num: number): Vector2D => {
     return new Vector2D(this.x * num, this.y * num);
+  };
+
+  scalarProduct = (other: Vector2D): number => {
+    return this.x * other.x + this.y * other.y;
   };
 
   rotate = (angle: number): Vector2D => {
@@ -67,13 +64,10 @@ class Vector2D {
   };
 
   distanceFromPoint = (point: Vector2D): number => {
-    return Math.sqrt(
-      Math.pow(this.x - point.x, 2) + Math.pow(this.y - point.y, 2)
-    );
+    return Math.sqrt(Math.pow(this.x - point.x, 2) + Math.pow(this.y - point.y, 2));
   };
 
-  getLength = (): number =>
-    Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+  getLength = (): number => Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
 }
 
 export default Vector2D;

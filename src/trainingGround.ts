@@ -14,6 +14,10 @@ import Population from "machine-learning/population";
 import PopulationNEAT from "machine-learning/NEAT/populationNEAT";
 import NeuralNetworkNEAT from "machine-learning/NEAT/neuralNetworkNEAT";
 import TargetSiteDealer from "mechanics/targetSiteDealer";
+import Vector2D from "utilities/vector2d";
+
+let displacementVector = new Vector2D(0, -4).rotate(-17);
+console.log(Math.round(displacementVector.getLength()));
 
 const urlParams = new URLSearchParams(window.location.search);
 const methodString: string = urlParams.get("method")!;

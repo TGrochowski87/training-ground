@@ -1,4 +1,11 @@
-import { gunPointOffset, sensorRayCount, siteRadius, sites, timeWhenDummiesStartMoving } from "configuration";
+import {
+  gunPointOffset,
+  playerSpeed,
+  sensorRayCount,
+  siteRadius,
+  sites,
+  timeWhenDummiesStartMoving,
+} from "configuration";
 import EnemyControls from "mechanics/enemyControls";
 import Sensor from "machine-learning/sensor";
 import Vector2D from "utilities/vector2d";
@@ -128,6 +135,22 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       }
       if (this.rotatesDone[1] == false) {
         this.rotatesDone[1] = this.controls.right;
+      }
+
+      const targetSiteDirectionVector: Vector2D = new Vector2D(
+        this.currentSitePosition.x - this.position.x,
+        this.currentSitePosition.y - this.position.y
+      ).setMagnitude(4);
+      let displacementVector: Vector2D | undefined;
+      if (this.controls.forward) {
+        displacementVector = new Vector2D(0, -playerSpeed).rotate(this.angle);
+      }
+      if (this.controls.backward) {
+        displacementVector = new Vector2D(0, playerSpeed).rotate(this.angle);
+      }
+
+      if (displacementVector) {
+        const projectionLength: number = targetSiteDirectionVector.scalarProduct(displacementVector) / playerSpeed;
       }
 
       const neuralNetInputs = this.look(walls, player);

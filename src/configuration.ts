@@ -23,8 +23,8 @@ export const sensorRayCount: number = 8;
 
 // Machine Learning
 export const populationSize: number = 200;
-export const weightMutationRate: number = 0.2;
-export const weightPerturbationChance: number = 0.9;
+export const weightMutationRate: number = 0.3;
+export const weightPerturbationChance: number = 0.8;
 export const timeWhenDummiesStartMoving: number = 3000;
 
 // Machine Learning NEAT

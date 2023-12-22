@@ -105,7 +105,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       }
 
       if (this.currentWeaponCooldown <= 0 && this.controls.shoot) {
-        if (this.playerSpottedOnSensors.every((x) => x == 0.0)) {
+        if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
           this.needlessShots++;
         } else if (this.shotsWithoutReachingNextSite <= 30) {
           this.shotsWithoutReachingNextSite++;
@@ -160,9 +160,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
     }
 
-    this.bullets = this.bullets.filter((bullet) => bullet.toBeDeleted === false);
-    this.bullets.forEach((bullet) => bullet.update(walls, [player]));
-    if (this.bullets.some((b) => b.enemyHit)) {
+    this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
+    this.bullets.forEach(bullet => bullet.update(walls, [player]));
+    if (this.bullets.some(b => b.enemyHit)) {
       this.playerAliveAfterSpotted = 0;
       this.playerWasSpotted = false;
       this.playerShotCounter++;
@@ -192,7 +192,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     ctx.translate(this.position.x, this.position.y);
     ctx.rotate(this.angle);
 
-    ctx.fillStyle = this.playerSpottedOnSensors.some((x) => x > 0.0) ? "#AF0D0D" : color;
+    ctx.fillStyle = this.playerSpottedOnSensors.some(x => x > 0.0) ? "#AF0D0D" : color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
     ctx.fill();
@@ -226,7 +226,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     ctx.restore();
 
     this.aimRay.draw(ctx);
-    this.bullets.forEach((bullet) => bullet.draw(ctx));
+    this.bullets.forEach(bullet => bullet.draw(ctx));
   };
 
   drawBrain = (ctx: CanvasRenderingContext2D): void => {
@@ -234,10 +234,10 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   };
 
   calculateFitness = () => {
-    const pointsForReachingSite: number = 10;
-    const pointsForJustifiedShots: number = 0.02;
-    const negativePointsForNeedlessShots: number = 0.02;
-    const pointsForShotsAtPlayer: number = 0.6;
+    const pointsForReachingSite: number = 20;
+    const pointsForJustifiedShots: number = 0.05;
+    const negativePointsForNeedlessShots: number = 0.05;
+    const pointsForShotsAtPlayer: number = 1;
     let points: number = 0;
 
     // Points for every reached site
@@ -251,7 +251,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points *= 1 - runningBackwardsPenalty;
 
     // Penalty for rotating always in only one direction
-    const runningInCirclesPenalty = this.rotatesDone.some((x) => x == false) ? 0.2 : 0;
+    const runningInCirclesPenalty = this.rotatesDone.some(x => x == false) ? 0.2 : 0;
     points *= 1 - runningInCirclesPenalty;
 
     // Penalty for needless shooting

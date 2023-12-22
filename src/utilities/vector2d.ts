@@ -40,6 +40,12 @@ class Vector2D {
     return this.x * other.x + this.y * other.y;
   };
 
+  angleBetween = (other: Vector2D): number => {
+    const cos: number = this.scalarProduct(other) / (this.getLength() * other.getLength())
+    const angle: number = Math.acos(cos);
+    return angle;
+  }
+
   rotate = (angle: number): Vector2D => {
     const newX = this.x * Math.cos(angle) - this.y * Math.sin(angle);
     const newY = this.x * Math.sin(angle) + this.y * Math.cos(angle);

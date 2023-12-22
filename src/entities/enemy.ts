@@ -105,7 +105,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       }
 
       if (this.currentWeaponCooldown <= 0 && this.controls.shoot) {
-        if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
+        if (this.playerSpottedOnSensors.every((x) => x == 0.0)) {
           this.needlessShots++;
         } else if (this.shotsWithoutReachingNextSite <= 30) {
           this.shotsWithoutReachingNextSite++;
@@ -137,31 +137,32 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.rotatesDone[1] = this.controls.right;
       }
 
-      const targetSiteDirectionVector: Vector2D = new Vector2D(
-        this.currentSitePosition.x - this.position.x,
-        this.currentSitePosition.y - this.position.y
-      ).setMagnitude(4);
-      let displacementVector: Vector2D | undefined;
-      if (this.controls.forward) {
-        displacementVector = new Vector2D(0, -playerSpeed).rotate(this.angle);
-      }
-      if (this.controls.backward) {
-        displacementVector = new Vector2D(0, playerSpeed).rotate(this.angle);
-      }
+      let siteApproachingValue: number = 0;
+      if (this.controls.forward || this.controls.backward) {
+        const targetSiteDirectionVector: Vector2D = new Vector2D(
+          this.currentSitePosition.x - this.position.x,
+          this.currentSitePosition.y - this.position.y
+        ).setMagnitude(4);
 
-      if (displacementVector) {
-        const projectionLength: number = targetSiteDirectionVector.scalarProduct(displacementVector) / playerSpeed;
+        const displacementVector: Vector2D = this.controls.forward
+          ? new Vector2D(0, -playerSpeed).rotate(this.angle)
+          : new Vector2D(0, playerSpeed).rotate(this.angle);
+
+        const angleBetween: number = targetSiteDirectionVector.angleBetween(displacementVector);
+        if (angleBetween < Math.PI / 2) {
+          siteApproachingValue = targetSiteDirectionVector.scalarProduct(displacementVector) / Math.pow(playerSpeed, 2);
+        }
       }
 
       const neuralNetInputs = this.look(walls, player);
-      this.think([...neuralNetInputs, +(this.distanceToTargetSite < this.previousDistanceToTargetSite)]);
+      this.think([...neuralNetInputs, siteApproachingValue]);
       this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
     }
 
-    this.bullets = this.bullets.filter(bullet => bullet.toBeDeleted === false);
-    this.bullets.forEach(bullet => bullet.update(walls, [player]));
-    if (this.bullets.some(b => b.enemyHit)) {
+    this.bullets = this.bullets.filter((bullet) => bullet.toBeDeleted === false);
+    this.bullets.forEach((bullet) => bullet.update(walls, [player]));
+    if (this.bullets.some((b) => b.enemyHit)) {
       this.playerAliveAfterSpotted = 0;
       this.playerWasSpotted = false;
       this.playerShotCounter++;
@@ -191,7 +192,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     ctx.translate(this.position.x, this.position.y);
     ctx.rotate(this.angle);
 
-    ctx.fillStyle = this.playerSpottedOnSensors.some(x => x > 0.0) ? "#AF0D0D" : color;
+    ctx.fillStyle = this.playerSpottedOnSensors.some((x) => x > 0.0) ? "#AF0D0D" : color;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
     ctx.fill();
@@ -225,7 +226,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     ctx.restore();
 
     this.aimRay.draw(ctx);
-    this.bullets.forEach(bullet => bullet.draw(ctx));
+    this.bullets.forEach((bullet) => bullet.draw(ctx));
   };
 
   drawBrain = (ctx: CanvasRenderingContext2D): void => {
@@ -250,7 +251,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points *= 1 - runningBackwardsPenalty;
 
     // Penalty for rotating always in only one direction
-    const runningInCirclesPenalty = this.rotatesDone.some(x => x == false) ? 0.2 : 0;
+    const runningInCirclesPenalty = this.rotatesDone.some((x) => x == false) ? 0.2 : 0;
     points *= 1 - runningInCirclesPenalty;
 
     // Penalty for needless shooting

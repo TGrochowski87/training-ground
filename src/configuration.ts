@@ -30,7 +30,7 @@ export const timeWhenDummiesStartMoving: number = 4000;
 // Machine Learning NEAT
 export const compatibilityCoefficients: [number, number, number] = [0.8, 0.8, 0.1];
 export const genomeLengthNormalizationThreshold: number = 20;
-export const massExtinctionThreshold: number = 15;
+export const massExtinctionThreshold: number = 30;
 export const speciesExtinctionThreshold: number = 15;
 export const partOfSpeciesMembersAllowedToReproduce: number = 0.5;
 export const addNodeMutationChance: number = 0.06;

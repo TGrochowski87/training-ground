@@ -46,9 +46,10 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   playerAliveAfterSpotted: number = 0;
   fitness: number = 0.0;
 
-  rotatesDone: [boolean, boolean] = [false, false];
   backwardCounter: number = 0;
   forwardCounter: number = 0;
+  rightCounter: number = 0;
+  leftCounter: number = 0;
 
   // Used only for when exporting.
   // Stores the last champion's fitness while the new one is mid calculation.
@@ -125,16 +126,15 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         }
       }
 
-      if (this.controls.backward && this.controls.forward == false) {
+      if (this.controls.backward) {
         this.backwardCounter++;
-      } else if (this.controls.backward == false && this.controls.forward) {
+      } else if (this.controls.forward) {
         this.forwardCounter++;
       }
-      if (this.rotatesDone[0] == false) {
-        this.rotatesDone[0] = this.controls.left;
-      }
-      if (this.rotatesDone[1] == false) {
-        this.rotatesDone[1] = this.controls.right;
+      if (this.controls.left) {
+        this.leftCounter++;
+      } else if (this.controls.right) {
+        this.rightCounter++;
       }
 
       let siteApproachingValue: number = 0;
@@ -247,11 +247,12 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points += pointsForReachingSite * (1 - this.distanceToTargetSite);
 
     // High penalty for running backwards
-    const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.2 : 0;
+    const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.3 : 0;
     points *= 1 - runningBackwardsPenalty;
 
-    // Penalty for rotating always in only one direction
-    const runningInCirclesPenalty = this.rotatesDone.some(x => x == false) ? 0.2 : 0;
+    // High penalty for constantly rotating
+    const runningInCirclesPenalty =
+      this.rightCounter > 0.8 * this.forwardCounter || this.leftCounter > 0.8 * this.forwardCounter ? 0.3 : 0;
     points *= 1 - runningInCirclesPenalty;
 
     // Penalty for needless shooting
@@ -269,10 +270,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     // Penalty for ignoring the player
     points *= Math.max(0, 1 - 0.05 * this.playerIgnoredCounter);
 
-    // Big penalty for not shooting at all
-    if (this.playerWasSpottedAtAll && this.justifiedShots == 0 && this.needlessShots == 0) {
-      points *= 0.7;
-    }
+    // High penalty for not shooting at all
+    const pacifismPenalty = this.playerWasSpottedAtAll && this.justifiedShots == 0 && this.needlessShots == 0 ? 0.3 : 0;
+    points *= 1 - pacifismPenalty;
 
     this.fitness = points > 0 ? points : 0;
   };

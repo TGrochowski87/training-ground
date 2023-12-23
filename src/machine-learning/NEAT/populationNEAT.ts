@@ -170,7 +170,10 @@ class PopulationNEAT extends Population {
     this.distributeOffspringBetweenSpecies(offspring);
     this.filterOutEmptySpecies();
 
-    if (this.generation % this.numberOfGenerationsBetweenIncrease == 0) {
+    if (
+      this.maxGenerationLifetime < this.peakGenerationLifetime &&
+      this.generation % this.numberOfGenerationsBetweenIncrease == 0
+    ) {
       this.maxGenerationLifetime += this.generationLifetimeIncrease;
       console.log(`Generation lifetime increased to ${this.maxGenerationLifetime}`);
     }
@@ -216,7 +219,7 @@ class PopulationNEAT extends Population {
   private adjustCompatibilityThreshold = () => {
     if (this.population.length > this.targetSpeciesCount) {
       this.compatibilityThreshold += this.compatibilityModifier;
-    } else if (this.population.length > this.targetSpeciesCount) {
+    } else if (this.population.length < this.targetSpeciesCount) {
       this.compatibilityThreshold -= this.compatibilityModifier;
     }
   };

@@ -23,13 +23,13 @@ export const sensorRayCount: number = 8;
 
 // Machine Learning
 export const populationSize: number = 200;
-export const weightMutationRate: number = 0.3;
+export const weightMutationRate: number = 0.2;
 export const weightPerturbationChance: number = 0.8;
 export const timeWhenDummiesStartMoving: number = 4000;
 
 // Machine Learning NEAT
-export const compatibilityCoefficients: [number, number, number] = [0.8, 0.8, 0.1];
-export const genomeLengthNormalizationThreshold: number = 20;
+export const compatibilityCoefficients: [number, number, number] = [1, 1, 3];
+export const genomeLengthNormalizationThreshold: number = 30;
 export const massExtinctionThreshold: number = 30;
 export const speciesExtinctionThreshold: number = 15;
 export const partOfSpeciesMembersAllowedToReproduce: number = 0.5;
@@ -37,7 +37,7 @@ export const addNodeMutationChance: number = 0.06;
 export const addConnectionMutationChance: number = 0.09;
 export const inheritedConnectionStaysDisabledChance: number = 0.75;
 export const populationPartWithoutCrossover: number = 0.25;
-export const interspeciesMatingRate: number = 0.001;
+export const interspeciesMatingRate: number = 0.01;
 
 // AI Adaptation
 export const networkViewWidth: number = 1100;

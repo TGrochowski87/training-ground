@@ -381,7 +381,6 @@ class NeuralNetworkNEAT extends NeuralNetwork {
 
     // Though it is stated in the original paper to normalize by gene number,
     // they did not do it for their tests.
-
     // const numberOfGenes =
     //   compatibilityData.numberOfGenesInBiggerGenome < genomeLengthNormalizationThreshold
     //     ? 1

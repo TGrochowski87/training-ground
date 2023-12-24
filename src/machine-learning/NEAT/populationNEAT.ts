@@ -127,7 +127,7 @@ class PopulationNEAT extends Population {
     // Could consider marking species as extinct instead of removing them to make the data available.
     if (this.shouldMassExtinctionHappen()) {
       console.log("Mass extinction event!");
-      this.population = this.population.slice(0, 2);
+      this.massExtinctionEvent();
     } else {
       this.filterOutStagnantSpecies();
     }
@@ -305,6 +305,15 @@ class PopulationNEAT extends Population {
       } else {
         speciesLeft.push(species);
       }
+    }
+
+    this.population = [...speciesLeft];
+  };
+
+  private massExtinctionEvent = () => {
+    const speciesLeft: Species[] = this.population.slice(0, 2);
+    if (this.speciesOfTopMember) {
+      speciesLeft.push(this.population[this.speciesOfTopMember]);
     }
 
     this.population = [...speciesLeft];

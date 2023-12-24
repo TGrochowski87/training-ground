@@ -312,8 +312,8 @@ class PopulationNEAT extends Population {
 
   private massExtinctionEvent = () => {
     const speciesLeft: Species[] = this.population.slice(0, 2);
-    if (this.speciesOfTopMember) {
-      speciesLeft.push(this.population[this.speciesOfTopMember]);
+    if (this.speciesOfTopMember && speciesLeft.some(s => s.id == this.speciesOfTopMember) == false) {
+      speciesLeft.push(this.population.find(s => s.id == this.speciesOfTopMember)!);
     }
 
     this.population = [...speciesLeft];

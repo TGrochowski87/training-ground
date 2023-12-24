@@ -28,7 +28,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   playerSpottedOnSensors: number[];
 
   distanceToTargetSite: number;
-  previousDistanceToTargetSite: number;
   currentSitePosition: Vector2D;
   lastSitePosition: Vector2D; // Initially set to spawn position.
   currentTargetSiteSequenceIndex: number;
@@ -70,7 +69,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.lastSitePosition = pos;
 
     this.distanceToTargetSite = this.calculateDistanceToTargetSite();
-    this.previousDistanceToTargetSite = this.distanceToTargetSite;
   }
 
   update = (walls: Wall[], player: Player, lifetime?: number): void => {
@@ -84,7 +82,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.lastSitePosition = this.currentSitePosition;
         this.currentSitePosition = TargetSiteDealer.getNextTargetSite(this.currentTargetSiteSequenceIndex);
         this.currentTargetSiteSequenceIndex++;
-        this.updateDistanceToTargetSite(0.0);
         this.shotsWithoutReachingNextSite = 0;
 
         if (player instanceof DummyPlayer && player.isDead && this.currentTargetSiteSequenceIndex % 3 == 0) {
@@ -101,9 +98,8 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
           player.angle = 0;
           player.isDead = false;
         }
-      } else {
-        this.updateDistanceToTargetSite(this.calculateDistanceToTargetSite());
       }
+      this.distanceToTargetSite = this.calculateDistanceToTargetSite();
 
       if (this.currentWeaponCooldown <= 0 && this.controls.shoot) {
         if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
@@ -278,11 +274,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   };
 
   abstract exportBrain(generation: number): void;
-
-  private updateDistanceToTargetSite = (value: number) => {
-    this.previousDistanceToTargetSite = this.distanceToTargetSite;
-    this.distanceToTargetSite = value;
-  };
 
   private calculateDistanceToTargetSite = (): number => {
     const distanceLeft = distanceBetweenPoints(this.position, this.currentSitePosition);

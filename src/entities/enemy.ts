@@ -28,6 +28,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   playerSpottedOnSensors: number[];
 
   distanceToTargetSite: number;
+  smallestDistanceToTargetSite: number;
   currentSitePosition: Vector2D;
   lastSitePosition: Vector2D; // Initially set to spawn position.
   currentTargetSiteSequenceIndex: number;
@@ -69,6 +70,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     this.lastSitePosition = pos;
 
     this.distanceToTargetSite = this.calculateDistanceToTargetSite();
+    this.smallestDistanceToTargetSite = this.distanceToTargetSite;
   }
 
   update = (walls: Wall[], player: Player, lifetime?: number): void => {
@@ -83,6 +85,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.currentSitePosition = TargetSiteDealer.getNextTargetSite(this.currentTargetSiteSequenceIndex);
         this.currentTargetSiteSequenceIndex++;
         this.shotsWithoutReachingNextSite = 0;
+        this.smallestDistanceToTargetSite = this.calculateDistanceToTargetSite();
 
         if (player instanceof DummyPlayer && player.isDead && this.currentTargetSiteSequenceIndex % 3 == 0) {
           if (lifetime == undefined) {
@@ -100,6 +103,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         }
       }
       this.distanceToTargetSite = this.calculateDistanceToTargetSite();
+      if (this.distanceToTargetSite < this.smallestDistanceToTargetSite) {
+        this.smallestDistanceToTargetSite = this.distanceToTargetSite;
+      }
 
       if (this.currentWeaponCooldown <= 0 && this.controls.shoot) {
         if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
@@ -240,7 +246,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     points += this.sitesVisited * pointsForReachingSite;
 
     // Points for approaching the last site
-    points += pointsForReachingSite * (1 - this.distanceToTargetSite);
+    points += pointsForReachingSite * (1 - this.smallestDistanceToTargetSite);
 
     // High penalty for running backwards
     const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.3 : 0;

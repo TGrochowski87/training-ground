@@ -20,6 +20,8 @@ import DummyPlayer from "./dummyPlayer";
 import DummyControls from "mechanics/dummyControls";
 
 abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
+  readonly rewardForReachingSite: number = 30;
+
   brain: NN;
   sensor: Sensor;
   controls: EnemyControls;
@@ -34,7 +36,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   currentTargetSiteSequenceIndex: number;
 
   // Fitness components
-  sitesVisited: number = 0;
+  pointsForVisitedSites: number = 0;
+  properDirectionCounter: number = 0;
+  wrongDirectionCounter: number = 0;
   needlessShots: number = 0;
   justifiedShots: number = 0;
   playerWasSpottedAtAll: boolean = false;
@@ -80,7 +84,12 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       this.updatePlayerPositionInfo();
 
       if (this.isSiteReached()) {
-        this.sitesVisited++;
+        this.pointsForVisitedSites +=
+          (this.rewardForReachingSite * this.properDirectionCounter) /
+          (this.properDirectionCounter + this.wrongDirectionCounter);
+        this.properDirectionCounter = 0;
+        this.wrongDirectionCounter = 0;
+
         this.lastSitePosition = this.currentSitePosition;
         this.currentSitePosition = TargetSiteDealer.getNextTargetSite(this.currentTargetSiteSequenceIndex);
         this.currentTargetSiteSequenceIndex++;
@@ -154,6 +163,12 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         if (angleBetween < Math.PI / 2) {
           siteApproachingValue = targetSiteDirectionVector.scalarProduct(displacementVector) / Math.pow(playerSpeed, 2);
         }
+      }
+
+      if (siteApproachingValue >= 5.0) {
+        this.properDirectionCounter++;
+      } else {
+        this.wrongDirectionCounter++;
       }
 
       const neuralNetInputs = this.look(walls, player);
@@ -236,17 +251,19 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   };
 
   calculateFitness = () => {
-    const pointsForReachingSite: number = 20;
     const pointsForJustifiedShots: number = 0.05;
     const negativePointsForNeedlessShots: number = 0.05;
     const pointsForShotsAtPlayer: number = 1;
     let points: number = 0;
 
     // Points for every reached site
-    points += this.sitesVisited * pointsForReachingSite;
+    points += this.pointsForVisitedSites;
 
     // Points for approaching the last site
-    points += pointsForReachingSite * (1 - this.smallestDistanceToTargetSite);
+    const pointsForApproachingSite = this.rewardForReachingSite * (1 - this.smallestDistanceToTargetSite);
+    points +=
+      pointsForApproachingSite *
+      (this.properDirectionCounter / (this.properDirectionCounter + this.wrongDirectionCounter));
 
     // High penalty for running backwards
     const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.3 : 0;

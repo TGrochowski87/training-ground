@@ -165,7 +165,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         }
       }
 
-      if (siteApproachingValue >= 5.0) {
+      if (siteApproachingValue >= 0.5) {
         this.properDirectionCounter++;
       } else {
         this.wrongDirectionCounter++;

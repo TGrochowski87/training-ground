@@ -124,7 +124,7 @@ class PopulationConventional extends Population {
     for (let i = 0; i < this.members.length; i++) {
       runningSum += this.members[i].fitness;
 
-      if (runningSum > rand) {
+      if (runningSum >= rand) {
         return this.members[i];
       }
     }

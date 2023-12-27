@@ -85,7 +85,7 @@ class NeuralNetworkConventional extends NeuralNetwork {
     }
     let a = document.createElement("a") as HTMLAnchorElement;
     a.href = window.URL.createObjectURL(new Blob([stringRepresentation], { type: "text/plain" }));
-    a.download = `brain-conventional-g${generation}-f${fitness}.txt`;
+    a.download = `brain-conventional-f${fitness}-g${generation}.txt`;
     document.body.append(a);
     a.click();
     document.body.removeChild(a);

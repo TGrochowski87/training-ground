@@ -409,7 +409,7 @@ class NeuralNetworkNEAT extends NeuralNetwork {
 
     let a = document.createElement("a") as HTMLAnchorElement;
     a.href = window.URL.createObjectURL(new Blob([stringRepresentation], { type: "text/plain" }));
-    a.download = `brain-NEAT-g${generation}-s${speciesId}-f${fitness}.txt`;
+    a.download = `brain-NEAT-f${fitness}-g${generation}-s${speciesId}.txt`;
     document.body.append(a);
     a.click();
     document.body.removeChild(a);

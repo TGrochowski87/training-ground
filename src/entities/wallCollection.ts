@@ -21,7 +21,7 @@ class WallCollection {
       new Wall(new Vector2D(gameScreenWidth / 2, (gameScreenHeight * 1) / 4), "DOWN", 150),
       new Wall(new Vector2D(gameScreenWidth / 2, (gameScreenHeight * 3) / 4 - 100), "UP", 150),
       new Wall(new Vector2D(0, (gameScreenHeight * 3) / 4 - 30), "RIGHT", 150),
-      new Wall(new Vector2D(gameScreenWidth, (gameScreenHeight * 3) / 4 - 30), "LEFT", 100),
+      new Wall(new Vector2D(gameScreenWidth, (gameScreenHeight * 3) / 4 - 30), "LEFT", 250),
       new Wall(new Vector2D(100, (gameScreenHeight * 1) / 4), "RIGHT", 100),
       new Wall(new Vector2D(gameScreenWidth - 200, (gameScreenHeight * 1) / 4), "RIGHT", 200),
       new Wall(new Vector2D(gameScreenWidth / 2, gameScreenHeight), "UP", 50),

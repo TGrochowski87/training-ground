@@ -58,10 +58,10 @@ export const resourcesScenario3: ScenarioResources = {
     new Wall(new Vector2D(5, scenario3FieldSize.y), "UP", scenario3FieldSize.y),
 
     // Obstacles
-    new Wall(new Vector2D(350, 0), "DOWN", scenario3FieldSize.y - 100),
-    new Wall(new Vector2D(700, 100), "DOWN", scenario3FieldSize.y - 100),
-    new Wall(new Vector2D(1050, 0), "DOWN", scenario3FieldSize.y - 100),
-    new Wall(new Vector2D(1400, 100), "DOWN", scenario3FieldSize.y - 100),
+    new Wall(new Vector2D(350, 100), "DOWN", scenario3FieldSize.y - 100),
+    new Wall(new Vector2D(700, 0), "DOWN", scenario3FieldSize.y - 100),
+    new Wall(new Vector2D(1050, 100), "DOWN", scenario3FieldSize.y - 100),
+    new Wall(new Vector2D(1400, 0), "DOWN", scenario3FieldSize.y - 100),
   ],
   fieldSize: scenario3FieldSize,
   lifespan: 3000,

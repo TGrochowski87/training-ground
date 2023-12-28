@@ -101,12 +101,12 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
             throw Error("Lifetime must be provided to enemy's update while training.");
           }
 
+          player.position =
+            TargetSiteDealer.dummyDisplacementSequence[Math.floor(this.currentTargetSiteSequenceIndex / 3) - 1];
           if (lifetime >= timeWhenDummiesStartMoving) {
-            player.position = this.currentSitePosition.add(new Vector2D(60, 0));
             (player.controls as DummyControls).go();
-          } else {
-            player.position = this.currentSitePosition;
           }
+
           player.angle = 0;
           player.isDead = false;
         }

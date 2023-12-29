@@ -116,6 +116,32 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.smallestDistanceToTargetSite = this.distanceToTargetSite;
       }
 
+      let siteApproachingValue: number = 0;
+      if (this.controls.forward || this.controls.backward) {
+        const targetSiteDirectionVector: Vector2D = new Vector2D(
+          this.currentSitePosition.x - this.position.x,
+          this.currentSitePosition.y - this.position.y
+        ).setMagnitude(4);
+
+        const displacementVector: Vector2D = this.controls.forward
+          ? new Vector2D(0, -playerSpeed).rotate(this.angle)
+          : new Vector2D(0, playerSpeed).rotate(this.angle);
+
+        const angleBetween: number = targetSiteDirectionVector.angleBetween(displacementVector);
+        if (angleBetween < Math.PI / 2) {
+          siteApproachingValue = targetSiteDirectionVector.scalarProduct(displacementVector) / Math.pow(playerSpeed, 2);
+        }
+      }
+
+      if (siteApproachingValue >= 0.5) {
+        this.properDirectionCounter++;
+      } else {
+        this.wrongDirectionCounter++;
+      }
+
+      const neuralNetInputs = this.look(walls, player);
+      this.think([...neuralNetInputs, siteApproachingValue]);
+
       if (this.currentWeaponCooldown <= 0 && this.controls.shoot) {
         if (this.playerSpottedOnSensors.every(x => x == 0.0)) {
           this.needlessShots++;
@@ -148,31 +174,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.rightCounter++;
       }
 
-      let siteApproachingValue: number = 0;
-      if (this.controls.forward || this.controls.backward) {
-        const targetSiteDirectionVector: Vector2D = new Vector2D(
-          this.currentSitePosition.x - this.position.x,
-          this.currentSitePosition.y - this.position.y
-        ).setMagnitude(4);
-
-        const displacementVector: Vector2D = this.controls.forward
-          ? new Vector2D(0, -playerSpeed).rotate(this.angle)
-          : new Vector2D(0, playerSpeed).rotate(this.angle);
-
-        const angleBetween: number = targetSiteDirectionVector.angleBetween(displacementVector);
-        if (angleBetween < Math.PI / 2) {
-          siteApproachingValue = targetSiteDirectionVector.scalarProduct(displacementVector) / Math.pow(playerSpeed, 2);
-        }
-      }
-
-      if (siteApproachingValue >= 0.5) {
-        this.properDirectionCounter++;
-      } else {
-        this.wrongDirectionCounter++;
-      }
-
-      const neuralNetInputs = this.look(walls, player);
-      this.think([...neuralNetInputs, siteApproachingValue]);
       this.move(this.controls, walls);
       this.aimRay.update(this.position.add(gunPointOffset.rotate(this.angle)), this.angle, walls, player);
     }
@@ -293,6 +294,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     const pacifismPenalty = this.playerWasSpottedAtAll && this.justifiedShots == 0 && this.needlessShots == 0 ? 0.3 : 0;
     points *= 1 - pacifismPenalty;
 
+    debugger;
     this.fitness = points > 0 ? points : 0;
   };
 

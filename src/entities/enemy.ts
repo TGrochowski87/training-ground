@@ -35,6 +35,8 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   lastSitePosition: Vector2D; // Initially set to spawn position.
   currentTargetSiteSequenceIndex: number;
 
+  explorationHistory: [number, number][] = [];
+
   // Fitness components
   pointsForVisitedSites: number = 0;
   properDirectionCounter: number = 0;
@@ -87,6 +89,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
         this.pointsForVisitedSites +=
           (this.rewardForReachingSite * this.properDirectionCounter) /
           (this.properDirectionCounter + this.wrongDirectionCounter);
+        this.explorationHistory.push([this.properDirectionCounter, this.wrongDirectionCounter]);
         this.properDirectionCounter = 0;
         this.wrongDirectionCounter = 0;
 

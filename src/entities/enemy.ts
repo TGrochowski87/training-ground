@@ -297,7 +297,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     const pacifismPenalty = this.playerWasSpottedAtAll && this.justifiedShots == 0 && this.needlessShots == 0 ? 0.3 : 0;
     points *= 1 - pacifismPenalty;
 
-    debugger;
     this.fitness = points > 0 ? points : 0;
   };
 

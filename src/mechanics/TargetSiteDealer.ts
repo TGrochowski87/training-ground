@@ -13,7 +13,6 @@ class TargetSiteDealer {
   // Static constructor
   public static initialize(sites: Vector2D[], specialInitialSequence?: number[]) {
     if (specialInitialSequence?.some(x => x > sites.length - 1)) {
-      debugger;
       throw Error("Provided initial sequences contains out of range indexes.");
     }
 

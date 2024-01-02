@@ -43,7 +43,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   needlessShots: number = 0;
   justifiedShots: number = 0;
   playerWasSpottedAtAll: boolean = false;
-  shotsAtPlayer: number = 0;
+  accurateShots: number = 0;
   shotsWithoutReachingNextSite: number = 0;
   playerShotCounter: number = 0;
   playerIgnoredCounter: number = 0;
@@ -155,7 +155,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
           const playerResultPos = new Vector2D(x, y).add(this.position);
 
           if (playerResultPos.y < this.position.y && Math.abs(playerResultPos.x - this.position.x) <= 30) {
-            this.shotsAtPlayer++;
+            this.accurateShots++;
           } else {
             this.justifiedShots++;
           }
@@ -269,6 +269,21 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       pointsForApproachingSite *
       (this.properDirectionCounter / (this.properDirectionCounter + this.wrongDirectionCounter));
 
+    // Slight boost for shooting when the player is spotted
+    points += pointsForJustifiedShots * this.justifiedShots;
+
+    // Bigger boost for shooting at player
+    points += pointsForShotsAtPlayer * this.accurateShots;
+
+    // Penalty for needless shooting
+    points -= Math.pow(this.needlessShots, 2) * negativePointsForNeedlessShots;
+
+    // Big boost for shooting the player
+    points *= 1 + 0.2 * this.playerShotCounter;
+
+    // Penalty for ignoring the player
+    points *= Math.max(0, 1 - 0.05 * this.playerIgnoredCounter);
+
     // High penalty for running backwards
     const runningBackwardsPenalty = this.backwardCounter > this.forwardCounter ? 0.3 : 0;
     points *= 1 - runningBackwardsPenalty;
@@ -277,21 +292,6 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     const runningInCirclesPenalty =
       this.rightCounter > 0.8 * this.forwardCounter || this.leftCounter > 0.8 * this.forwardCounter ? 0.3 : 0;
     points *= 1 - runningInCirclesPenalty;
-
-    // Penalty for needless shooting
-    points -= Math.pow(this.needlessShots, 2) * negativePointsForNeedlessShots;
-
-    // Slight boost for shooting when the player is spotted
-    points += pointsForJustifiedShots * this.justifiedShots;
-
-    // Bigger boost for shooting at player
-    points += pointsForShotsAtPlayer * this.shotsAtPlayer;
-
-    // Big boost for shooting the player
-    points *= 1 + 0.2 * this.playerShotCounter;
-
-    // Penalty for ignoring the player
-    points *= Math.max(0, 1 - 0.05 * this.playerIgnoredCounter);
 
     // High penalty for not shooting at all
     const pacifismPenalty = this.playerWasSpottedAtAll && this.justifiedShots == 0 && this.needlessShots == 0 ? 0.3 : 0;

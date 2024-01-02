@@ -35,10 +35,9 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   lastSitePosition: Vector2D; // Initially set to spawn position.
   currentTargetSiteSequenceIndex: number;
 
-  explorationHistory: [number, number][] = [];
+  explorationRecord: [properDirectionCount: number, wrongDirectionCount: number][] = [];
 
   // Fitness components
-  pointsForVisitedSites: number = 0;
   properDirectionCounter: number = 0;
   wrongDirectionCounter: number = 0;
   needlessShots: number = 0;
@@ -86,10 +85,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
       this.updatePlayerPositionInfo();
 
       if (this.isSiteReached()) {
-        this.pointsForVisitedSites +=
-          (this.rewardForReachingSite * this.properDirectionCounter) /
-          (this.properDirectionCounter + this.wrongDirectionCounter);
-        this.explorationHistory.push([this.properDirectionCounter, this.wrongDirectionCounter]);
+        this.explorationRecord.push([this.properDirectionCounter, this.wrongDirectionCounter]);
         this.properDirectionCounter = 0;
         this.wrongDirectionCounter = 0;
 
@@ -255,13 +251,17 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
   };
 
   calculateFitness = () => {
+    const rewardForReachingSite: number = 30;
     const pointsForJustifiedShots: number = 0.05;
     const negativePointsForNeedlessShots: number = 0.05;
     const pointsForShotsAtPlayer: number = 1;
     let points: number = 0;
 
     // Points for every reached site
-    points += this.pointsForVisitedSites;
+    points += this.explorationRecord.reduce(
+      (prev, current) => prev + (rewardForReachingSite * current[0]) / (current[0] + current[1]),
+      0
+    );
 
     // Points for approaching the last site
     const pointsForApproachingSite = this.rewardForReachingSite * (1 - this.smallestDistanceToTargetSite);

@@ -57,7 +57,7 @@ const speciesSelectionContainer: HTMLDivElement = document.getElementById("speci
 speciesSelectionContainer.style.width = `${gameScreenWidth}px`;
 const speciesNumberInfo: HTMLHeadingElement = document.getElementById("species-number-info") as HTMLHeadingElement;
 const showSelectedCheckbox: HTMLInputElement = document.getElementById("show-only-selected") as HTMLInputElement;
-const speciesSelectionButtons: HTMLButtonElement[] = [];
+let speciesSelectionButtons: Map<number, HTMLButtonElement> = new Map();
 let selectedSpeciesId: number = 0;
 if (methodString == "NEAT") {
   prepareNEATControls();
@@ -94,10 +94,6 @@ function manageGameCanvas(time: number) {
 
     if (methodString == "NEAT") {
       updateButtons();
-      const highestSpeciesId = Math.max(...(population as PopulationNEAT).population.map(s => s.id));
-      for (let i = speciesSelectionButtons.length; i <= highestSpeciesId; i++) {
-        addNewSpeciesButton(i);
-      }
     }
   }
 
@@ -180,23 +176,31 @@ function addNewSpeciesButton(id: number) {
   };
 
   speciesSelectionContainer.appendChild(button);
-  speciesSelectionButtons[id] = button;
+  speciesSelectionButtons.set(id, button);
 }
 
 const updateButtons = () => {
-  for (let i = 0; i < speciesSelectionButtons.length; i++) {
-    if ((population as PopulationNEAT).population.some(s => s.id == i) == false) {
-      speciesSelectionButtons[i].disabled = true;
+  const aliveSpeciesIds: number[] = (population as PopulationNEAT).population.map(s => s.id);
+  const buttonsToRemove = Array.from(speciesSelectionButtons.keys()).filter(
+    id => aliveSpeciesIds.includes(id) == false
+  );
+
+  for (const id of buttonsToRemove) {
+    speciesSelectionContainer.removeChild(speciesSelectionButtons.get(id)!);
+    speciesSelectionButtons.delete(id);
+  }
+
+  const currentButtons: number[] = Array.from(speciesSelectionButtons.keys());
+
+  for (const id of aliveSpeciesIds) {
+    if (currentButtons.includes(id) == false) {
+      addNewSpeciesButton(id);
     }
   }
 
-  if (speciesSelectionButtons[selectedSpeciesId].disabled) {
-    for (let i = 0; i < speciesSelectionButtons.length; i++) {
-      if (speciesSelectionButtons[i].disabled == false) {
-        selectedSpeciesId = i;
-        speciesNumberInfo.textContent = `Selected species: ${selectedSpeciesId}`;
-      }
-    }
+  if (buttonsToRemove.includes(selectedSpeciesId)) {
+    selectedSpeciesId = currentButtons[0];
+    speciesNumberInfo.textContent = `Selected species: ${selectedSpeciesId}`;
   }
 };
 

@@ -19,10 +19,18 @@ export const resourcesScenario1: ScenarioResources = {
     new Wall(new Vector2D(gameScreenWidth, gameScreenHeight - 5), "LEFT", gameScreenWidth),
     new Wall(new Vector2D(5, gameScreenHeight), "UP", gameScreenHeight),
 
-    // Around the player
+    // Around the sector
     new Wall(new Vector2D(gameScreenWidth / 2 - 100, (gameScreenHeight * 3) / 4 - 100), "RIGHT", 200),
     new Wall(new Vector2D(gameScreenWidth / 2 - 100, (gameScreenHeight * 3) / 4 - 100), "DOWN", 200),
     new Wall(new Vector2D(gameScreenWidth / 2 + 100, (gameScreenHeight * 3) / 4 - 100), "DOWN", 200),
+
+    new Wall(new Vector2D(gameScreenWidth / 2, (gameScreenHeight * 1) / 4), "DOWN", 150),
+    new Wall(new Vector2D(gameScreenWidth / 2, (gameScreenHeight * 3) / 4 - 100), "UP", 150),
+    new Wall(new Vector2D(0, (gameScreenHeight * 3) / 4 - 30), "RIGHT", 150),
+    new Wall(new Vector2D(gameScreenWidth, (gameScreenHeight * 3) / 4 - 30), "LEFT", 100),
+    new Wall(new Vector2D(100, (gameScreenHeight * 1) / 4), "RIGHT", 100),
+    new Wall(new Vector2D(gameScreenWidth - 200, (gameScreenHeight * 1) / 4), "RIGHT", 200),
+    new Wall(new Vector2D(gameScreenWidth / 2, gameScreenHeight), "UP", 50),
   ],
   fieldSize: new Vector2D(gameScreenWidth, gameScreenHeight),
   lifespan: 5000,
@@ -40,12 +48,12 @@ export const resourcesScenario2: ScenarioResources = {
     new Wall(new Vector2D(5, scenario2FieldSize.y), "UP", scenario2FieldSize.y),
   ],
   fieldSize: scenario2FieldSize,
-  lifespan: 3000,
+  lifespan: 2000,
   sites: [
     new Vector2D(100, scenario2FieldSize.y / 2),
     new Vector2D(scenario2FieldSize.x - 100, scenario2FieldSize.y / 2),
   ],
-  dummyPos: new Vector2D(scenario2FieldSize.x - 100, scenario2FieldSize.y / 2),
+  dummyPos: new Vector2D(scenario2FieldSize.x - 300, scenario2FieldSize.y / 2),
 };
 
 const scenario3FieldSize: Vector2D = new Vector2D(1600, 300);
@@ -64,12 +72,12 @@ export const resourcesScenario3: ScenarioResources = {
     new Wall(new Vector2D(1400, 0), "DOWN", scenario3FieldSize.y - 100),
   ],
   fieldSize: scenario3FieldSize,
-  lifespan: 3000,
+  lifespan: 2000,
   sites: [
     new Vector2D(100, scenario3FieldSize.y / 2),
     new Vector2D(scenario3FieldSize.x - 100, scenario3FieldSize.y / 2),
   ],
-  dummyPos: new Vector2D(scenario3FieldSize.x - 100, scenario3FieldSize.y / 2),
+  dummyPos: new Vector2D(scenario3FieldSize.x - 300, 100),
 };
 
 const scenario4FieldSize: Vector2D = new Vector2D(800, 800);
@@ -88,7 +96,7 @@ export const resourcesScenario4: ScenarioResources = {
     new Wall(new Vector2D(200, 600), "UP", scenario4FieldSize.y - 450),
   ],
   fieldSize: scenario4FieldSize,
-  lifespan: 3000,
+  lifespan: 2000,
   sites: [
     new Vector2D(100, 100),
     new Vector2D(scenario4FieldSize.x - 100, 100),
@@ -96,5 +104,5 @@ export const resourcesScenario4: ScenarioResources = {
     new Vector2D(100, scenario4FieldSize.y - 100),
     new Vector2D(100, 350),
   ],
-  dummyPos: new Vector2D(100, 350),
+  dummyPos: new Vector2D(300, 650),
 };

@@ -20,8 +20,6 @@ import DummyPlayer from "./dummyPlayer";
 import DummyControls from "mechanics/dummyControls";
 
 abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
-  readonly rewardForReachingSite: number = 30;
-
   brain: NN;
   sensor: Sensor;
   controls: EnemyControls;
@@ -264,7 +262,7 @@ abstract class Enemy<NN extends NeuralNetwork> extends Fighter {
     );
 
     // Points for approaching the last site
-    const pointsForApproachingSite = this.rewardForReachingSite * (1 - this.smallestDistanceToTargetSite);
+    const pointsForApproachingSite = rewardForReachingSite * (1 - this.smallestDistanceToTargetSite);
     points +=
       pointsForApproachingSite *
       (this.properDirectionCounter / (this.properDirectionCounter + this.wrongDirectionCounter));

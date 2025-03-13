@@ -2,7 +2,7 @@
 
 This project is a platform for training neural networks and testing their abilities and efficiency in playing a 2D shooter game.
 
-Yes, this is a neural network training environment written in JavaScript and it is designed to be run in the browser! Also, notice that there are no functional dependencies in package.json file. Everything here is built from scratch.
+Yes, this is a neural network training environment written in TypeScript and it is designed to be run in the browser! Also, notice that there are no functional dependencies in package.json file. Everything here is built from scratch.
 
 ## Project's goal
 

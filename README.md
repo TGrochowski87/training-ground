@@ -10,7 +10,7 @@ The goal was to compare performance of two neural networks, trained with a diffe
 
 ## Game rules
 
-The game is very simple. There are five controls: move forward ⬆️, move backward ⬇️, rotate left ⬅️, rotate right ➡️ and shoot [spacebar].
+The game is very simple. There are five controls: move forward ⬆️, move backward ⬇️, rotate left ⬅️, rotate right ➡️ and shoot `[spacebar]`.
 
 ![alt text](./readme-assets/image-1.png)
 
